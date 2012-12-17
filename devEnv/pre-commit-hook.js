@@ -1,3 +1,5 @@
+
+// TODO: configure nclosure with additional deps
 require('nclosure').nclosure();
 
 var exec = require('child_process').exec,
@@ -101,7 +103,7 @@ function runDepUnitTests(files) {
    var mocha = new Mocha;
    mocha.reporter('dot').ui('bdd');
 
-   goog.array.forEach(allFiles, function(file) {
+  goog.array.forEach(allFiles, function(file) {
     mocha.addFile(path.join('test', file.substr(4)));
   });
 
@@ -124,7 +126,8 @@ function resolveDependencies(files) {
   goog.array.forEach(files, function(file) {
     provides = goog.array.extend(
       provides,
-      goog.object.getKeys(goog.dependencies_.pathToNames[file]));
+      goog.object.getKeys(goog.dependencies_.pathToNames[file])
+    );
   });
 
   while (provides.length) {
