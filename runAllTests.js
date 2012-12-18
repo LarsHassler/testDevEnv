@@ -6,22 +6,19 @@
  * To change this template use File | Settings | File Templates.
  */
 
-var Mocha = require('mocha'),
-  fs = require('fs'),
-  path = require('path');
+var testRunner = require('./devEnv/testRunner.js'),
+    TestRunner = new testRunner.testRunner(),
+    fs = require('fs');
 
-var mocha = new Mocha;
-mocha.reporter('dot').ui('bdd');
-
-fs.readdirSync('test').filter(function(file){
+fs.readdirSync('src').filter(function(file) {
   // Only keep the .js files
   return file.substr(-3) === '.js';
 
-}).forEach(function(file){
+}).forEach(function(file) {
     // Use the method "addFile" to add the file to mocha
-    mocha.addFile(path.join('test', file));
-  });
+    TestRunner.addFiles(file);
+});
 
-mocha.run(function(){
+TestRunner.run(function() {
   console.log('finished');
 });

@@ -1,12 +1,10 @@
 
-// TODO: configure nclosure with additional deps
 require('nclosure').nclosure();
 
 var exec = require('child_process').exec,
+    testRunner = require('./testRunner.js'),
     path = require('path'),
     Mocha = require('mocha');
-
-var sourceFiles = [], testFiles = [];
 
 goog.require('goog.array');
 goog.require('goog.object');
@@ -15,12 +13,15 @@ goog.require('goog.object');
  * gets the changed files from the current commit.
  */
 function getChangedFiles() {
+  console.log('-- getting changes');
   exec('git diff --cached --name-status', function(err, stderr) {
+    var sourceFiles = [], testFiles = [];
+    console.log('-- finished getting changes');
     if (err) {
       console.log('could not found changes');
       process.exit(1);
     }
-          require('./devEnv/test_require.js');
+
     // parse stderr to get file names
     var messages = stderr.split('\n');
 
@@ -33,14 +34,15 @@ function getChangedFiles() {
           else if (data[1].substr(0, 4) === 'src/')
             sourceFiles.push(data[1]);
     });
-    console.log(sourceFiles);
-    if (!sourceFiles.length)
+    if (!sourceFiles.length) {
+      console.log('-- no changes found which need checking');
       proccess.exit(0);
+    }
 
-    process.exit(1);
-
+    console.log('-- start check for testfiles');
     checkForTests(sourceFiles, testFiles);
 
+    console.log('-- start gjslint');
     gjslint(sourceFiles, testFiles);
   });
 }
@@ -60,13 +62,17 @@ function checkForTests(files, testFiles) {
  * @param {Array.<string>} testFiles the commited testFiles.
  */
 function gjslint(srcFiles, testFiles) {
-  exec('gjslint ' + srcFiles.join(' ') + testFiles.join(' '),
+  console.log('gjslint ' + srcFiles.join(' ') + ' ' + testFiles.join(' '));
+  exec('gjslint ' + srcFiles.join(' ') + ' ' + testFiles.join(' '),
     function(err, stderr) {
+      console.log('-- finished gjslint');
+      console.log(err);
       if (err) {
         console.log(stderr);
         process.exit(1);
       }
 
+      console.log('-- start unittests');
       runUnitTests(srcFiles);
     }
   );
@@ -77,17 +83,14 @@ function gjslint(srcFiles, testFiles) {
  * @param {Array.<string>} files the commited files.
  */
 function runUnitTests(files) {
-  var mocha = new Mocha;
-  mocha.reporter('dot').ui('bdd');
+  var TestRunner = new testRunner.testRunner()
   goog.array.forEach(files, function(file) {
-    mocha.addFile(path.join('test', file.substr(4)));
+    TestRunner.addFiles(file.substr(4));
   });
 
-  mocha.run(function(err) {
-    if (err)
-      process.exit(err);
-
-    runDepUnitTests(files);
+  TestRunner.run(function(err) {
+    console.log('-- finished unittests');
+    process.exit(err);
   });
 }
 
@@ -147,4 +150,4 @@ function resolveDependencies(files) {
   return collectedFiles;
 }
 
-getChangedFiles();
+exports.run = getChangedFiles;

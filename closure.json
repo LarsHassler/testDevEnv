@@ -1,0 +1,3 @@
+{
+  additionalDeps: ['remobidDeps.js']
+}
