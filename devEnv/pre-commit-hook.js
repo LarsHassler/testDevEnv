@@ -34,7 +34,7 @@ function getChangedFiles() {
           else if (data[1].substr(0, 4) === 'src/')
             sourceFiles.push(data[1]);
     });
-    if (!sourceFiles.length) {
+    if (!sourceFiles.length && !testFiles.length) {
       console.log('-- no changes found which need checking');
       process.exit(0);
     }
