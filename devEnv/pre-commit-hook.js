@@ -9,6 +9,8 @@ var exec = require('child_process').exec,
 goog.require('goog.array');
 goog.require('goog.object');
 
+console.log(process.env);
+process.exit(0);
 /**
  * gets the changed files from the current commit.
  */
