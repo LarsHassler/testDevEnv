@@ -18,6 +18,8 @@ function getChangedFiles() {
     var sourceFiles = [], testFiles = [];
     console.log('-- finished getting changes');
     if (err) {
+      console.log(err);
+      console.log(stderr);
       console.log('could not found changes');
       process.exit(1);
     }
@@ -65,6 +67,8 @@ function gjslint(srcFiles, testFiles) {
   exec('gjslint ' + srcFiles.join(' ') + ' ' + testFiles.join(' '),
     function(err, stderr) {
       if (err) {
+        if(!stderr)
+          console.log(err);
         console.log(stderr);
         process.exit(1);
       }

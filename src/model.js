@@ -12,7 +12,7 @@ goog.require('goog.events.EventTarget');
 
 /**
  *
- * @param {string=} opt_name
+ * @param {string=} opt_name optinal name for the model.
  * @constructor
  * @extends {goog.events.EventTarget}
  */
@@ -27,7 +27,7 @@ remobid.Model = function(opt_name) {
 goog.inherits(remobid.Model, goog.events.EventTarget);
 
 /**
- * @return {string}
+ * @return {string} name of the model.
  */
 remobid.Model.prototype.getName = function() {
   return this.name_;
