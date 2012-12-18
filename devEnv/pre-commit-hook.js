@@ -36,7 +36,7 @@ function getChangedFiles() {
     });
     if (!sourceFiles.length) {
       console.log('-- no changes found which need checking');
-      proccess.exit(0);
+      process.exit(0);
     }
 
     console.log('-- start check for testfiles');
