@@ -13,7 +13,7 @@ describe('remobid.Model', function() {
 
     it('should set name to test if no name was given', function() {
       var Model = new remobid.Model();
-      assertEquals(Model.getName(),'atest');
+      assertEquals(Model.getName(),'abtest');
     });
   });
 
