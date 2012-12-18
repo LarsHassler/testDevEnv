@@ -53,7 +53,7 @@ function getChangedFiles() {
  * @param {Array.<string>} testFiles the commited test files.
  */
 function checkForTests(files, testFiles) {
-  // process.exit(1); if test files don't exist
+  //process.exit(1); if test files don't exist
 }
 
 /**
@@ -62,11 +62,8 @@ function checkForTests(files, testFiles) {
  * @param {Array.<string>} testFiles the commited testFiles.
  */
 function gjslint(srcFiles, testFiles) {
-  console.log('gjslint ' + srcFiles.join(' ') + ' ' + testFiles.join(' '));
   exec('gjslint ' + srcFiles.join(' ') + ' ' + testFiles.join(' '),
     function(err, stderr) {
-      console.log('-- finished gjslint');
-      console.log(err);
       if (err) {
         console.log(stderr);
         process.exit(1);
