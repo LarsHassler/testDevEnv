@@ -20,7 +20,7 @@ function getChangedFiles() {
       console.log('could not found changes');
       process.exit(1);
     }
-
+          require('./devEnv/test_require.js');
     // parse stderr to get file names
     var messages = stderr.split('\n');
 
@@ -131,14 +131,14 @@ function resolveDependencies(files) {
   });
 
   while (provides.length) {
-    var namespace = goog.array.pop(provides);
+    var namespace = provides.pop();
     var file = goog.dependencies_.nameToPath[namespace];
     goog.array.insert(collectedFiles.push(file));
     goog.array.forEach(
       goog.object.getKeys(goog.dependencies_.requires[path]),
       function(namespace) {
-        // only include files which are not part of the closure library
-        if (namespace.substr(0, 4) != 'goog')
+        // only include files which are  part of our namespace
+        if (namespace.substr(0, 7) == 'remobid')
           provides.push(namespace);
       }
     );
