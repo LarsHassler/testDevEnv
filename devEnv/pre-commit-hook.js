@@ -15,7 +15,7 @@ goog.require('goog.object');
 function getChangedFiles() {
   console.log('-- getting changes');
   exec('git diff --cached --name-status', function(err, stderr) {
-    var sourceFiles = [], testFiles = [];
+    var sourceFiles = [], testFiles = [], onlyLintFiles = [];
     console.log('-- finished getting changes');
     if (err) {
       console.log(err);
@@ -30,11 +30,14 @@ function getChangedFiles() {
     goog.array.forEach(messages, function(message) {
       var data = message.split('\t');
       if (data[0] != 'D')
-        if (data[1] && data[1].substr(-3) === '.js')
-          if (data[1].substr(0, 5) === 'test/')
-            testFiles.push(data[1]);
-          else if (data[1].substr(0, 4) === 'src/')
-            sourceFiles.push(data[1]);
+        if (data[1])
+          if(data[1].substr(-13) == '_interface.js')
+            onlyLintFiles.push(data[1]);
+          else if(data[1].substr(-3) === '.js')
+            if (data[1].substr(0, 5) === 'test/')
+              testFiles.push(data[1]);
+            else if (data[1].substr(0, 4) === 'src/')
+              sourceFiles.push(data[1]);
     });
     if (!sourceFiles.length && !testFiles.length) {
       console.log('-- no changes found which need checking');
@@ -45,7 +48,7 @@ function getChangedFiles() {
     checkForTests(sourceFiles, testFiles);
 
     console.log('-- start gjslint');
-    gjslint(sourceFiles, testFiles);
+    gjslint(sourceFiles, testFiles, onlyLintFiles);
   });
 }
 
@@ -62,9 +65,11 @@ function checkForTests(files, testFiles) {
  * runs Google Closure Linter for all given files
  * @param {Array.<string>} srcFiles the commited files.
  * @param {Array.<string>} testFiles the commited testFiles.
+ * @param {Array.<string>} additionalFiles the commited additionalFiles.
  */
-function gjslint(srcFiles, testFiles) {
-  exec('gjslint ' + srcFiles.join(' ') + ' ' + testFiles.join(' '),
+function gjslint(srcFiles, testFiles, additionalFiles) {
+  exec('gjslint ' + srcFiles.join(' ') + ' ' + testFiles.join(' ')
+    + ' ' + additionalFiles.join(' '),
     function(err, stderr) {
       if (err) {
         if(!stderr)
