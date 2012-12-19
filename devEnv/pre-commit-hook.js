@@ -31,7 +31,7 @@ function getChangedFiles() {
       var data = message.split('\t');
       if (data[0] != 'D')
         if (data[1])
-          if(data[1].substr(-13) == '_interface.js')
+          if(data[1].substr(-13) == '_interface.js' || data[1].substr(-8) == '_enum.js')
             onlyLintFiles.push(data[1]);
           else if(data[1].substr(-3) === '.js')
             if (data[1].substr(0, 5) === 'test/')
