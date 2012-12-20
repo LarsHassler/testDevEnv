@@ -10,11 +10,30 @@ goog.require('remobid.common.storage.StorageErrorType');
 goog.require('remobid.common.storage.StorageInterface');
 
 /**
+ * @param {string} version Rest version url to the data resource.
+ * @param {string} resourceId identifier for the resource.
  * @constructor
  * @implements {remobid.common.storage.StorageInterface}
  */
-remobid.common.storage.LocalStorage = function() {
+remobid.common.storage.LocalStorage = function(version, resourceId) {
+  /**
+   * reference to window.localStorage
+   * @type {localStorage?}
+   * @private
+   */
   this.storage_ = null;
+  /**
+   * holds the version of the resource
+   * @type {string}
+   * @private
+   */
+  this.version_ = version;
+  /**
+   * holds the identifier of the resource
+   * @type {string}
+   * @private
+   */
+  this.url_ = resourceId;
   /** @preserveTry */
   try {
     /**
@@ -59,7 +78,7 @@ remobid.common.storage.LocalStorage.prototype.store = function(
     if (!goog.isString(data))
       data = goog.json.serialize(data);
     goog.array.forEach(id, function(key) {
-      this.storage_.setItem(key, data);
+      this.storage_.setItem(this.createKey_(key), data);
     }, this);
     callback(null);
   } catch (e) {
@@ -78,11 +97,11 @@ remobid.common.storage.LocalStorage.prototype.load = function(
   if (goog.isArray(id)) {
     results = [];
     for (var i = 0, end = id.length; i < end; i++) {
-      results.push(this.storage_.getItem(id[i]));
+      results.push(this.storage_.getItem(this.createKey_(id[i])));
     }
   }
   else
-    results = this.storage_.getItem(id);
+    results = this.storage_.getItem(this.createKey_(id));
 
   callback(null, results);
 };
@@ -96,7 +115,7 @@ remobid.common.storage.LocalStorage.prototype.delete = function(callback, id) {
     id = [id];
 
   for (var i = 0, end = id.length; i < end; i++)
-    this.storage_.removeItem(id[i]);
+    this.storage_.removeItem(this.createKey_(id[i]));
 
   callback(null);
 };
@@ -135,3 +154,14 @@ remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(
   }
   return validKey;
 };
+
+/**
+ * formats the id into a key using both version and url
+ * @param {string|number} id the id of the resource.
+ * @return {String} the associated key.
+ * @private
+ */
+remobid.common.storage.LocalStorage.prototype.createKey_ = function(id) {
+  return 'rb-' + this.version_ + '-' + this.url_ + '-' + id;
+};
+

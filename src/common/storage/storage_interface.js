@@ -6,7 +6,8 @@ goog.provide('remobid.common.storage.StorageInterface');
 
 /**
  *
- * @param {string} url Rest style url to the data resource.
+ * @param {string} version Rest version url to the data resource.
+ * @param {string} resourceId identifier for the resource.
  * @interface
  */
 remobid.common.storage.StorageInterface = function() {};
@@ -17,9 +18,9 @@ remobid.common.storage.StorageInterface = function() {};
  *    after the action is completed.
  * @param {null|string|number|Array} id single id, set of ids or null for all
  *    entries - maybe filtered by the options.
- * @param {object} opt_option a set of options like
- *    offset
- *    limit.
+ * @param {{offset: number?,
+ *     limit: number?,
+ *     fields: Array.<string>}} opt_option a set of options like
  */
 remobid.common.storage.StorageInterface.prototype.load;
 

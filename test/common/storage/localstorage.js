@@ -15,9 +15,11 @@ goog.require('remobid.common.storage.StorageErrorType');
 
 describe('localstorage', function() {
   var Storage;
+  var s_url = 'users';
+  var s_version = 'v1';
 
   it('should be available in newer browsers', function() {
-    Storage = new remobid.common.storage.LocalStorage();
+    Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
     if (goog.userAgent.WEBKIT && goog.userAgent.isVersion('532.5') ||
       goog.userAgent.GECKO && goog.userAgent.isVersion('1.9.1') ||
       goog.userAgent.IE && goog.userAgent.isVersion('8')) {
@@ -29,7 +31,7 @@ describe('localstorage', function() {
   describe('implemented', function() {
 
     beforeEach(function() {
-      Storage = new remobid.common.storage.LocalStorage();
+      Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
     });
 
     afterEach(function() {
@@ -82,7 +84,8 @@ describe('localstorage', function() {
         var key, data, moreTests = 2,
           cb = function(err) {
             assertNull(err);
-            var stored_data = window.localStorage.getItem(key);
+            var saved_key = 'rb-' + s_version + '-' + s_url + '-' + key;
+            var stored_data = window.localStorage.getItem(saved_key);
             assertEquals(data, stored_data);
             if (!--moreTests)
               done();
@@ -100,12 +103,13 @@ describe('localstorage', function() {
 
     it('should store object data', function(done) {
       if (Storage.isAvailable()) {
-        var key = 'user_2',
+        var key = '2',
           data = {'key' : 1};
         Storage.store(function(err) {
           assertNull(err);
           assertEquals(1, window.localStorage.length);
-          var stored_data = window.localStorage.getItem(key);
+          var saved_key = 'rb-' + s_version + '-' + s_url + '-' + key;
+          var stored_data = window.localStorage.getItem(saved_key);
           assertObjectEquals(data, goog.json.parse(stored_data));
           done();
         }, key, data);
@@ -115,9 +119,10 @@ describe('localstorage', function() {
 
     it('should load a single key as a string', function(done) {
       if (Storage.isAvailable()) {
-        var key = 'user_3',
-           data = 'name_3';
-          window.localStorage.setItem(key, data);
+        var key = '3',
+            data = 'name_3',
+            saved_key = 'rb-' + s_version + '-' + s_url + '-' + key;
+          window.localStorage.setItem(saved_key, data);
           Storage.load(function(err, loadedData) {
             assertNull(err);
             assertEquals(data, loadedData);
@@ -131,10 +136,11 @@ describe('localstorage', function() {
 
     it('should load multiple keys as an array', function(done) {
       if (Storage.isAvailable()) {
-        var keys = ['user_1', 'user_2'],
+        var keys = ['1', '2'],
           data = ['name_1', 'name_2'];
         for (var i = 0, end = keys.length; i < end; i++) {
-          window.localStorage.setItem(keys[i], data[i]);
+          var saved_key = 'rb-' + s_version + '-' + s_url + '-' + keys[i];
+          window.localStorage.setItem(saved_key, data[i]);
         }
         Storage.load(function(err, loadedData) {
           assertNull(err);
@@ -147,15 +153,17 @@ describe('localstorage', function() {
 
     it('should delete a single key', function(done) {
       if (Storage.isAvailable()) {
-        var keys = ['user_1', 'user_2'],
+        var keys = ['1', '2'],
           data = ['name_1', 'name_2'];
         for (var i = 0, end = keys.length; i < end; i++) {
-          window.localStorage.setItem(keys[i], data[i]);
+          var saved_key = 'rb-' + s_version + '-' + s_url + '-' + keys[i];
+          window.localStorage.setItem(saved_key, data[i]);
         }
         Storage.delete(function(err) {
           assertNull(err);
           assertEquals(1, window.localStorage.length);
-          assertEquals(data[1], window.localStorage.getItem(keys[1]));
+          var saved_key = 'rb-' + s_version + '-' + s_url + '-' + keys[1];
+          assertEquals(data[1], window.localStorage.getItem(saved_key));
           done();
         }, keys[0]);
       } else
@@ -164,16 +172,20 @@ describe('localstorage', function() {
 
     it('should delete only given keys', function(done) {
       if (Storage.isAvailable()) {
-        var keys = ['user_1', 'user_2', 'user_3', 'user_4'],
+        var keys = ['1', '2', '3', '4'],
           data = ['name_1', 'name_2', 'name_3', 'name_4'];
         for (var i = 0, end = keys.length; i < end; i++) {
-          window.localStorage.setItem(keys[i], data[i]);
+          var saved_key = 'rb-' + s_version + '-' + s_url + '-' + keys[i];
+          window.localStorage.setItem(saved_key, data[i]);
         }
         Storage.delete(function(err) {
           assertNull(err);
           assertEquals(2, window.localStorage.length);
-          assertEquals(data[1], window.localStorage.getItem(keys[1]));
-          assertEquals(data[3], window.localStorage.getItem(keys[3]));
+          var key_prefix = 'rb-' + s_version + '-' + s_url + '-';
+          assertEquals(data[1],
+            window.localStorage.getItem(key_prefix + keys[1]));
+          assertEquals(data[3],
+            window.localStorage.getItem(key_prefix + keys[3]));
           done();
         }, [keys[0], keys[2]]);
       } else
@@ -182,17 +194,18 @@ describe('localstorage', function() {
   });
 
   describe.skip('load options', function() {
-    it('should only return the filter data', function(done) {
+    it('should only return the fields data', function(done) {
       if (Storage.isAvailable()) {
         var key = 'key',
-          data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12};
-        window.localStorage.setItem(key, goog.json.serialize(data));
+          data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12},
+          data_string = goog.json.serialize(data);
+        window.localStorage.setItem('rb-v1-users' + key, data_string);
         Storage.load(function(err, returnData) {
           assertNull(err);
           var expectedData = {'lastName': 'Doe', 'age': 12};
           assertObjectEquals(expectedData, goog.json.parse(returnData));
           done();
-        }, key, { filter: ['lastName', 'age']});
+        }, key, { fields: ['lastName', 'age']});
       } else
         done();
     });
