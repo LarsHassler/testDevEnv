@@ -78,7 +78,7 @@ describe('localstorage', function() {
     it('should store string data', function(done) {
       if (Storage.isAvailable()) {
         var key, data, moreTests = 2,
-          cb = function(err, returnData) {
+          cb = function(err) {
             assertNull(err);
             var stored_data = window.localStorage.getItem(key);
             assertEquals(data, stored_data);
@@ -167,7 +167,7 @@ describe('localstorage', function() {
         for (var i = 0, end = keys.length; i < end; i++) {
           window.localStorage.setItem(keys[i], data[i]);
         }
-        Storage.delete(function(err, returnData) {
+        Storage.delete(function(err) {
           assertNull(err);
           assertEquals(2, window.localStorage.length);
           assertEquals(data[1], window.localStorage.getItem(keys[1]));

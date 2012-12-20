@@ -67,7 +67,7 @@ remobid.common.storage.LocalStorage.prototype.store = function(
       id = [id];
     if (!goog.isString(data))
       data = goog.json.serialize(data);
-    goog.array.forEach(id, function(key, index) {
+    goog.array.forEach(id, function(key) {
       this.storage_.setItem(key, data);
     }, this);
     callback(null);
@@ -78,7 +78,7 @@ remobid.common.storage.LocalStorage.prototype.store = function(
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.load = function(
-    callback, id, options) {
+    callback, id) {
   var validKey = this.checkValidKey_(id);
 
   if (!validKey) {
@@ -91,9 +91,10 @@ remobid.common.storage.LocalStorage.prototype.load = function(
     return;
   }
 
+  /** @type {string|Array.<string>} */
   var results;
   if (goog.isArray(id)) {
-    var results = [];
+    results = [];
     for (var i = 0, end = id.length; i < end; i++) {
       results.push(this.storage_.getItem(id[i]));
     }
