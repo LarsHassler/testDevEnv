@@ -179,8 +179,21 @@ describe('localstorage', function() {
     });
   });
 
-  describe.skip('load options', function() {
-
+  describe('load options', function() {
+    it('should only return the filter data', function(done) {
+      if (Storage.isAvailable()) {
+        var key = 'key',
+          data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12};
+        window.localStorage.setItem(key, goog.json.serialize(data));
+        Storage.load(function(err, returnData) {
+          assertNull(err);
+          var expectedData = {'lastName': 'Doe', 'age': 12};
+          assertObjectEquals(expectedData, goog.json.parse(returnData));
+          done();
+        }, key, { filter: ['lastName', 'age']});
+      } else
+        done();
+    });
   });
 });
 

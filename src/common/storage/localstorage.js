@@ -39,17 +39,8 @@ remobid.common.storage.LocalStorage.prototype.isAvailable = function() {
 remobid.common.storage.LocalStorage.prototype.store = function(
     callback, id, data) {
 
-  var validKey = this.checkValidKey_(id);
-
-  if (!validKey) {
-    callback(
-      true,
-      {
-        message: remobid.common.storage.StorageErrorType.INVALID_KEY
-      }
-    );
+  if (!this.checkValidKey_(id))
     return;
-  }
 
   // check for missing data
   if (!data) {
@@ -78,18 +69,9 @@ remobid.common.storage.LocalStorage.prototype.store = function(
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.load = function(
-    callback, id) {
-  var validKey = this.checkValidKey_(id);
-
-  if (!validKey) {
-    callback(
-      true,
-      {
-        message: remobid.common.storage.StorageErrorType.INVALID_KEY
-      }
-    );
+    callback, id, options) {
+  if (!this.checkValidKey_(id, callback))
     return;
-  }
 
   /** @type {string|Array.<string>} */
   var results;
@@ -107,17 +89,8 @@ remobid.common.storage.LocalStorage.prototype.load = function(
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.delete = function(callback, id) {
-  var validKey = this.checkValidKey_(id);
-
-  if (!validKey) {
-    callback(
-      true,
-      {
-        message: remobid.common.storage.StorageErrorType.INVALID_KEY
-      }
-    );
-    return;
-  }
+  if (!this.checkValidKey_(id))
+    retrun;
 
   if (!goog.isArray(id))
     id = [id];
@@ -131,10 +104,13 @@ remobid.common.storage.LocalStorage.prototype.delete = function(callback, id) {
 /**
  * checks if a given key is valid
  * @param {string|number|Array.<string>|Array.<number>} key the key to check.
+ * @param {function} errorcallback callback function to use if the key is not
+ *    valid.
  * @return {Boolean} whenever the key is valid or not.
  * @private
  */
-remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(key) {
+remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(
+    key, errorcallback) {
   var validKey = false;
   // check for acceptable id values
   if (goog.isString(key))
@@ -148,6 +124,14 @@ remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(key) {
         validKey = false;
       }
     }
+  }
+  if (!validKey && errorcallback) {
+    callback(
+      true,
+      {
+        message: remobid.common.storage.StorageErrorType.INVALID_KEY
+      }
+    );
   }
   return validKey;
 };

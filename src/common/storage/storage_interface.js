@@ -9,7 +9,7 @@ goog.provide('remobid.common.storage.StorageInterface');
  * @param {string} url Rest style url to the data resource.
  * @interface
  */
-remobid.common.storage.StorageInterface = function(url) {};
+remobid.common.storage.StorageInterface = function() {};
 
 /**
  * loads data for a given id, set of ids or by a filter

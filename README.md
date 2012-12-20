@@ -12,6 +12,7 @@ require('../../devEnv/pre-commit-hook.js').run();
 Git Settings
 ------------
 
+- get git cli autocomplete
 - enable color
 - create aliases
-- change push settings to current brnach only
+- change push settings to current branch only
