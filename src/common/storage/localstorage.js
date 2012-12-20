@@ -39,7 +39,7 @@ remobid.common.storage.LocalStorage.prototype.isAvailable = function() {
 remobid.common.storage.LocalStorage.prototype.store = function(
     callback, id, data) {
 
-  if (!this.checkValidKey_(id))
+  if (!this.checkValidKey_(id, callback))
     return;
 
   // check for missing data
@@ -126,7 +126,7 @@ remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(
     }
   }
   if (!validKey && errorcallback) {
-    callback(
+    errorcallback(
       true,
       {
         message: remobid.common.storage.StorageErrorType.INVALID_KEY
