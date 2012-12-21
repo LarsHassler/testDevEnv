@@ -13,6 +13,18 @@ Git Settings
 ------------
 
 - get git cli autocomplete
-- enable color
+    https://github.com/git/git/tree/master/contrib/completion
+
+- enable color:
+
+    [color]
+        status = auto
+        diff = auto
+        branch = auto
+        interactive = auto
+        ui = true
+
 - create aliases
 - change push settings to current branch only
+
+    git config --global push.default tracking
