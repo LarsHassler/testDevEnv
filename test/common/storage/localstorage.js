@@ -193,17 +193,17 @@ describe('localstorage', function() {
     });
   });
 
-  describe.skip('load options', function() {
+  describe('load options', function() {
     it('should only return the fields data', function(done) {
       if (Storage.isAvailable()) {
         var key = 'key',
           data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12},
           data_string = goog.json.serialize(data);
-        window.localStorage.setItem('rb-v1-users' + key, data_string);
+        window.localStorage.setItem('rb-v1-users-' + key, data_string);
         Storage.load(function(err, returnData) {
           assertNull(err);
           var expectedData = {'lastName': 'Doe', 'age': 12};
-          assertObjectEquals(expectedData, goog.json.parse(returnData));
+          assertObjectEquals(expectedData, returnData);
           done();
         }, key, { fields: ['lastName', 'age']});
       } else

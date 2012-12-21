@@ -6,6 +6,7 @@ goog.provide('remobid.common.storage.LocalStorage');
 
 goog.require('goog.array');
 goog.require('goog.json');
+goog.require('goog.object');
 goog.require('remobid.common.storage.StorageErrorType');
 goog.require('remobid.common.storage.StorageInterface');
 
@@ -88,7 +89,7 @@ remobid.common.storage.LocalStorage.prototype.store = function(
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.load = function(
-    callback, id, options) {
+    callback, id, opt_option) {
   if (!this.checkValidKey_(id, callback))
     return;
 
@@ -97,14 +98,42 @@ remobid.common.storage.LocalStorage.prototype.load = function(
   if (goog.isArray(id)) {
     results = [];
     for (var i = 0, end = id.length; i < end; i++) {
-      results.push(this.storage_.getItem(this.createKey_(id[i])));
+      var data = this.fetchData_(id[i], opt_option);
+      results.push(data);
     }
   }
-  else
-    results = this.storage_.getItem(this.createKey_(id));
+  else {
+    var results = this.fetchData_(id, opt_option);
+  }
 
   callback(null, results);
 };
+
+/**
+ * gets data form localstorage for one given key and applies the given options
+ * @param {string|number} id id of the resource.
+ * @param {object} opt_option optional options which should be applied.
+ * @return {string|object} the filtered data.
+ * @private
+ */
+remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
+    id, opt_option) {
+  var key = this.createKey_(id);
+  var data = this.storage_.getItem(key);
+
+  if (!opt_option) {
+
+  }
+  else if (opt_option.fields) {
+    data = goog.json.parse(data);
+    data = goog.object.filter(data, function(element, index) {
+      return goog.array.contains(opt_option.fields, index);
+    });
+  }
+
+  return data;
+};
+
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.delete = function(callback, id) {
