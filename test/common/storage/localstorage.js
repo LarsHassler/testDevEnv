@@ -107,7 +107,7 @@ describe('localstorage', function() {
           data = {'key' : 1};
         Storage.store(function(err) {
           assertNull(err);
-          assertEquals(1, window.localStorage.length);
+          assertEquals(2, window.localStorage.length);
           var saved_key = 'rb-' + s_version + '-' + s_url + '-' + key;
           var stored_data = window.localStorage.getItem(saved_key);
           assertObjectEquals(data, goog.json.parse(stored_data));
@@ -191,21 +191,92 @@ describe('localstorage', function() {
       } else
         done();
     });
+
+    describe('types', function() {
+      it('should save and return strings', function(done) {
+        if (Storage.isAvailable()) {
+          var key = '1',
+              data = 'string';
+          Storage.store(function(err) {
+            assertNull(err);
+            Storage.load(function(err2, loaded_data) {
+              assertNull(err2);
+              assertTrue(goog.isString(data));
+              assertEquals(data, loaded_data);
+              done();
+            }, key);
+          }, key, data);
+        } else
+          done();
+      });
+
+      it('should save and return numbers', function(done) {
+        if (Storage.isAvailable()) {
+          var key = '1',
+            data = 100;
+          Storage.store(function(err) {
+            assertNull(err);
+            Storage.load(function(err2, loaded_data) {
+              assertNull(err2);
+              assertTrue(goog.isNumber(data));
+              assertEquals(data, loaded_data);
+              done();
+            }, key);
+          }, key, data);
+        } else
+          done();
+      });
+
+      it('should save and return arrays', function(done) {
+        if (Storage.isAvailable()) {
+          var key = '1',
+            data = [100, 102, 205];
+          Storage.store(function(err) {
+            assertNull(err);
+            Storage.load(function(err2, loaded_data) {
+              assertNull(err2);
+              assertTrue(goog.isArray(loaded_data));
+              assertArrayEquals(data, loaded_data);
+              done();
+            }, key);
+          }, key, data);
+        } else
+          done();
+      });
+
+      it('should save and return objects', function(done) {
+        if (Storage.isAvailable()) {
+          var key = '1',
+            data = {key1: 'string', key2: 1, key3: [1, '2']};
+          Storage.store(function(err) {
+            assertNull(err);
+            Storage.load(function(err2, loaded_data) {
+              assertNull(err2);
+              assertTrue(goog.isObject(loaded_data));
+              assertObjectEquals(data, loaded_data);
+              done();
+            }, key);
+          }, key, data);
+        } else
+          done();
+      });
+    });
   });
 
   describe('load options', function() {
     it('should only return the fields data', function(done) {
       if (Storage.isAvailable()) {
         var key = 'key',
-          data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12},
-          data_string = goog.json.serialize(data);
-        window.localStorage.setItem('rb-v1-users-' + key, data_string);
-        Storage.load(function(err, returnData) {
+          data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12};
+        Storage.store(function(err) {
           assertNull(err);
-          var expectedData = {'lastName': 'Doe', 'age': 12};
-          assertObjectEquals(expectedData, returnData);
-          done();
-        }, key, { fields: ['lastName', 'age']});
+          Storage.load(function(err, returnData) {
+            assertNull(err);
+            var expectedData = {'lastName': 'Doe', 'age': 12};
+            assertObjectEquals(expectedData, returnData);
+            done();
+          }, key, { fields: ['lastName', 'age']});
+        }, key, data);
       } else
         done();
     });

@@ -3,6 +3,7 @@
  */
 
 goog.provide('remobid.common.storage.LocalStorage');
+goog.provide('remobid.common.storage.LocalStorage.DataType');
 
 goog.require('goog.array');
 goog.require('goog.json');
@@ -76,15 +77,37 @@ remobid.common.storage.LocalStorage.prototype.store = function(
   try {
     if (!goog.isArray(id))
       id = [id];
-    if (!goog.isString(data))
-      data = goog.json.serialize(data);
     goog.array.forEach(id, function(key) {
-      this.storage_.setItem(this.createKey_(key), data);
+      this.save_(key, data);
     }, this);
-    callback(null);
   } catch (e) {
     callback(true, e);
   }
+  callback(null);
+};
+
+
+/**
+ * saved data and the responding type into localstorage,
+ *    supports number|string|Array|object.
+ * @param {string|number} id the given id to save the data at.
+ * @param {string|number|array|object} data the data to store.
+ * @private
+ */
+remobid.common.storage.LocalStorage.prototype.save_ = function(id, data) {
+  var key = this.createKey_(id);
+  var type = remobid.common.storage.LocalStorage.DataType.STRING;
+  if (goog.isNumber(data)) {
+    type = remobid.common.storage.LocalStorage.DataType.NUMBER;
+    data = '' + data;
+  }
+
+  if (!goog.isString(data)) {
+    type = remobid.common.storage.LocalStorage.DataType.JSON;
+    data = goog.json.serialize(data);
+  }
+  this.storage_.setItem(key + '_t', type);
+  this.storage_.setItem(key, data);
 };
 
 /** @override */
@@ -120,12 +143,17 @@ remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
     id, opt_option) {
   var key = this.createKey_(id);
   var data = this.storage_.getItem(key);
+  var type = this.storage_.getItem(key + '_t');
+
+  if (type == remobid.common.storage.LocalStorage.DataType.NUMBER)
+    data = parseInt(data, 10);
+  else if (type == remobid.common.storage.LocalStorage.DataType.JSON)
+    data = goog.json.parse(data);
 
   if (!opt_option) {
 
   }
   else if (opt_option.fields) {
-    data = goog.json.parse(data);
     data = goog.object.filter(data, function(element, index) {
       return goog.array.contains(opt_option.fields, index);
     });
@@ -143,8 +171,12 @@ remobid.common.storage.LocalStorage.prototype.delete = function(callback, id) {
   if (!goog.isArray(id))
     id = [id];
 
-  for (var i = 0, end = id.length; i < end; i++)
-    this.storage_.removeItem(this.createKey_(id[i]));
+  for (var i = 0, end = id.length; i < end; i++) {
+    var key = this.createKey_(id[i]);
+    this.storage_.removeItem(key);
+    this.storage_.removeItem(key + '_t');
+  }
+
 
   callback(null);
 };
@@ -194,3 +226,11 @@ remobid.common.storage.LocalStorage.prototype.createKey_ = function(id) {
   return 'rb-' + this.version_ + '-' + this.url_ + '-' + id;
 };
 
+
+
+/** @enum {string} */
+remobid.common.storage.LocalStorage.DataType = {
+  NUMBER: 'N',
+  STRING: 'S',
+  JSON: 'J'
+};
