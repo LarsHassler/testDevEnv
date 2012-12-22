@@ -41,7 +41,7 @@ var getSourceFiles = function(dir, done) {
 
 
 (function(){
- getSourceFiles('test', function(err, files){
+ getSourceFiles('test/unit', function(err, files){
    for(var i = 0, len = files.length; i < len; i++)
      TestRunner.addFiles(files[i].substr(5));
    TestRunner.run(function() {

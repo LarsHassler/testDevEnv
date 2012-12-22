@@ -34,7 +34,7 @@ function getChangedFiles() {
           if(data[1].substr(-13) == '_interface.js' || data[1].substr(-8) == '_enum.js')
             onlyLintFiles.push(data[1]);
           else if(data[1].substr(-3) === '.js')
-            if (data[1].substr(0, 5) === 'test/')
+            if (data[1].substr(0, 5) === 'test/unit')
               testFiles.push(data[1]);
             else if (data[1].substr(0, 4) === 'src/')
               sourceFiles.push(data[1]);

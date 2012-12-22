@@ -13,7 +13,7 @@ goog.require('remobid.common.storage.LocalStorage');
 goog.require('remobid.common.storage.StorageErrorType');
 
 
-describe('localstorage', function() {
+describe('Browser - localstorage', function() {
   var Storage;
   var s_url = 'users';
   var s_version = 'v1';
