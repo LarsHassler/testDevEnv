@@ -9,6 +9,26 @@ var exec = require('child_process').exec,
 goog.require('goog.array');
 goog.require('goog.object');
 
+function stashChanges() {
+  console.log('-- stashing not commited changes');
+  exec('git stash -q --keep-index', function(err, stderr) {
+    if (err) {
+      console.log('!!!! could not stash changes');
+    }
+    getChangedFiles();
+  });
+};
+
+function finish(exitCode) {
+  exec('git stash apply', function(err, stderr) {
+    if(err) {
+      console.log(exitCode);
+      process.exit('!!! could not apply stash - check manually !!!');
+    }
+    process.exit(exitCode);
+  });
+};
+
 /**
  * gets the changed files from the current commit.
  */
@@ -21,7 +41,7 @@ function getChangedFiles() {
       console.log(err);
       console.log(stderr);
       console.log('could not found changes');
-      process.exit(1);
+      finish(1);
     }
 
     // parse stderr to get file names
@@ -41,7 +61,7 @@ function getChangedFiles() {
     });
     if (!sourceFiles.length && !testFiles.length) {
       console.log('-- no changes found which need checking');
-      process.exit(0);
+      finish(0);
     }
 
     console.log('-- start check for testfiles');
@@ -58,7 +78,7 @@ function getChangedFiles() {
  * @param {Array.<string>} testFiles the commited test files.
  */
 function checkForTests(files, testFiles) {
-  //process.exit(1); if test files don't exist
+  //finish(1); if test files don't exist
 }
 
 /**
@@ -75,7 +95,7 @@ function gjslint(srcFiles, testFiles, additionalFiles) {
         if(!stderr)
           console.log(err);
         console.log(stderr);
-        process.exit(1);
+        finish(1);
       }
 
       console.log('-- start unittests');
@@ -96,7 +116,7 @@ function runUnitTests(files) {
 
   TestRunner.run(function(err) {
     console.log('-- finished unittests');
-    process.exit(err);
+    finish(err);
   });
 }
 
@@ -118,7 +138,7 @@ function runDepUnitTests(files) {
 
   mocha.run(function(failures) {
     console.log('finished');
-    process.exit(failures);
+    finish(failures);
   });
 
 }
@@ -156,4 +176,4 @@ function resolveDependencies(files) {
   return collectedFiles;
 }
 
-exports.run = getChangedFiles;
+exports.run = stashChanges;
