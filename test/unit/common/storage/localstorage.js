@@ -2,6 +2,7 @@
  * @fileoverview tests for a html5 localstorage engine.
 */
 
+/** @preserveTry */
 try {
   if (require)
     require('nclosure');
@@ -159,7 +160,7 @@ describe('Unit - localstorage', function() {
           var saved_key = 'rb-' + s_version + '-' + s_url + '-' + keys[i];
           window.localStorage.setItem(saved_key, data[i]);
         }
-        Storage.delete(function(err) {
+        Storage.remove(function(err) {
           assertNull(err);
           assertEquals(1, window.localStorage.length);
           var saved_key = 'rb-' + s_version + '-' + s_url + '-' + keys[1];
@@ -178,7 +179,7 @@ describe('Unit - localstorage', function() {
           var saved_key = 'rb-' + s_version + '-' + s_url + '-' + keys[i];
           window.localStorage.setItem(saved_key, data[i]);
         }
-        Storage.delete(function(err) {
+        Storage.remove(function(err) {
           assertNull(err);
           assertEquals(2, window.localStorage.length);
           var key_prefix = 'rb-' + s_version + '-' + s_url + '-';

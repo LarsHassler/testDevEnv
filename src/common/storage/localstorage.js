@@ -106,7 +106,7 @@ remobid.common.storage.LocalStorage.prototype.save_ = function(id, data) {
     type = remobid.common.storage.LocalStorage.DataType.JSON;
     data = goog.json.serialize(data);
   }
-  this.storage_.setItem(key + '_t', type);
+  this.storage_.setItem(key + ':t', type);
   this.storage_.setItem(key, data);
 };
 
@@ -143,7 +143,7 @@ remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
     id, opt_option) {
   var key = this.createKey_(id);
   var data = this.storage_.getItem(key);
-  var type = this.storage_.getItem(key + '_t');
+  var type = this.storage_.getItem(key + ':t');
 
   if (type == remobid.common.storage.LocalStorage.DataType.NUMBER)
     data = parseInt(data, 10);
@@ -164,9 +164,9 @@ remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
 
 
 /** @override */
-remobid.common.storage.LocalStorage.prototype.delete = function(callback, id) {
+remobid.common.storage.LocalStorage.prototype.remove = function(callback, id) {
   if (!this.checkValidKey_(id))
-    retrun;
+    return;
 
   if (!goog.isArray(id))
     id = [id];
@@ -174,7 +174,7 @@ remobid.common.storage.LocalStorage.prototype.delete = function(callback, id) {
   for (var i = 0, end = id.length; i < end; i++) {
     var key = this.createKey_(id[i]);
     this.storage_.removeItem(key);
-    this.storage_.removeItem(key + '_t');
+    this.storage_.removeItem(key + ':t');
   }
 
 

@@ -40,7 +40,7 @@ remobid.common.storage.StorageInterface.prototype.store;
  *    after the action is completed.
  * @param {string|number|Array} id single id, set of ids.
  */
-remobid.common.storage.StorageInterface.prototype.delete;
+remobid.common.storage.StorageInterface.prototype.remove;
 
 /**
  * @return {boolean} whenever the storage engine is a available.
