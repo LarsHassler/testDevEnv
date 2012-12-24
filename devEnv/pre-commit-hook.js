@@ -34,42 +34,46 @@ function finish(exitCode) {
  */
 function getChangedFiles() {
   console.log('-- getting changes');
-  exec('git diff --cached --name-status', function(err, stderr) {
-    var sourceFiles = [], testFiles = [], onlyLintFiles = [];
-    console.log('-- finished getting changes');
-    if (err) {
-      console.log(err);
-      console.log(stderr);
-      console.log('could not found changes');
-      finish(1);
-    }
+  try {
+    exec('git diff --cached --name-status', function(err, stderr) {
+      var sourceFiles = [], testFiles = [], onlyLintFiles = [];
+      console.log('-- finished getting changes');
+      if (err) {
+        console.log(err);
+        console.log(stderr);
+        console.log('could not found changes');
+        finish(1);
+      }
 
-    // parse stderr to get file names
-    var messages = stderr.split('\n');
+      // parse stderr to get file names
+      var messages = stderr.split('\n');
 
-    goog.array.forEach(messages, function(message) {
-      var data = message.split('\t');
-      if (data[0] != 'D')
-        if (data[1])
-          if(data[1].substr(-13) == '_interface.js' || data[1].substr(-8) == '_enum.js')
-            onlyLintFiles.push(data[1]);
-          else if(data[1].substr(-3) === '.js')
-            if (data[1].substr(0, 5) === 'test/unit')
-              testFiles.push(data[1]);
-            else if (data[1].substr(0, 4) === 'src/')
-              sourceFiles.push(data[1]);
+      goog.array.forEach(messages, function(message) {
+        var data = message.split('\t');
+        if (data[0] != 'D')
+          if (data[1])
+            if(data[1].substr(-13) == '_interface.js' || data[1].substr(-8) == '_enum.js')
+              onlyLintFiles.push(data[1]);
+            else if(data[1].substr(-3) === '.js')
+              if (data[1].substr(0, 5) === 'test/unit')
+                testFiles.push(data[1]);
+              else if (data[1].substr(0, 4) === 'src/')
+                sourceFiles.push(data[1]);
+      });
+      if (!sourceFiles.length && !testFiles.length) {
+        console.log('-- no changes found which need checking');
+        finish(0);
+      }
+
+      console.log('-- start check for testfiles');
+      checkForTests(sourceFiles, testFiles);
+
+      console.log('-- start gjslint');
+      gjslint(sourceFiles, testFiles, onlyLintFiles);
     });
-    if (!sourceFiles.length && !testFiles.length) {
-      console.log('-- no changes found which need checking');
-      finish(0);
-    }
-
-    console.log('-- start check for testfiles');
-    checkForTests(sourceFiles, testFiles);
-
-    console.log('-- start gjslint');
-    gjslint(sourceFiles, testFiles, onlyLintFiles);
-  });
+  } catch (e) {
+    finish(e);
+  }
 }
 
 /**
