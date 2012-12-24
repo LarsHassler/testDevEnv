@@ -9,21 +9,16 @@ try {
 }
 
 goog.require('goog.testing.asserts');
-goog.require('remobid.common.cache.localstorage');
+goog.require('remobid.common.cache.Localstorage');
+goog.require('remobid.common.storage.LocalStorage');
 
 describe('Localstorage Cache - UNIT', function () {
-  var storageMock = function() {
+  var storageMock = new goog.testing.Mock(new remobid.common.storage.LocalStorage('v1', 'test'));
 
-    var storage_ = {};
+  it('should only except common datastorage as enginge', function(done) {
+    assertNotThrows(new remobid.common.cache.Localstorage(storageMock));
+    var fakeStorage = {};
+    assertThrows(new remobid.common.cache.Localstorage(fakeStorage));
+  });
 
-    this.store = function(key,data) {
-      storage_[key] = data;
-    };
-    this.remove = function(key) {
-      delete storage_[key];
-    };
-    this.load = function(key) {
-      return storage_[key];
-    }
-  }
 });
