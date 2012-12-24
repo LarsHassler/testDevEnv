@@ -24,6 +24,13 @@ remobid.devEnv.TestRunner = function(var_args) {
   this.srcFiles_ = [];
 
   /**
+   * hold the types of test to run
+   * @type {Array.<String>}
+   * @private
+   */
+  this.testTypes_ = [];
+
+  /**
    * instance of Mocha
    * @type {Mocha}
    */
@@ -47,12 +54,30 @@ remobid.devEnv.TestRunner.prototype.addFiles = function(var_args) {
 };
 
 /**
+ * addes type to run
+ * @param {...string} var_args
+ */
+remobid.devEnv.TestRunner.prototype.addTypes = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var type = arguments[i];
+    if(goog.array.contains(['unit','integration','browser'], type))
+      goog.array.insert(this.testTypes_, type);
+    else
+      throw new Error('unknown test type');
+  }
+};
+
+/**
  * starts the test run
  * @param {Function} callback
  */
 remobid.devEnv.TestRunner.prototype.run = function(callback) {
   goog.array.forEach(this.srcFiles_, function(file) {
-    this.mocha.addFile(path.join('test', file));
+    goog.array.forEach(this.testTypes_, function(type) {
+      var fileName = path.join('test', type, file);
+      if(fs.existsSync(fileName))
+        this.mocha.addFile(fileName);
+    }, this);
   }, this);
 
   this.mocha.run(callback);
