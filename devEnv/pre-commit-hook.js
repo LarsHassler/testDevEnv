@@ -9,6 +9,12 @@ var exec = require('child_process').exec,
 goog.require('goog.array');
 goog.require('goog.object');
 
+
+process.on('uncaughtException', function(err) {
+  console.log(err);
+  finish(1);
+});
+
 function stashChanges() {
   console.log('checking current branch');
   exec('git branch', function(err, stderr) {
@@ -35,12 +41,13 @@ function stashChanges() {
   });
 };
 
-
 function finish(exitCode) {
+  console.log('rearrangine stage with stash pop');
   exec('git stash pop', function(err, stderr) {
     if(err) {
+      console.log('!!! could not apply stash - check manually !!!');
       console.log(exitCode);
-      process.exit('!!! could not apply stash - check manually !!!');
+      process.exit(1);
     }
     process.exit(exitCode);
   });

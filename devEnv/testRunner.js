@@ -4,7 +4,8 @@
 
 require('nclosure').nclosure();
 var Mocha = require('mocha'),
-    path = require('path');
+    path = require('path'),
+    fs = require('fs');
 
 goog.provide('remobid.devEnv.TestRunner');
 
