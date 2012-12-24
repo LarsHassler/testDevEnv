@@ -1,0 +1,15 @@
+{
+	"id": "remobid",
+	"paths": ["src","../c4ms/closure/Library/third_party/closure/goog"],
+	"closure-library" : "../c4ms/closure/Library/closure/goog/",
+	"mode" : "ADVANCED",
+	"level" : "VERBOSE",
+	"pretty-print" : false,
+	"output-charset": "UTF-8",
+    "inputs" : ["test/unit/common/storage/localstorage.js", "test/browser/common/storage/localstorage.js"],
+    "output-file" : "test/browser/common/storage/localstorage_c.js",
+    "experimental-compiler-options": {
+        "sourceMapFormat": "V3"
+    },
+    "externs" : ["node_modules/nclosure/lib/externs.js", "lib/externs/mocha.js"]
+}
