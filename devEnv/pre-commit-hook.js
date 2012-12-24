@@ -109,7 +109,8 @@ function gjslint(srcFiles, testFiles, additionalFiles) {
  * @param {Array.<string>} files the commited files.
  */
 function runUnitTests(files) {
-  var TestRunner = new testRunner.testRunner()
+  var TestRunner = new testRunner.testRunner();
+  TestRunner.addTypes('unit');
   goog.array.forEach(files, function(file) {
     TestRunner.addFiles(file.substr(4));
   });
@@ -118,62 +119,6 @@ function runUnitTests(files) {
     console.log('-- finished unittests');
     finish(err);
   });
-}
-
-/**
- * runs mocha tets for all given files
- * @param {Array.<string>} files the commited files.
- */
-function runDepUnitTests(files) {
-
-  // collect depended test files
-  var allFiles = resolveDependencies(files);
-
-   var mocha = new Mocha;
-   mocha.reporter('dot').ui('bdd');
-
-  goog.array.forEach(allFiles, function(file) {
-    mocha.addFile(path.join('test', file.substr(4)));
-  });
-
-  mocha.run(function(failures) {
-    console.log('finished');
-    finish(failures);
-  });
-
-}
-
-/**
- * collects all files that depend on the given ones
- * @param {Array.<string>} files the commited files.
- * @return {Array.<string>} all files for which the tests need to run.
- */
-function resolveDependencies(files) {
-  var collectedFiles = [];
-  var provides = [];
-
-  goog.array.forEach(files, function(file) {
-    provides = goog.array.extend(
-      provides,
-      goog.object.getKeys(goog.dependencies_.pathToNames[file])
-    );
-  });
-
-  while (provides.length) {
-    var namespace = provides.pop();
-    var file = goog.dependencies_.nameToPath[namespace];
-    goog.array.insert(collectedFiles.push(file));
-    goog.array.forEach(
-      goog.object.getKeys(goog.dependencies_.requires[path]),
-      function(namespace) {
-        // only include files which are  part of our namespace
-        if (namespace.substr(0, 7) == 'remobid')
-          provides.push(namespace);
-      }
-    );
-  }
-
-  return collectedFiles;
 }
 
 exports.run = stashChanges;
