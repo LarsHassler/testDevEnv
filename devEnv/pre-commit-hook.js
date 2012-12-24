@@ -37,7 +37,7 @@ function stashChanges() {
 
 
 function finish(exitCode) {
-  exec('git stash apply', function(err, stderr) {
+  exec('git stash pop', function(err, stderr) {
     if(err) {
       console.log(exitCode);
       process.exit('!!! could not apply stash - check manually !!!');
