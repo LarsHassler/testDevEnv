@@ -10,14 +10,31 @@ goog.require('goog.array');
 goog.require('goog.object');
 
 function stashChanges() {
-  console.log('-- stashing not commited changes');
-  exec('git stash -q --keep-index', function(err, stderr) {
-    if (err) {
-      console.log('!!!! could not stash changes');
+  console.log('checking current branch');
+  exec('git branch', function(err, stderr) {
+    if(err) {
+      console.log('!!! could not get branches');
+      process.exit(1);
     }
-    getChangedFiles();
+
+    console.log('found branches');
+    console.log(stderr);
+    console.log(/\*(\s)master/.test(stderr));
+    if(/\*(\s)master/.test(stderr)) {
+      console.log('not allowed to commit to master')
+      process.exit(1);
+    }
+
+    console.log('-- stashing not commited changes');
+    exec('git stash -q --keep-index', function(err, stderr) {
+      if (err) {
+        process.exit('!!!! could not stash changes');
+      }
+      getChangedFiles();
+    });
   });
 };
+
 
 function finish(exitCode) {
   exec('git stash apply', function(err, stderr) {
