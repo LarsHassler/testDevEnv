@@ -81,7 +81,9 @@ remobid.common.storage.LocalStorage.prototype.store = function(
       this.save_(key, data);
     }, this);
   } catch (e) {
-    callback(true, e);
+    callback(true, {
+      message: remobid.common.storage.StorageErrorType.QUOTA_EXCEEDED
+    });
   }
   callback(null);
 };
