@@ -261,6 +261,23 @@ describe('Unit - localstorage', function() {
         } else
           done();
       });
+
+      it('should save and return Date objects', function(done) {
+        if (Storage.isAvailable()) {
+          var key = '1',
+            data = new Date();
+          Storage.store(function(err) {
+            assertNull(err);
+            Storage.load(function(err2, loaded_data) {
+              assertNull(err2);
+              assertTrue(goog.isDateLike(loaded_data));
+              assertObjectEquals(data, loaded_data);
+              done();
+            }, key);
+          }, key, data);
+        } else
+          done();
+      });
     });
   });
 
