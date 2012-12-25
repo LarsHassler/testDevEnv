@@ -67,6 +67,7 @@ function getChangedFiles() {
         console.log(stderr);
         console.log('could not found changes');
         finish(1);
+        return;
       }
 
       // parse stderr to get file names
@@ -124,6 +125,7 @@ function gjslint(srcFiles, testFiles, additionalFiles) {
           console.log(err);
         console.log(stderr);
         finish(1);
+        return;
       }
 
       console.log('-- start unittests');
