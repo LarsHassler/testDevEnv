@@ -105,4 +105,27 @@ describe('Localstorage Cache - UNIT', function () {
     }, 'key','test');
   });
 
+  it('should remove expired values if Limit reached', function(done) {
+    var org_store = LC.storage_.setItem;
+    var org_clearExpire = LC.clearExpired;
+    LC.setExpireTime(-10);
+    LC.store(function(err) {
+      assertNull(err);
+      LC.storage_.setItem = function() {
+        throw new Error('QUOTA');
+      };
+      LC.clearExpired = function(cb) {
+        LC.storage_.setItem = org_store;
+        org_clearExpire.apply(LC, arguments);
+      };
+      LC.store(function(err) {
+        assertNull(err);
+        assertNull(LC.storage_.getItem('LC-' + version + '-' + url + '-key'));
+        assertEquals('test2',
+          LC.storage_.getItem('LC-' + version + '-' + url + '-key2'));
+        done();
+      }, 'key2', 'test2');
+    }, 'key', 'test');
+  });
+
 });

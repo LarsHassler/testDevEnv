@@ -84,6 +84,7 @@ remobid.common.storage.LocalStorage.prototype.store = function(
     callback(true, {
       message: remobid.common.storage.StorageErrorType.QUOTA_EXCEEDED
     });
+    return;
   }
   callback(null);
 };
