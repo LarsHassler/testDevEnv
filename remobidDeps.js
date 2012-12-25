@@ -5,3 +5,4 @@ goog.addDependency('../../../../../../src/common/cache/localcache.js', ['remobid
 goog.addDependency('../../../../../../src/common/storage/localstorage.js', ['remobid.common.storage.LocalStorage', 'remobid.common.storage.LocalStorage.DataType'], ['goog.array', 'goog.json', 'goog.object', 'remobid.common.storage.StorageErrorType', 'remobid.common.storage.StorageInterface']);
 goog.addDependency('../../../../../../src/common/storage/storageErrorType_enum.js', ['remobid.common.storage.StorageErrorType'], []);
 goog.addDependency('../../../../../../src/common/storage/storage_interface.js', ['remobid.common.storage.StorageInterface'], []);
+goog.addDependency('../../../../../../test/mock/browser/localstorage.js', ['remobid.test.mock.browser.LocalStorage'], ['goog.object']);

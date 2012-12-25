@@ -81,7 +81,10 @@ remobid.common.storage.LocalStorage.prototype.store = function(
       this.save_(key, data);
     }, this);
   } catch (e) {
-    callback(true, e);
+    callback(true, {
+      message: remobid.common.storage.StorageErrorType.QUOTA_EXCEEDED
+    });
+    return;
   }
   callback(null);
 };
@@ -95,7 +98,7 @@ remobid.common.storage.LocalStorage.prototype.store = function(
  * @private
  */
 remobid.common.storage.LocalStorage.prototype.save_ = function(id, data) {
-  var key = this.createKey_(id);
+  var key = this.createKey(id);
   var type = remobid.common.storage.LocalStorage.DataType.STRING;
   if (goog.isNumber(data)) {
     type = remobid.common.storage.LocalStorage.DataType.NUMBER;
@@ -145,7 +148,7 @@ remobid.common.storage.LocalStorage.prototype.load = function(
  */
 remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
     id, opt_option) {
-  var key = this.createKey_(id);
+  var key = this.createKey(id);
   var data = this.storage_.getItem(key);
   var type = this.storage_.getItem(key + ':t');
 
@@ -178,7 +181,7 @@ remobid.common.storage.LocalStorage.prototype.remove = function(callback, id) {
     id = [id];
 
   for (var i = 0, end = id.length; i < end; i++) {
-    var key = this.createKey_(id[i]);
+    var key = this.createKey(id[i]);
     this.storage_.removeItem(key);
     this.storage_.removeItem(key + ':t');
   }
@@ -226,9 +229,9 @@ remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(
  * formats the id into a key using both version and url
  * @param {string|number} id the id of the resource.
  * @return {String} the associated key.
- * @private
+ * @protected
  */
-remobid.common.storage.LocalStorage.prototype.createKey_ = function(id) {
+remobid.common.storage.LocalStorage.prototype.createKey = function(id) {
   return 'rb-' + this.version_ + '-' + this.url_ + '-' + id;
 };
 
