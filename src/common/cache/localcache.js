@@ -8,30 +8,54 @@ goog.require('remobid.common.storage.LocalStorage');
 
 /**
  *
- * @param {remobid.common.storage.StorageInterface=} opt_storage the storage
- *    engine to use for saving.
+ * @param {string} version Rest version url to the data resource.
+ * @param {string} resourceId identifier for the resource.
+ * @extends {remobid.common.storage.LocalStorage}
  * @constructor
  */
-remobid.common.cache.LocalCache = function(opt_storage) {
+remobid.common.cache.LocalCache = function(version, resourceId) {
+  goog.base(version, resourceId);
+
   /**
-   *
-   * @type {?remobid.common.storage.StorageInterface}
+   * time after which the cache should expire in ms.
+   * @type {Number}
    * @private
    */
-  this.storage_ = null;
+  this.expireTime_ = 60 * 60 * 1000;
+};
+goog.inherits(remobid.common.cache.LocalCache,
+  remobid.common.storage.LocalStorage);
 
-  if (opt_storage)
-    this.setStorage(opt_storage);
+/** @override */
+remobid.common.cache.LocalCache.prototype.store = function(callback, id, data) {
+  goog.base(this, 'store', goog.bind(function(err) {
+    if (err)
+       callback(err);
+
+    this.storage_.setItem(this.createKey_(id) + ':d', goog.now());
+    callback(null);
+
+  }, this), id, data);
 };
 
-/**
- * Sets the storage engine
- * @param {remobid.common.storage.StorageInterface=} storage the storage
- *    engine to use for saving.
- */
-remobid.common.cache.LocalCache.prototype.setStorage = function(storage) {
-  if (!(storage instanceof remobid.common.storage.LocalStorage))
-    throw new Error('execpts only remobid.common.storage.LocalStorage');
+/** @override */
+remobid.common.cache.LocalCache.prototype.load = function(callback, id) {
+  var key = this.createKey_(id);
+  var savedDate = this.storage_.getItem(key + ':d');
+  // no date found => data is not in cache
+  if (!savedDate) {
+    callback(null, null);
+    return;
+  }
 
-  this.storage_ = storage;
+  // cache expired so remove the value
+  if (savedDate < goog.now() - this.expireTime_) {
+    this.storage_.removeItem(key + ':d');
+    this.remove(function(err) {
+      callback(null, null);
+    }, id);
+  }
+  else
+    goog.base(this, 'load', callback, id);
 };
+
