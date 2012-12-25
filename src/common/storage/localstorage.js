@@ -101,6 +101,10 @@ remobid.common.storage.LocalStorage.prototype.save_ = function(id, data) {
     type = remobid.common.storage.LocalStorage.DataType.NUMBER;
     data = '' + data;
   }
+  if (goog.isDateLike(data)) {
+    type = remobid.common.storage.LocalStorage.DataType.DATE;
+    data = '' + data.valueOf();
+  }
 
   if (!goog.isString(data)) {
     type = remobid.common.storage.LocalStorage.DataType.JSON;
@@ -149,6 +153,8 @@ remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
     data = parseInt(data, 10);
   else if (type == remobid.common.storage.LocalStorage.DataType.JSON)
     data = goog.json.parse(data);
+  else if (type == remobid.common.storage.LocalStorage.DataType.DATE)
+    data = new Date(parseInt(data, 10));
 
   if (!opt_option) {
 
@@ -232,5 +238,6 @@ remobid.common.storage.LocalStorage.prototype.createKey_ = function(id) {
 remobid.common.storage.LocalStorage.DataType = {
   NUMBER: 'N',
   STRING: 'S',
-  JSON: 'J'
+  JSON: 'J',
+  DATE: 'D'
 };
