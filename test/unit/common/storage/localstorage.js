@@ -282,6 +282,16 @@ describe('Unit - localstorage', function() {
   });
 
   describe('load options', function() {
+
+    beforeEach(function() {
+      Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
+    });
+
+    afterEach(function() {
+      if (Storage.isAvailable())
+        window.localStorage.clear();
+    });
+
     it('should only return the fields data', function(done) {
       if (Storage.isAvailable()) {
         var key = 'key',
