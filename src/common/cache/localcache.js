@@ -103,7 +103,7 @@ remobid.common.cache.LocalCache.prototype.remove = function(callback, id) {
  */
 remobid.common.cache.LocalCache.prototype.clearExpired = function(callback) {
   var reg = new RegExp(
-    '^LC-' + this.version_ + '-' + this.url_ + '-([0-9a-zA-Z]*):d$');
+    '^LC-([0-9a-zA-Z]*)-([0-9a-zA-Z]*)-([0-9a-zA-Z]*):d$');
   var storageSize = this.storage_.length;
   var i = 0;
   var matches;
@@ -114,7 +114,7 @@ remobid.common.cache.LocalCache.prototype.clearExpired = function(callback) {
       this.remove(goog.bind(function() {
         storageSize = this.storage_.length;
         i--;
-      }, this), matches[1]);
+      }, this), matches[3]);
     }
     else
       i++;
