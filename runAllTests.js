@@ -41,11 +41,14 @@ var getSourceFiles = function(dir, done) {
 
 
 (function(){
- getSourceFiles('test/unit', function(err, files){
-   for(var i = 0, len = files.length; i < len; i++)
-     TestRunner.addFiles(files[i].substr(5));
-   TestRunner.run(function() {
-     console.log('finished');
-   });
- });
+  TestRunner.addTypes('unit');
+
+  getSourceFiles('test/unit', function(err, files){
+    for(var i = 0, len = files.length; i < len; i++)
+      TestRunner.addFiles(files[i].substr(10));
+    TestRunner.run(function() {
+      console.log('finished');
+    });
+  });
+
 })();
