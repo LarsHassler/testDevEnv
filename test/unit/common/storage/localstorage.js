@@ -308,6 +308,25 @@ describe('Unit - localstorage', function() {
       } else
         done();
     });
+
+    it('should apply fields only on object data', function(done) {
+      if (Storage.isAvailable()) {
+        var key = 'key',
+          data = 'test';
+        Storage.store(function(err) {
+          assertNull(err);
+          Storage.load(function(err, returnData) {
+              assertTrue(err);
+              assertEquals(
+                remobid.common.storage.StorageErrorType.LOAD_OPTIONS_FIELDS,
+                returnData.message
+              );
+              done();
+            }, key, { fields: ['lastName', 'age']});
+        }, key, data);
+      } else
+        done();
+    });
   });
 });
 

@@ -126,16 +126,22 @@ remobid.common.storage.LocalStorage.prototype.load = function(
     return;
 
   var results;
-  if (goog.isArray(id)) {
-    results = [];
-    for (var i = 0, end = id.length; i < end; i++) {
-      var data = this.fetchData(id[i], opt_option);
-      results.push(data);
+  try {
+    if (goog.isArray(id)) {
+      results = [];
+      for (var i = 0, end = id.length; i < end; i++) {
+        var data = this.fetchData(id[i], opt_option, callback);
+        results.push(data);
+      }
     }
+    else {
+      results = this.fetchData(id, opt_option, callback);
+    }
+  } catch (e) {
+    callback(true, {message: e.message});
+    return;
   }
-  else {
-    results = this.fetchData(id, opt_option);
-  }
+
 
   callback(null, results);
 };
@@ -144,11 +150,13 @@ remobid.common.storage.LocalStorage.prototype.load = function(
  * gets data form localstorage for one given key and applies the given options
  * @param {string|number} id id of the resource.
  * @param {Object} opt_option optional options which should be applied.
+ * @param {function(boolean?,Object=)} callback the callback function which is
+ *    called after the action is completed.
  * @return {*} the filtered data.
  * @protected
  */
 remobid.common.storage.LocalStorage.prototype.fetchData = function(
-    id, opt_option) {
+    id, opt_option, callback) {
   var key = this.createKey(id);
   var data = this.storage_.getItem(key);
   var type = this.storage_.getItem(key + ':t');
@@ -160,13 +168,17 @@ remobid.common.storage.LocalStorage.prototype.fetchData = function(
   else if (type == remobid.common.storage.LocalStorage.DataType.DATE)
     data = new Date(parseInt(data, 10));
 
-  if (!opt_option) {
-
-  }
-  else if (opt_option.fields) {
-    data = goog.object.filter(data, function(element, index) {
-      return goog.array.contains(opt_option.fields, index);
-    });
+  if (opt_option) {
+    if (opt_option.fields) {
+      if (goog.isObject(data)) {
+        data = goog.object.filter(data, function(element, index) {
+          return goog.array.contains(opt_option.fields, index);
+        });
+      } else {
+        var m = remobid.common.storage.StorageErrorType.LOAD_OPTIONS_FIELDS;
+        throw new Error(m);
+      }
+    }
   }
 
   return data;
