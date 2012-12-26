@@ -18,7 +18,7 @@ remobid.common.cache.LocalCache = function(version, resourceId) {
 
   /**
    * time after which the cache should expire in ms.
-   * @type {Number}
+   * @type {number}
    * @private
    */
   this.expireTime_ = 60 * 60 * 1000;
@@ -35,8 +35,8 @@ remobid.common.cache.LocalCache.prototype.setExpireTime = function(ms) {
 
 /**
  * stores the given data for the given id
- * @param {function(err)} callback the callback function which is called
- *    after the action is completed.
+ * @param {function(boolean?,Object=)} callback the callback function which is
+ *    called after the action is completed.
  * @param {string|number|Array.<string>|Array.<number>} id
  *    single id, set of ids.
  * @param {Object} data the data to store.
@@ -80,7 +80,7 @@ remobid.common.cache.LocalCache.prototype.load = function(callback, id) {
   }
 
   // if the cache is expired remove the value
-  if (savedDate < goog.now() - this.expireTime_) {
+  if (parseInt(savedDate, 10) < goog.now() - this.expireTime_) {
     this.remove(function(err) {
       callback(null, null);
     }, id);
@@ -98,8 +98,8 @@ remobid.common.cache.LocalCache.prototype.remove = function(callback, id) {
 
 /**
  * removes all expired values from the storage engine.
- * @param {function} callback the callback which will be called with an error
- *    or when the action is finished.
+ * @param {function(boolean?)} callback the callback which will be called with
+ *    an error or when the action is finished.
  */
 remobid.common.cache.LocalCache.prototype.clearExpired = function(callback) {
   var reg = new RegExp(

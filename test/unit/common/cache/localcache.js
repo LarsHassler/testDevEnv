@@ -24,7 +24,7 @@ describe('Localstorage Cache - UNIT', function () {
     try {
        var t = window && window.localStorage && window.localStorage.getItem;
     } catch (e) {
-      LC.storage_ = remobid.test.mock.browser.LocalStorage.getInstance();
+      LC.storage_ = /** @type {Storage} */ remobid.test.mock.browser.LocalStorage.getInstance();
     }
   });
 

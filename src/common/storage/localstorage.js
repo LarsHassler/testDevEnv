@@ -19,12 +19,6 @@ goog.require('remobid.common.storage.StorageInterface');
  */
 remobid.common.storage.LocalStorage = function(version, resourceId) {
   /**
-   * reference to window.localStorage
-   * @type {localStorage?}
-   * @private
-   */
-  this.storage_ = null;
-  /**
    * holds the version of the resource
    * @type {string}
    * @private
@@ -36,6 +30,7 @@ remobid.common.storage.LocalStorage = function(version, resourceId) {
    * @private
    */
   this.url_ = resourceId;
+
   /** @preserveTry */
   try {
     /**
@@ -43,7 +38,14 @@ remobid.common.storage.LocalStorage = function(version, resourceId) {
      * @private
      */
     this.storage_ = window.localStorage;
-  } catch (e) {}
+  } catch (e) {
+    /**
+     * reference to window.localStorage
+     * @type {Storage?}
+     * @private
+     */
+    this.storage_ = null;
+  }
 };
 
 /** @override */
@@ -94,7 +96,7 @@ remobid.common.storage.LocalStorage.prototype.store = function(
  * saved data and the responding type into localstorage,
  *    supports number|string|Array|object.
  * @param {string|number} id the given id to save the data at.
- * @param {string|number|array|object} data the data to store.
+ * @param {string|number|Array|Object} data the data to store.
  * @private
  */
 remobid.common.storage.LocalStorage.prototype.save_ = function(id, data) {
@@ -123,7 +125,6 @@ remobid.common.storage.LocalStorage.prototype.load = function(
   if (!this.checkValidKey_(id, callback))
     return;
 
-  /** @type {string|Array.<string>} */
   var results;
   if (goog.isArray(id)) {
     results = [];
@@ -133,7 +134,7 @@ remobid.common.storage.LocalStorage.prototype.load = function(
     }
   }
   else {
-    var results = this.fetchData_(id, opt_option);
+    results = this.fetchData_(id, opt_option);
   }
 
   callback(null, results);
@@ -142,8 +143,8 @@ remobid.common.storage.LocalStorage.prototype.load = function(
 /**
  * gets data form localstorage for one given key and applies the given options
  * @param {string|number} id id of the resource.
- * @param {object} opt_option optional options which should be applied.
- * @return {string|object} the filtered data.
+ * @param {Object} opt_option optional options which should be applied.
+ * @return {*} the filtered data.
  * @private
  */
 remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
@@ -174,7 +175,7 @@ remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.remove = function(callback, id) {
-  if (!this.checkValidKey_(id))
+  if (!this.checkValidKey_(id, callback))
     return;
 
   if (!goog.isArray(id))
@@ -193,9 +194,9 @@ remobid.common.storage.LocalStorage.prototype.remove = function(callback, id) {
 /**
  * checks if a given key is valid
  * @param {string|number|Array.<string>|Array.<number>} key the key to check.
- * @param {function} errorcallback callback function to use if the key is not
- *    valid.
- * @return {Boolean} whenever the key is valid or not.
+ * @param {function(boolean?,Object=)} errorcallback callback function to use if
+ *    the key is not valid.
+ * @return {boolean} whenever the key is valid or not.
  * @private
  */
 remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(
@@ -228,7 +229,7 @@ remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(
 /**
  * formats the id into a key using both version and url
  * @param {string|number} id the id of the resource.
- * @return {String} the associated key.
+ * @return {string} the associated key.
  * @protected
  */
 remobid.common.storage.LocalStorage.prototype.createKey = function(id) {
