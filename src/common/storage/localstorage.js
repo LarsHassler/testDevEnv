@@ -129,12 +129,12 @@ remobid.common.storage.LocalStorage.prototype.load = function(
   if (goog.isArray(id)) {
     results = [];
     for (var i = 0, end = id.length; i < end; i++) {
-      var data = this.fetchData_(id[i], opt_option);
+      var data = this.fetchData(id[i], opt_option);
       results.push(data);
     }
   }
   else {
-    results = this.fetchData_(id, opt_option);
+    results = this.fetchData(id, opt_option);
   }
 
   callback(null, results);
@@ -145,9 +145,9 @@ remobid.common.storage.LocalStorage.prototype.load = function(
  * @param {string|number} id id of the resource.
  * @param {Object} opt_option optional options which should be applied.
  * @return {*} the filtered data.
- * @private
+ * @protected
  */
-remobid.common.storage.LocalStorage.prototype.fetchData_ = function(
+remobid.common.storage.LocalStorage.prototype.fetchData = function(
     id, opt_option) {
   var key = this.createKey(id);
   var data = this.storage_.getItem(key);

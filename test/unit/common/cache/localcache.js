@@ -43,6 +43,7 @@ describe('Localstorage Cache - UNIT', function () {
     }, '1', 'test');
   });
 
+
   it('should not return expired values', function(done) {
     LC.store(function(err) {
       assertNull(err);
@@ -53,6 +54,20 @@ describe('Localstorage Cache - UNIT', function () {
         done();
       },'1');
     }, '1', 'test');
+  });
+
+  it('should return array', function(done) {
+    LC.store(function(err) {
+      assertNull(err);
+      LC.store(function(err) {
+        assertNull(err);
+        LC.load(function(err, data) {
+          assertNull(err);
+          assertArrayEquals(['test1', 'test2'], data);
+          done();
+        }, ['1', '2']);
+      }, '2', 'test2');
+    }, '1', 'test1');
   });
 
   it('should remove expired values on load', function(done) {

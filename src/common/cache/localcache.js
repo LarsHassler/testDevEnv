@@ -69,24 +69,44 @@ remobid.common.cache.LocalCache.prototype.store = function(callback, id, data,
 };
 
 /** @override */
-remobid.common.cache.LocalCache.prototype.load = function(callback, id) {
+remobid.common.cache.LocalCache.prototype.load = function(
+  callback, id, opt_option) {
+  if (!this.checkValidKey_(id, callback))
+    return;
+
+  var results;
+  if (goog.isArray(id)) {
+    results = [];
+    for (var i = 0, end = id.length; i < end; i++) {
+      var data = this.fetchData(id[i], opt_option);
+      results.push(data);
+    }
+  }
+  else {
+    results = this.fetchData(id, opt_option);
+  }
+
+  callback(null, results);
+};
+
+/** @override */
+remobid.common.cache.LocalCache.prototype.fetchData = function(
+  id, opt_option) {
   var key = this.createKey(id);
   var savedDate = this.storage_.getItem(key + ':d');
 
   // no date found => data is not in cache
   if (!savedDate) {
-    callback(null, null);
-    return;
+    return null;
   }
 
   // if the cache is expired remove the value
   if (parseInt(savedDate, 10) < goog.now() - this.expireTime_) {
-    this.remove(function(err) {
-      callback(null, null);
-    }, id);
+    this.remove(goog.nullFunction, id);
+    return null;
   }
   else
-    goog.base(this, 'load', callback, id);
+    return goog.base(this, 'fetchData', id, opt_option);
 };
 
 /** @override */
