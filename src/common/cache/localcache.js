@@ -44,6 +44,17 @@ remobid.common.cache.LocalCache.prototype.setExpireTime = function(ms) {
  */
 remobid.common.cache.LocalCache.prototype.store = function(callback, id, data,
     opt_retry) {
+  if (!this.checkValidKey_(id, callback))
+    return;
+
+  // check for missing data
+  if (!data) {
+    callback(
+      true,
+      {message: remobid.common.storage.StorageErrorType.MISSING_DATA}
+    );
+    return;
+  }
   goog.base(this, 'store', goog.bind(function(err) {
     // if quota exceeded clear expired and try again
     if (err) {
@@ -75,15 +86,20 @@ remobid.common.cache.LocalCache.prototype.load = function(
     return;
 
   var results;
-  if (goog.isArray(id)) {
-    results = [];
-    for (var i = 0, end = id.length; i < end; i++) {
-      var data = this.fetchData(id[i], opt_option);
-      results.push(data);
+  try {
+    if (goog.isArray(id)) {
+      results = [];
+      for (var i = 0, end = id.length; i < end; i++) {
+        var data = this.fetchData(id[i], opt_option, callback);
+        results.push(data);
+      }
     }
-  }
-  else {
-    results = this.fetchData(id, opt_option);
+    else {
+      results = this.fetchData(id, opt_option, callback);
+    }
+  } catch (e) {
+    callback(true, {message: e.message});
+    return;
   }
 
   callback(null, results);
@@ -91,7 +107,7 @@ remobid.common.cache.LocalCache.prototype.load = function(
 
 /** @override */
 remobid.common.cache.LocalCache.prototype.fetchData = function(
-  id, opt_option) {
+  id, opt_option, callback) {
   var key = this.createKey(id);
   var savedDate = this.storage_.getItem(key + ':d');
 
@@ -105,14 +121,24 @@ remobid.common.cache.LocalCache.prototype.fetchData = function(
     this.remove(goog.nullFunction, id);
     return null;
   }
-  else
+  else {
     return goog.base(this, 'fetchData', id, opt_option);
+  }
 };
 
 /** @override */
 remobid.common.cache.LocalCache.prototype.remove = function(callback, id) {
-  var key = this.createKey(id);
-  this.storage_.removeItem(key + ':d');
+  if (!this.checkValidKey_(id, callback))
+    return;
+
+  if (!goog.isArray(id))
+    id = [id];
+
+  for (var i = 0, end = id.length; i < end; i++) {
+    var key = this.createKey(id[i]);
+    this.storage_.removeItem(key + ':d');
+  }
+
   goog.base(this, 'remove', callback, id);
 };
 
