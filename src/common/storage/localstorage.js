@@ -8,28 +8,17 @@ goog.provide('remobid.common.storage.LocalStorage.DataType');
 goog.require('goog.array');
 goog.require('goog.json');
 goog.require('goog.object');
+goog.require('remobid.common.storage.StorageBase');
 goog.require('remobid.common.storage.StorageErrorType');
-goog.require('remobid.common.storage.StorageInterface');
 
 /**
  * @param {string} version Rest version url to the data resource.
  * @param {string} resourceId identifier for the resource.
  * @constructor
- * @implements {remobid.common.storage.StorageInterface}
+ * @extends {remobid.common.storage.StorageBase}
  */
 remobid.common.storage.LocalStorage = function(version, resourceId) {
-  /**
-   * holds the version of the resource
-   * @type {string}
-   * @private
-   */
-  this.version_ = version;
-  /**
-   * holds the identifier of the resource
-   * @type {string}
-   * @private
-   */
-  this.url_ = resourceId;
+  goog.base(this, version, resourceId);
 
   /** @preserveTry */
   try {
@@ -47,6 +36,8 @@ remobid.common.storage.LocalStorage = function(version, resourceId) {
     this.storage_ = null;
   }
 };
+goog.inherits(remobid.common.storage.LocalStorage,
+  remobid.common.storage.StorageBase);
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.isAvailable = function() {
@@ -62,16 +53,14 @@ remobid.common.storage.LocalStorage.prototype.isAvailable = function() {
 remobid.common.storage.LocalStorage.prototype.store = function(
     callback, id, data) {
 
-  if (!this.checkValidKey_(id, callback))
+  if (!this.checkValidId(id, callback))
     return;
 
   // check for missing data
   if (!data) {
     callback(
       true,
-      {
-        message: remobid.common.storage.StorageErrorType.MISSING_DATA
-      }
+      {message: remobid.common.storage.StorageErrorType.MISSING_DATA}
     );
     return;
   }
@@ -119,33 +108,6 @@ remobid.common.storage.LocalStorage.prototype.save_ = function(id, data) {
   this.storage_.setItem(key, data);
 };
 
-/** @override */
-remobid.common.storage.LocalStorage.prototype.load = function(
-    callback, id, opt_option) {
-  if (!this.checkValidKey_(id, callback))
-    return;
-
-  var results;
-  try {
-    if (goog.isArray(id)) {
-      results = [];
-      for (var i = 0, end = id.length; i < end; i++) {
-        var data = this.fetchData(id[i], opt_option, callback);
-        results.push(data);
-      }
-    }
-    else {
-      results = this.fetchData(id, opt_option, callback);
-    }
-  } catch (e) {
-    callback(true, {message: e.message});
-    return;
-  }
-
-
-  callback(null, results);
-};
-
 /**
  * gets data form localstorage for one given key and applies the given options
  * @param {string|number} id id of the resource.
@@ -187,7 +149,7 @@ remobid.common.storage.LocalStorage.prototype.fetchData = function(
 
 /** @override */
 remobid.common.storage.LocalStorage.prototype.remove = function(callback, id) {
-  if (!this.checkValidKey_(id, callback))
+  if (!this.checkValidId(id, callback))
     return;
 
   if (!goog.isArray(id))
@@ -202,53 +164,6 @@ remobid.common.storage.LocalStorage.prototype.remove = function(callback, id) {
 
   callback(null);
 };
-
-/**
- * checks if a given key is valid
- * @param {string|number|Array.<string>|Array.<number>} key the key to check.
- * @param {function(boolean?,Object=)} errorcallback callback function to use if
- *    the key is not valid.
- * @return {boolean} whenever the key is valid or not.
- * @private
- */
-remobid.common.storage.LocalStorage.prototype.checkValidKey_ = function(
-    key, errorcallback) {
-  var validKey = false;
-  // check for acceptable id values
-  if (goog.isString(key))
-    validKey = true;
-  else if (goog.isNumber(key))
-    validKey = true;
-  else if (goog.isArray(key)) {
-    validKey = true;
-    for (var i = 0, end = key.length; i < end; i++) {
-      if (!goog.isString(key[i]) && !goog.isNumber(key[i])) {
-        validKey = false;
-      }
-    }
-  }
-  if (!validKey && errorcallback) {
-    errorcallback(
-      true,
-      {
-        message: remobid.common.storage.StorageErrorType.INVALID_KEY
-      }
-    );
-  }
-  return validKey;
-};
-
-/**
- * formats the id into a key using both version and url
- * @param {string|number} id the id of the resource.
- * @return {string} the associated key.
- * @protected
- */
-remobid.common.storage.LocalStorage.prototype.createKey = function(id) {
-  return 'rb-' + this.version_ + '-' + this.url_ + '-' + id;
-};
-
-
 
 /** @enum {string} */
 remobid.common.storage.LocalStorage.DataType = {

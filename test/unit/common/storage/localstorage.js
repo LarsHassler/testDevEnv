@@ -19,17 +19,10 @@ describe('Unit - localstorage', function() {
   var s_url = 'users';
   var s_version = 'v1';
 
-  it('should be available in newer browsers', function() {
-    Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
-    if (goog.userAgent.WEBKIT && goog.userAgent.isVersion('532.5') ||
-      goog.userAgent.GECKO && goog.userAgent.isVersion('1.9.1') ||
-      goog.userAgent.IE && goog.userAgent.isVersion('8')) {
-      assertTrue(Storage.isAvailable());
-    } else
-      assertFalse(Storage.isAvailable());
-  });
+  describe('base storage tests', function() {
 
-  describe('implemented', function() {
+    // add any tests here should be also added along with all other storage
+    // engines
 
     beforeEach(function() {
       Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
@@ -41,10 +34,9 @@ describe('Unit - localstorage', function() {
     });
 
     it('should only except a string,' +
-        'number or and array of strings|numbers as ids', function(
-        done) {
+        'number or and array of strings|numbers as ids', function(done) {
       if (Storage.isAvailable()) {
-        var moreTests = 4;
+        var moreTests = 12;
         var cb = function(err, data) {
           assertTrue(err);
           assertEquals(
@@ -59,6 +51,16 @@ describe('Unit - localstorage', function() {
         Storage.store(cb, null);
         Storage.store(cb);
         Storage.store(cb, [null]);
+
+        Storage.load(cb, {});
+        Storage.load(cb, null);
+        Storage.load(cb);
+        Storage.load(cb, [null]);
+
+        Storage.remove(cb, {});
+        Storage.remove(cb, null);
+        Storage.remove(cb);
+        Storage.remove(cb, [null]);
 
       } else {
         done();
@@ -80,45 +82,7 @@ describe('Unit - localstorage', function() {
         done();
     });
 
-    it('should store string data', function(done) {
-      if (Storage.isAvailable()) {
-        var key, data, moreTests = 2,
-          cb = function(err) {
-            assertNull(err);
-            var saved_key = 'rb-' + s_version + '-' + s_url + '-' + key;
-            var stored_data = window.localStorage.getItem(saved_key);
-            assertEquals(data, stored_data);
-            if (!--moreTests)
-              done();
-          };
-
-          key = 'user_1';
-          data = 'name1';
-        Storage.store(cb, key, data);
-          key = 1;
-          data = 'name1';
-        Storage.store(cb, key, data);
-      } else
-        done();
-    });
-
-    it('should store object data', function(done) {
-      if (Storage.isAvailable()) {
-        var key = '2',
-          data = {'key' : 1};
-        Storage.store(function(err) {
-          assertNull(err);
-          assertEquals(2, window.localStorage.length);
-          var saved_key = 'rb-' + s_version + '-' + s_url + '-' + key;
-          var stored_data = window.localStorage.getItem(saved_key);
-          assertObjectEquals(data, goog.json.parse(stored_data));
-          done();
-        }, key, data);
-      } else
-        done();
-    });
-
-    it('should load a single key as a string', function(done) {
+    it('should load a single id', function(done) {
       if (Storage.isAvailable()) {
         var key = '3',
             data = 'name_3',
@@ -135,7 +99,7 @@ describe('Unit - localstorage', function() {
       }
     });
 
-    it('should load multiple keys as an array', function(done) {
+    it('should load multiple ids', function(done) {
       if (Storage.isAvailable()) {
         var keys = ['1', '2'],
           data = ['name_1', 'name_2'];
@@ -152,7 +116,7 @@ describe('Unit - localstorage', function() {
         done();
     });
 
-    it('should delete a single key', function(done) {
+    it('should delete a single id', function(done) {
       if (Storage.isAvailable()) {
         var keys = ['1', '2'],
           data = ['name_1', 'name_2'];
@@ -171,7 +135,7 @@ describe('Unit - localstorage', function() {
         done();
     });
 
-    it('should delete only given keys', function(done) {
+    it('should delete multiple ids', function(done) {
       if (Storage.isAvailable()) {
         var keys = ['1', '2', '3', '4'],
           data = ['name_1', 'name_2', 'name_3', 'name_4'];
@@ -279,43 +243,33 @@ describe('Unit - localstorage', function() {
           done();
       });
     });
-  });
 
-  describe('load options', function() {
+    describe('load options', function() {
 
-    beforeEach(function() {
-      Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
-    });
-
-    afterEach(function() {
-      if (Storage.isAvailable())
-        window.localStorage.clear();
-    });
-
-    it('should only return the fields data', function(done) {
-      if (Storage.isAvailable()) {
-        var key = 'key',
-          data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12};
-        Storage.store(function(err) {
-          assertNull(err);
-          Storage.load(function(err, returnData) {
+      it('should only return the fields data', function(done) {
+        if (Storage.isAvailable()) {
+          var key = 'key',
+            data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12};
+          Storage.store(function(err) {
             assertNull(err);
-            var expectedData = {'lastName': 'Doe', 'age': 12};
-            assertObjectEquals(expectedData, returnData);
-            done();
-          }, key, { fields: ['lastName', 'age']});
-        }, key, data);
-      } else
-        done();
-    });
+            Storage.load(function(err, returnData) {
+              assertNull(err);
+              var expectedData = {'lastName': 'Doe', 'age': 12};
+              assertObjectEquals(expectedData, returnData);
+              done();
+            }, key, { fields: ['lastName', 'age']});
+          }, key, data);
+        } else
+          done();
+      });
 
-    it('should apply fields only on object data', function(done) {
-      if (Storage.isAvailable()) {
-        var key = 'key',
-          data = 'test';
-        Storage.store(function(err) {
-          assertNull(err);
-          Storage.load(function(err, returnData) {
+      it('should apply fields only on object data', function(done) {
+        if (Storage.isAvailable()) {
+          var key = 'key',
+            data = 'test';
+          Storage.store(function(err) {
+            assertNull(err);
+            Storage.load(function(err, returnData) {
               assertTrue(err);
               assertEquals(
                 remobid.common.storage.StorageErrorType.LOAD_OPTIONS_FIELDS,
@@ -323,10 +277,25 @@ describe('Unit - localstorage', function() {
               );
               done();
             }, key, { fields: ['lastName', 'age']});
-        }, key, data);
-      } else
-        done();
+          }, key, data);
+        } else
+          done();
+      });
     });
+  });
+
+  describe('Localstorage spesific', function() {
+
+    it('should be available in newer browsers', function() {
+      Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
+      if (goog.userAgent.WEBKIT && goog.userAgent.isVersion('532.5') ||
+        goog.userAgent.GECKO && goog.userAgent.isVersion('1.9.1') ||
+        goog.userAgent.IE && goog.userAgent.isVersion('8')) {
+        assertTrue(Storage.isAvailable());
+      } else
+        assertFalse(Storage.isAvailable());
+    });
+
   });
 });
 

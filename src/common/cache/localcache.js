@@ -44,7 +44,7 @@ remobid.common.cache.LocalCache.prototype.setExpireTime = function(ms) {
  */
 remobid.common.cache.LocalCache.prototype.store = function(callback, id, data,
     opt_retry) {
-  if (!this.checkValidKey_(id, callback))
+  if (!this.checkValidId(id, callback))
     return;
 
   // check for missing data
@@ -82,7 +82,7 @@ remobid.common.cache.LocalCache.prototype.store = function(callback, id, data,
 /** @override */
 remobid.common.cache.LocalCache.prototype.load = function(
   callback, id, opt_option) {
-  if (!this.checkValidKey_(id, callback))
+  if (!this.checkValidId(id, callback))
     return;
 
   var results;
@@ -128,7 +128,7 @@ remobid.common.cache.LocalCache.prototype.fetchData = function(
 
 /** @override */
 remobid.common.cache.LocalCache.prototype.remove = function(callback, id) {
-  if (!this.checkValidKey_(id, callback))
+  if (!this.checkValidId(id, callback))
     return;
 
   if (!goog.isArray(id))
@@ -170,5 +170,5 @@ remobid.common.cache.LocalCache.prototype.clearExpired = function(callback) {
 
 /** @override */
 remobid.common.cache.LocalCache.prototype.createKey = function(id) {
-  return 'LC-' + this.version_ + '-' + this.url_ + '-' + id;
+  return 'LC-' + this.version + '-' + this.resourceId + '-' + id;
 };
