@@ -39,7 +39,7 @@ describe('Localstorage Cache - UNIT', function () {
 
     it('should only except a string,' +
       'number or and array of strings|numbers as ids', function(done) {
-      var moreTests = 4;
+      var moreTests = 12;
       var cb = function(err, returnData) {
         assertTrue(err);
         assertEquals(
@@ -54,6 +54,16 @@ describe('Localstorage Cache - UNIT', function () {
       LC.store(cb, null);
       LC.store(cb);
       LC.store(cb, [null]);
+
+      LC.load(cb, {});
+      LC.load(cb, null);
+      LC.load(cb);
+      LC.load(cb, [null]);
+
+      LC.remove(cb, {});
+      LC.remove(cb, null);
+      LC.remove(cb);
+      LC.remove(cb, [null]);
     });
 
     it('should not accept empty data', function(done) {

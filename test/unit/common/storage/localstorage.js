@@ -36,7 +36,7 @@ describe('Unit - localstorage', function() {
     it('should only except a string,' +
         'number or and array of strings|numbers as ids', function(done) {
       if (Storage.isAvailable()) {
-        var moreTests = 4;
+        var moreTests = 12;
         var cb = function(err, data) {
           assertTrue(err);
           assertEquals(
@@ -51,6 +51,16 @@ describe('Unit - localstorage', function() {
         Storage.store(cb, null);
         Storage.store(cb);
         Storage.store(cb, [null]);
+
+        Storage.load(cb, {});
+        Storage.load(cb, null);
+        Storage.load(cb);
+        Storage.load(cb, [null]);
+
+        Storage.remove(cb, {});
+        Storage.remove(cb, null);
+        Storage.remove(cb);
+        Storage.remove(cb, [null]);
 
       } else {
         done();
