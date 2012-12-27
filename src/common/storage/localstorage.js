@@ -142,7 +142,6 @@ remobid.common.storage.LocalStorage.prototype.load = function(
     return;
   }
 
-
   callback(null, results);
 };
 
