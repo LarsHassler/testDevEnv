@@ -80,82 +80,75 @@ describe('Localstorage Cache - UNIT', function () {
 
     it('should load a single id', function(done) {
       var key = '1',
-        data = 'string';
-      LC.store(function(err) {
+        data = 'string',
+        saved_key = 'LC-' + version + '-' + url + '-' + key;
+      LC.storage_.setItem(saved_key, data);
+      LC.storage_.setItem(saved_key + ':t', data);
+      LC.storage_.setItem(saved_key + ':d', goog.now());
+      LC.load(function(err, loaded_data) {
         assertNull(err);
-        LC.load(function(err2, loaded_data) {
-          assertNull(err2);
-          assertEquals(data, loaded_data);
-          done();
-        }, key);
-      }, key, data);
+        assertEquals(3, LC.storage_.length);
+        assertEquals(data, loaded_data);
+        done();
+      }, key);
     });
 
     it('should load multiple ids', function(done) {
-      var key = '1',
-        data = 'string',
-        key2 = '2',
-        data2 = 'string2';
-      LC.store(function(err) {
+      var keys = ['1', '2'],
+        data = ['string', 'string2'];
+      for (var i = 0, end = keys.length; i < end; i++) {
+        var saved_key = 'LC-' + version + '-' + url + '-' + keys[i];
+        LC.storage_.setItem(saved_key, data[i]);
+        LC.storage_.setItem(saved_key + ':t', 'string');
+        LC.storage_.setItem(saved_key + ':d', goog.now());
+      }
+      LC.load(function(err, loaded_data) {
         assertNull(err);
-        LC.store(function(err) {
-          assertNull(err);
-          LC.load(function(err, loaded_data) {
-            assertNull(err);
-            assertArrayEquals([data, data2], loaded_data);
-            done();
-          }, [key, key2]);
-        }, key2, data2);
-      }, key, data);
+        assertEquals(6, LC.storage_.length);
+        assertArrayEquals(data, loaded_data);
+        done();
+      }, keys);
     });
 
     it('should delete a single id', function(done) {
-      var key = '1',
-        data = 'string',
-        key2 = '2',
-        data2 = 'string2';
-      LC.store(function(err) {
+      var keys = ['1', '2'],
+        data = ['name_1', 'name_2'];
+      for (var i = 0, end = keys.length; i < end; i++) {
+        var saved_key = 'LC-' + version + '-' + url + '-' + keys[i];
+        LC.storage_.setItem(saved_key, data[i]);
+        LC.storage_.setItem(saved_key + ':t', 'string');
+        LC.storage_.setItem(saved_key + ':d', goog.now());
+      }
+      LC.remove(function(err) {
         assertNull(err);
-        LC.store(function(err) {
+        assertEquals(3, LC.storage_.length);
+        LC.load(function(err, loaded_data) {
           assertNull(err);
-          LC.remove(function(err) {
-            assertNull(err);
-            assertEquals(3, LC.storage_.length);
-            LC.load(function(err, loaded_data) {
-              assertNull(err);
-              assertEquals(data2, loaded_data);
-              done();
-            }, key2);
-          }, key);
-        }, key2, data2);
-      }, key, data);
+          assertEquals(data[1], loaded_data);
+          done();
+        }, keys[1]);
+      }, keys[0]);
     });
 
     it('should delete multiple ids', function(done) {
-      var key = '1',
-        data = 'string',
-        key2 = '2',
-        data2 = 'string2',
-        key3 = '3',
-        data3 = 'string3';
-      LC.store(function(err) {
+      var keys = ['1', '2', '3', '4'],
+        data = ['name_1', 'name_2', 'name_3', 'name_4'];
+      for (var i = 0, end = keys.length; i < end; i++) {
+        var saved_key = 'LC-' + version + '-' + url + '-' + keys[i];
+        LC.storage_.setItem(saved_key, data[i]);
+        LC.storage_.setItem(saved_key + ':t', 'string');
+        LC.storage_.setItem(saved_key + ':d', goog.now());
+      }
+      LC.remove(function(err) {
         assertNull(err);
-        LC.store(function(err) {
-          assertNull(err);
-          LC.store(function(err) {
-            assertNull(err);
-            LC.remove(function(err) {
-              assertNull(err);
-              assertEquals(3, LC.storage_.length);
-              LC.load(function(err, loaded_data) {
-                assertNull(err);
-                assertEquals(data2, loaded_data);
-                done();
-              }, key2);
-            }, [key, key3]);
-          }, key3, data3);
-        }, key2, data2);
-      }, key, data);
+        assertEquals(6, LC.storage_.length);
+        var key_prefix = 'LC-' + version + '-' + url + '-';
+        assertEquals(data[1],
+          LC.storage_.getItem(key_prefix + keys[1]));
+        assertEquals(data[3],
+          LC.storage_.getItem(key_prefix + keys[3]));
+        done();
+      }, [keys[0], keys[2]]);
     });
 
     describe('types', function() {
