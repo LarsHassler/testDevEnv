@@ -5,8 +5,10 @@ basePath = '';
   files = [
     MOCHA,
     MOCHA_ADAPTER,
+    'test/unit/common/cache/localcache.js',
     'test/unit/common/storage/localstorage.js',
-    'test/unit/common/cache/localcache.js'
+    'test/unit/common/storage/rest.js',
+    'test/browser/common/storage/localstorage.js'
   ];
 
   // list of files to exclude
