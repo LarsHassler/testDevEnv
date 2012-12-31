@@ -21,10 +21,6 @@ describe('Unit - Rest storage', function () {
     Rest = new remobid.common.storage.Rest(version, url);
   });
 
-  afterEach(function() {
-
-  });
-
   describe('base storage tests', function() {
 
     // add any tests here should be also added along with all other storage
@@ -47,6 +43,16 @@ describe('Unit - Rest storage', function () {
       Rest.load(cb, null);
       Rest.load(cb);
       Rest.load(cb, [null]);
+
+      Rest.store(cb, {});
+      Rest.store(cb, null);
+      Rest.store(cb);
+      Rest.store(cb, [null]);
+
+      Rest.remove(cb, {});
+      Rest.remove(cb, null);
+      Rest.remove(cb);
+      Rest.remove(cb, [null]);
     });
 
     it.skip('should not accept empty data', function(done) {
@@ -101,6 +107,7 @@ describe('Unit - Rest storage', function () {
       it('should apply fields only on object data', function(done) {
 
       });
+
     });
 
   });
@@ -118,6 +125,15 @@ describe('Unit - Rest storage', function () {
       assertTrue(Rest.isAvailable());
       netStatus = false;
       assertFalse(Rest.isAvailable());
+    });
+
+    describe('dispose', function() {
+
+      it('should remove the restMaster_', function() {
+        Rest.dispose();
+        assertNull(Rest.restManager_);
+      });
+
     });
   });
 
