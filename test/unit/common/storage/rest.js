@@ -10,6 +10,7 @@ try {
 }
 
 goog.require('goog.testing.asserts');
+goog.require('goog.testing.net.XhrIoPool');
 goog.require('remobid.common.storage.Rest');
 
 describe('Unit - Rest storage', function () {
@@ -59,12 +60,56 @@ describe('Unit - Rest storage', function () {
 
     });
 
-    it.skip('should load a single id', function(done) {
-
+    it('should load a single id', function(done) {
+      var callback = function() {};
+      Rest.restManager_.get = function(resourceId, version, cb, id) {
+        assertEquals('wrong resourceId submitted',
+          'users',
+          resourceId
+        );
+        assertEquals('wrong version submitted',
+          'v1',
+          version
+        );
+        assertEquals('wrong callback submitted',
+          callback,
+          cb
+        );
+        assertEquals('wrong id submitted',
+          1,
+          id
+        );
+        done();
+      };
+      Rest.load(callback, 1);
     });
 
-    it.skip('should load multiple ids', function(done) {
-
+    it('should load multiple ids', function(done) {
+      var callback = function() {};
+      Rest.restManager_.get = function(resourceId, version, cb, id, parameter) {
+        assertEquals('wrong resourceId submitted',
+          'users',
+          resourceId
+        );
+        assertEquals('wrong version submitted',
+          'v1',
+          version
+        );
+        assertEquals('wrong callback submitted',
+          callback,
+          cb
+        );
+        assertEquals('wrong id submitted',
+          null,
+          id
+        );
+        assertEquals('wrong parameter submitted',
+          '?id=key1,2',
+          parameter
+        );
+        done();
+      };
+      Rest.load(callback, ['key1', 2]);
     });
 
     it.skip('should delete a single id', function(done) {
