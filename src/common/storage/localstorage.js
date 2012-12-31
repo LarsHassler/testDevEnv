@@ -50,20 +50,8 @@ remobid.common.storage.LocalStorage.prototype.isAvailable = function() {
 };
 
 /** @override */
-remobid.common.storage.LocalStorage.prototype.store = function(
+remobid.common.storage.LocalStorage.prototype.save = function(
     callback, id, data) {
-
-  if (!this.checkValidId(id, callback))
-    return;
-
-  // check for missing data
-  if (!data) {
-    callback(
-      true,
-      {message: remobid.common.storage.StorageErrorType.MISSING_DATA}
-    );
-    return;
-  }
   // May throw an exception if storage quota is exceeded.
   try {
     if (!goog.isArray(id))
