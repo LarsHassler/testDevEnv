@@ -1,3 +1,4 @@
 {
-  additionalDeps: ['remobidDeps.js']
+    closureBasePath: "deps/closure-library/",
+    additionalDeps: ['remobidDeps.js']
 }
