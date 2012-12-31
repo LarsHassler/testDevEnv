@@ -78,9 +78,69 @@ remobid.common.net.RestManager.prototype.isAvailable = function() {
   return this.available_;
 };
 
+/**
+ * starts a request to get data from the rest api.
+ * @param {string} url the url to get the data from.
+ * @param {string} version version of the rest api.
+ * @param {function(boolean?, *)} callback the callback function, taking a
+ *    boolean status and the fetched data.
+ * @param {(string|number)=} opt_id the id of the resource or null if the fetch
+ *    a collection.
+ * @param {string=} opt_parameters optional parameter to add to the request as
+ *    get parameters.
+ * @param {object.<string, string>=} opt_headers optional headers to send with
+ *    the request.
+ * @return {goog.net.XhrManager.Request} The queued request object.
+ */
+remobid.common.net.RestManager.prototype.get = function(
+  url, version, callback, opt_id, opt_parameters, opt_headers) {
+
+  if (!goog.isString(url) ||
+      !goog.isString(version) ||
+      !goog.isFunction(callback))
+    throw new Error('invalid request parameters');
+
+  var restUrl = '/' + version + '/' + url;
+  if (goog.isDefAndNotNull(opt_id))
+    restUrl += '/' + opt_id;
+  if (goog.isDefAndNotNull(opt_parameters))
+    restUrl += '/' + opt_parameters;
+
+  // abort the request first, just to make sure there is no running request with
+  // this url
+  this.abort(restUrl, true);
+
+  var headers = goog.object.clone(this.headers_);
+  if (goog.isDefAndNotNull(opt_headers))
+      goog.object.extend(headers, opt_headers);
+
+  return this.send(restUrl,
+    this.baseUrl_ + restUrl,
+    'GET',
+    undefined,
+    headers,
+    undefined,
+    goog.bind(this.handleGet_, this, callback));
+};
+
+/**
+ * callback after a get request. Checks Status code and calls the original
+ * call back
+ * @param {function(*, goog.net.XhrIo)} callback the callback function, as given
+ *    to the get method.
+ * @param {goog.events.Event} event the original event fire by the xhrmanager.
+ * @private
+ */
+remobid.common.net.RestManager.prototype.handleGet_ = function(
+    callback, event) {
+  var XhrIo = /** @type {goog.net.XhrIo} */ event.target;
+  if (XhrIo.getStatus() == '200')
+    callback(XhrIo.getResponseJson(), XhrIo);
+  // TODO handle redirects
+};
 
 
-// static
+/* ######## static function */
 
 /**
  * holds all instances of the RestManager.
