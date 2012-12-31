@@ -135,6 +135,47 @@ describe('UNIT - restmanager', function () {
 
   describe('actions', function() {
 
+    describe('delete', function() {
+
+      describe('errors', function() {
+
+        it('should throw an error if not all' +
+          ' necessary parameter are given', function() {
+          var Manager = remobid.common.net.RestManager.getInstance();
+          Manager.abort = Manager.send = goog.nullFunction;
+          assertThrows(
+            'request have to have an url',
+            goog.bind(Manager.delete, Manager, null, 'v1', goog.nullFunction, 1)
+          );
+
+          assertThrows(
+            'request have to have a version number',
+            goog.bind(Manager.delete, Manager,
+                'users', null, goog.nullFunction, 1)
+          );
+
+          assertThrows(
+            'request have to have a callback function',
+            goog.bind(Manager.delete, Manager, 'users', 'v1', null, 1)
+          );
+
+          assertThrows(
+            'request have to have a id',
+            goog.bind(Manager.delete, Manager, 'users',
+                'v1', goog.nullFunction, null)
+          );
+
+          assertNotThrows(
+            'exception thrown, even if all need parameter are given',
+            goog.bind(Manager.delete, Manager, 'users',
+              'v1', goog.nullFunction, 1)
+          );
+
+        });
+
+      });
+
+    });
     describe('get', function() {
 
       describe('settings', function() {
@@ -211,7 +252,8 @@ describe('UNIT - restmanager', function () {
         it('should call callback function after finished', function(done) {
           var Manager = remobid.common.net.RestManager.getInstance();
           Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
-          var cb = function(json, Xhrio) {
+          var cb = function(error, json) {
+            assertFalse(error);
             assertObjectEquals({ test: 'test' }, json);
             done();
           };

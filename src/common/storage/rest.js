@@ -41,11 +41,29 @@ remobid.common.storage.Rest.prototype.load = function(
   if (!this.checkValidId(id, callback))
     return;
 
+  var parameter = null;
+
   if (goog.isArray(id)) {
-    var parameter = '?id=' + id.join(',');
-    id = null;
+    id = id.join(',');
   }
   this.restManager_.get(
+    this.resourceId,
+    this.version,
+    callback,
+    id,
+    goog.isDefAndNotNull(parameter) ? parameter : null
+  );
+};
+
+/** @override */
+remobid.common.storage.Rest.prototype.remove = function(
+  callback, id, opt_option) {
+  if (!this.checkValidId(id, callback))
+    return;
+
+  var parameter = null;
+
+  this.restManager_.delete(
     this.resourceId,
     this.version,
     callback,

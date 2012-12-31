@@ -16,10 +16,13 @@ goog.require('remobid.common.storage.Rest');
 describe('Unit - Rest storage', function () {
   var Rest,
       version = 'v1',
-      url = 'users';
+      url = 'users',
+      baseUrl;
 
   beforeEach(function() {
+    baseUrl = remobid.common.net.RestManager.defaultBase_ = 'https://api.remobid.com';
     Rest = new remobid.common.storage.Rest(version, url);
+    Rest.restManager_.xhrPool_ = new goog.testing.net.XhrIoPool();
   });
 
   describe('base storage tests', function() {
@@ -60,60 +63,46 @@ describe('Unit - Rest storage', function () {
 
     });
 
-    it('should load a single id', function(done) {
+    it('should load a single id', function() {
       var callback = function() {};
-      Rest.restManager_.get = function(resourceId, version, cb, id) {
-        assertEquals('wrong resourceId submitted',
-          'users',
-          resourceId
-        );
-        assertEquals('wrong version submitted',
-          'v1',
-          version
-        );
-        assertEquals('wrong callback submitted',
-          callback,
-          cb
-        );
-        assertEquals('wrong id submitted',
-          1,
-          id
-        );
-        done();
-      };
+      var xhr = Rest.restManager_.xhrPool_.getXhr();
       Rest.load(callback, 1);
+      assertEquals('wrong uri constructed',
+        baseUrl + '/v1/users/1',
+        xhr.getLastUri()
+      );
+      assertEquals('wrong method used',
+        'GET',
+        xhr.getLastMethod()
+      );
     });
 
-    it('should load multiple ids', function(done) {
+    it('should load multiple ids', function() {
       var callback = function() {};
-      Rest.restManager_.get = function(resourceId, version, cb, id, parameter) {
-        assertEquals('wrong resourceId submitted',
-          'users',
-          resourceId
-        );
-        assertEquals('wrong version submitted',
-          'v1',
-          version
-        );
-        assertEquals('wrong callback submitted',
-          callback,
-          cb
-        );
-        assertEquals('wrong id submitted',
-          null,
-          id
-        );
-        assertEquals('wrong parameter submitted',
-          '?id=key1,2',
-          parameter
-        );
-        done();
-      };
+      var xhr = Rest.restManager_.xhrPool_.getXhr();
       Rest.load(callback, ['key1', 2]);
+      assertEquals('wrong uri constructed',
+        baseUrl + '/v1/users/key1,2',
+        xhr.getLastUri()
+      );
+      assertEquals('wrong method used',
+        'GET',
+        xhr.getLastMethod()
+      );
     });
 
-    it.skip('should delete a single id', function(done) {
-
+    it('should delete a single id', function() {
+      var callback = function() {};
+      var xhr = Rest.restManager_.xhrPool_.getXhr();
+      Rest.remove(callback, 2);
+      assertEquals('wrong uri constructed',
+        baseUrl + '/v1/users/2',
+        xhr.getLastUri()
+      );
+      assertEquals('wrong method used',
+        'DELETE',
+        xhr.getLastMethod()
+      );
     });
 
     it.skip('should delete multiple ids', function(done) {

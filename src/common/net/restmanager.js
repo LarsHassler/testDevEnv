@@ -5,6 +5,7 @@
 goog.provide('remobid.common.net.RestManager');
 
 goog.require('goog.crypt.base64');
+goog.require('goog.json');
 goog.require('goog.net.XhrManager');
 
 /**
@@ -80,13 +81,56 @@ remobid.common.net.RestManager.prototype.isAvailable = function() {
 };
 
 /**
+ * starts a request to delete data via the rest api.
+ * @param {string} url the url to the data.
+ * @param {string} version version of the rest api.
+ * @param {function(boolean?, *)} callback the callback function, taking a
+ *    boolean status and the fetched data.
+ * @param {(string|number)=} id the id of the resource to delete. Use comma-
+ *    separation to batch multiple deletes into one request.
+ * @param {string=} opt_parameters optional parameter to add to the request as
+ *    get parameters.
+ * @param {object.<string, string>=} opt_headers optional headers to send with
+ *    the request.
+ * @return {goog.net.XhrManager.Request} The queued request object.
+ */
+remobid.common.net.RestManager.prototype.delete = function(
+  url, version, callback, id, opt_parameters, opt_headers) {
+
+  if (!goog.isString(url) ||
+      !goog.isString(version) ||
+      !goog.isFunction(callback) ||
+      (!goog.isString(id) && !goog.isNumber(id)))
+    throw new Error('invalid request parameters');
+
+  return this.startRequest_('DELETE', url, version, callback, id,
+    opt_parameters, opt_headers);
+};
+
+/**
+ * callback after a delete request. Checks Status code and calls the original
+ * call back
+ * @param {function(boolean?)} callback the callback function, as given
+ *    to the delete method.
+ * @param {goog.events.Event} event the original event fire by the xhrmanager.
+ * @private
+ */
+remobid.common.net.RestManager.prototype.handleDelete_ = function(
+  callback, event) {
+  var XhrIo = /** @type {goog.net.XhrIo} */ event.target;
+  if (XhrIo.getStatus() == '200' || XhrIo.getStatus() == '204')
+    callback(false);
+};
+
+/**
  * starts a request to get data from the rest api.
  * @param {string} url the url to get the data from.
  * @param {string} version version of the rest api.
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
  * @param {(string|number)=} opt_id the id of the resource or null if the fetch
- *    a collection.
+ *    a collection. Use comma-separation to batch multiple ids into one
+ *    request.
  * @param {string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
  * @param {object.<string, string>=} opt_headers optional headers to send with
@@ -101,33 +145,14 @@ remobid.common.net.RestManager.prototype.get = function(
       !goog.isFunction(callback))
     throw new Error('invalid request parameters');
 
-  var restUrl = '/' + version + '/' + url;
-  if (goog.isDefAndNotNull(opt_id))
-    restUrl += '/' + opt_id;
-  if (goog.isDefAndNotNull(opt_parameters))
-    restUrl += '/' + opt_parameters;
-
-  // abort the request first, just to make sure there is no running request with
-  // this url
-  this.abort(restUrl, true);
-
-  var headers = goog.object.clone(this.headers_);
-  if (goog.isDefAndNotNull(opt_headers))
-      goog.object.extend(headers, opt_headers);
-
-  return this.send(restUrl,
-    this.baseUrl_ + restUrl,
-    'GET',
-    undefined,
-    headers,
-    undefined,
-    goog.bind(this.handleGet_, this, callback));
+  return this.startRequest_('GET', url, version, callback, opt_id,
+      opt_parameters, opt_headers);
 };
 
 /**
  * callback after a get request. Checks Status code and calls the original
  * call back
- * @param {function(*, goog.net.XhrIo)} callback the callback function, as given
+ * @param {function(boolean?, *)} callback the callback function, as given
  *    to the get method.
  * @param {goog.events.Event} event the original event fire by the xhrmanager.
  * @private
@@ -136,10 +161,76 @@ remobid.common.net.RestManager.prototype.handleGet_ = function(
     callback, event) {
   var XhrIo = /** @type {goog.net.XhrIo} */ event.target;
   if (XhrIo.getStatus() == '200')
-    callback(XhrIo.getResponseJson(), XhrIo);
-  // TODO handle redirects
+    callback(false, XhrIo.getResponseJson());
 };
 
+/**
+ * @param {string} method the HTTP-Method to use with the request.
+ * @param {string} url the url of the request.
+ * @param {string} version version of the rest api.
+ * @param {function(boolean?, *)} callback the callback function, taking a
+ *    boolean status and the fetched data.
+ * @param {(string|number)=} opt_id the id of the resource or null if the fetch
+ *    a collection. Use comma-separation to batch multiple ids into one
+ *    request.
+ * @param {string=} opt_parameters optional parameter to add to the request as
+ *    get parameters.
+ * @param {object.<string, string>=} opt_headers optional headers to send with
+ *    the request.
+ * @return {goog.net.XhrManager.Request} The queued request object.
+ * @private
+ */
+remobid.common.net.RestManager.prototype.startRequest_ = function(
+  method, url, version, callback, opt_id, opt_parameters, opt_headers) {
+
+  var restUrl = '/' + version + '/' + url;
+  if (goog.isDefAndNotNull(opt_id))
+    restUrl += '/' + opt_id;
+  if (goog.isDefAndNotNull(opt_parameters))
+    restUrl += '/' + opt_parameters;
+
+  var headers = goog.object.clone(this.headers_);
+  if (goog.isDefAndNotNull(opt_headers))
+    goog.object.extend(headers, opt_headers);
+
+  var requestId = method + ':' + restUrl + ':' + goog.json.serialize(headers);
+  requestId = goog.crypt.base64.encodeString(requestId);
+
+  // abort the request first, just to make sure there is no running request with
+  // this url
+  this.abort(requestId, true);
+
+  return this.send(requestId,
+    this.baseUrl_ + restUrl,
+    method,
+    undefined,
+    headers,
+    undefined,
+    goog.bind(this.handleRequest_, this, method, callback));
+};
+
+/**
+ * callback after a request. Checks Status code and calls the original
+ * call back.
+ * @param {string} method the method of the request.
+ * @param {function(*, goog.net.XhrIo)} callback the callback function, as given
+ *    to the original method.
+ * @param {goog.events.Event} event the original event fire by the xhrmanager.
+ * @private
+ */
+remobid.common.net.RestManager.prototype.handleRequest_ = function(
+  method, callback, event) {
+  // TODO handle some errors and redirects
+  switch (method) {
+    case 'GET':
+      this.handleGet_(callback, event);
+      break;
+    case 'DELETE':
+      this.handleDelete_(callback, event);
+      break;
+  }
+
+};
 
 /* ######## static function */
 
