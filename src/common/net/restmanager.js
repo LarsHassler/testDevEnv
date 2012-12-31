@@ -75,6 +75,7 @@ remobid.common.net.RestManager.prototype.setBearerToken = function(token) {
  * @return {boolean} the status of the connection to the rest endpoint.
  */
 remobid.common.net.RestManager.prototype.isAvailable = function() {
+  // TODO add connection checks
   return this.available_;
 };
 
