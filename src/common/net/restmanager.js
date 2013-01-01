@@ -89,9 +89,9 @@ remobid.common.net.RestManager.prototype.isAvailable = function() {
  * @param {(string|number)} id the id of the resource to delete. Use comma-
  *    separation to batch multiple updates into one request.
  * @param {Object} data the data to store.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {Object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  */
@@ -130,9 +130,9 @@ remobid.common.net.RestManager.prototype.handlePut_ = function(
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
  * @param {Object} data the data to store.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {Object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  */
@@ -212,12 +212,12 @@ remobid.common.net.RestManager.prototype.handleDelete_ = function(
  * @param {string} version version of the rest api.
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
- * @param {(string|number)=} opt_id the id of the resource or null if the fetch
+ * @param {?(string|number)=} opt_id the id of the resource or null if the fetch
  *    a collection. Use comma-separation to batch multiple ids into one
  *    request.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {Object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  */
