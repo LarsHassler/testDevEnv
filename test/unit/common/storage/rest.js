@@ -30,27 +30,30 @@ describe('Unit - Rest storage', function () {
     // add any tests here should be also added along with all other storage
     // engines
 
-    it.skip('should only except a string,' +
+    it('should only except a string,' +
       'number or and array of strings|numbers as ids', function(done) {
-      var moreTests = 12;
+      var moreTests = 8;
       var cb = function(err, data) {
         assertTrue(err);
         assertEquals(
           remobid.common.storage.StorageErrorType.INVALID_KEY,
           data.message
         );
-        if (!--moreTests)
+        if (--moreTests <= 0)
           done();
       };
 
-      Rest.load(cb, {});
+      // should be allowed
       Rest.load(cb, null);
       Rest.load(cb);
+
+      Rest.store(cb, null, {});
+
+      // should be not allowed
+      Rest.load(cb, {});
       Rest.load(cb, [null]);
 
       Rest.store(cb, {});
-      Rest.store(cb, null);
-      Rest.store(cb);
       Rest.store(cb, [null]);
 
       Rest.remove(cb, {});
@@ -59,8 +62,16 @@ describe('Unit - Rest storage', function () {
       Rest.remove(cb, [null]);
     });
 
-    it('should not accept empty data', function() {
-
+    it('should not accept empty data', function(done) {
+      var cb = function(err, data) {
+        assertTrue(err);
+        assertEquals(
+          remobid.common.storage.StorageErrorType.MISSING_DATA,
+          data.message
+        );
+        done();
+      };
+      Rest.store(cb, '1');
     });
 
     it('should load a single id', function() {
@@ -116,6 +127,60 @@ describe('Unit - Rest storage', function () {
       assertEquals('wrong method used',
         'DELETE',
         xhr.getLastMethod()
+      );
+    });
+
+    it('should store a single id', function() {
+      var callback = function() {};
+      var xhr = Rest.restManager_.xhrPool_.getXhr();
+      Rest.store(callback, 2, {"key": "data"});
+      assertEquals('wrong uri constructed',
+        baseUrl + '/v1/users/2',
+        xhr.getLastUri()
+      );
+      assertEquals('wrong method used',
+        'PUT',
+        xhr.getLastMethod()
+      );
+      assertEquals('wrong body used',
+        '{"key":"data"}',
+        xhr.getLastContent()
+      );
+    });
+
+    it('should store with no id', function() {
+      var callback = function() {};
+      var xhr = Rest.restManager_.xhrPool_.getXhr();
+      Rest.store(callback, null, {"key": "data"});
+      assertEquals('wrong uri constructed',
+        baseUrl + '/v1/users',
+        xhr.getLastUri()
+      );
+      assertEquals('wrong method used',
+        'POST',
+        xhr.getLastMethod()
+      );
+      assertEquals('wrong body used',
+        '{"key":"data"}',
+        xhr.getLastContent()
+      );
+    });
+
+    it('should store multiple ids', function() {
+      var callback = function() {};
+      var xhr = Rest.restManager_.xhrPool_.getXhr();
+      Rest.store(callback, [1,2], {"key": "data"});
+      assertEquals('wrong uri constructed',
+        baseUrl + '/v1/users/1,2',
+        xhr.getLastUri()
+      );
+      assertEquals('wrong method used',
+        'PUT',
+        xhr.getLastMethod()
+      );
+      assertEquals('wrong body used',
+        '{"key":"data"}',
+        xhr.getLastContent()
       );
     });
 

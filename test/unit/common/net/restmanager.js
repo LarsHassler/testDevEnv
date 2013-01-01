@@ -135,7 +135,235 @@ describe('UNIT - restmanager', function () {
 
   describe('actions', function() {
 
+    describe('with all actions', function() {
+
+      it('should abort any request first', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.abort = function() {
+          done();
+        };
+        Manager.send = goog.nullFunction;
+        Manager.get('users', 'v1', goog.nullFunction);
+      });
+
+      it('should have all headers', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        var specific_headers = {'sp_key': 'sp_value'};
+        var total_headers = {
+          'sp_key': 'sp_value',
+          'Authorization': 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='};
+        Manager.setBasicAuthentication('Aladdin', 'open sesame');
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertObjectEquals(total_headers, headers);
+          done();
+        };
+        Manager.get('users', 'v1', goog.nullFunction,
+          null, null, specific_headers);
+      });
+
+      it('url should combine baseUrl and resource url', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertEquals('https://api.remobid.com/v1/users', url);
+          done();
+        };
+        Manager.get('users', 'v1', goog.nullFunction);
+      });
+
+      it('url should combine baseUrl, resource url ' +
+        'and id if given', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertEquals('https://api.remobid.com/v1/users/123', url);
+          done();
+        };
+        Manager.get('users', 'v1', goog.nullFunction, 123);
+      });
+
+      it('should add optional parameter to the url', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertEquals(
+            'https://api.remobid.com/v1/users/123?fields=name',
+            url
+          );
+          done();
+        };
+        Manager.get('users', 'v1', goog.nullFunction, 123, '?fields=name');
+      });
+
+    });
+
+    describe('put', function() {
+
+      it('should call callback function after finished', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
+        var callbackTimes = 1;
+        var cb = function(error, json) {
+          assertFalse(error);
+          if(!--callbackTimes)
+            done();
+        };
+        Manager.put('users', 'v1', cb, 1, {});
+        var xhr = Manager.xhrPool_.getXhr();
+        xhr.simulateResponse(200, '');
+      });
+
+      it('method should be PUT', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertEquals('PUT', method);
+          done();
+        };
+        Manager.put('users', 'v1', goog.nullFunction, 1, {});
+      });
+
+      describe('errors', function() {
+
+        it('should throw an error if not all' +
+          ' necessary parameter are given', function() {
+          var Manager = remobid.common.net.RestManager.getInstance();
+          Manager.abort = Manager.send = goog.nullFunction;
+          assertThrows(
+            'request have to have an url',
+            goog.bind(Manager.put, Manager, null, 'v1', goog.nullFunction,
+              1, {})
+          );
+
+          assertThrows(
+            'request have to have a version number',
+            goog.bind(Manager.put, Manager,
+              'users', null, goog.nullFunction, 1, {})
+          );
+
+          assertThrows(
+            'request have to have a callback function',
+            goog.bind(Manager.put, Manager, 'users', 'v1', null, 1, {})
+          );
+
+          assertThrows(
+            'request have to have a id',
+            goog.bind(Manager.put, Manager, 'users',
+              'v1', goog.nullFunction, null, {})
+          );
+
+          assertThrows(
+            'request have to have data',
+            goog.bind(Manager.put, Manager, 'users',
+              'v1', goog.nullFunction, null, {})
+          );
+
+          assertNotThrows(
+            'exception thrown, even if all need parameter are given',
+            goog.bind(Manager.put, Manager, 'users',
+              'v1', goog.nullFunction, 1, {})
+          );
+
+        });
+
+      });
+
+    });
+
+    describe('post', function() {
+
+      it('should call callback function after finished', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
+        var callbackTimes = 1;
+        var cb = function(error, json) {
+          assertFalse(error);
+          if(!--callbackTimes)
+            done();
+        };
+        Manager.post('users', 'v1', cb, {});
+        var xhr = Manager.xhrPool_.getXhr();
+        xhr.simulateResponse(200, '');
+      });
+
+      it('method should be POST', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertEquals('POST', method);
+          done();
+        };
+        Manager.post('users', 'v1', goog.nullFunction, {});
+      });
+
+      describe('errors', function() {
+
+        it('should throw an error if not all' +
+          ' necessary parameter are given', function() {
+          var Manager = remobid.common.net.RestManager.getInstance();
+          Manager.abort = Manager.send = goog.nullFunction;
+          assertThrows(
+            'request have to have an url',
+            goog.bind(Manager.post, Manager, null, 'v1', goog.nullFunction, 1)
+          );
+
+          assertThrows(
+            'request have to have a version number',
+            goog.bind(Manager.post, Manager,
+              'users', null, goog.nullFunction, {})
+          );
+
+          assertThrows(
+            'request have to have a callback function',
+            goog.bind(Manager.post, Manager, 'users', 'v1', null, {})
+          );
+
+          assertThrows(
+            'request have to have  data',
+            goog.bind(Manager.post, Manager, 'users',
+              'v1', goog.nullFunction, null)
+          );
+
+          assertNotThrows(
+            'exception thrown, even if all need parameter are given',
+            goog.bind(Manager.post, Manager, 'users',
+              'v1', goog.nullFunction, {})
+          );
+
+        });
+
+      });
+
+    });
+
     describe('delete', function() {
+
+      it('should call callback function after finished', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
+        var callbackTimes = 2;
+        var cb = function(error, json) {
+          assertFalse(error);
+          if(!--callbackTimes)
+            done();
+        };
+        Manager.delete('users', 'v1', cb, 1);
+        var xhr = Manager.xhrPool_.getXhr();
+        xhr.simulateResponse(200, '');
+        Manager.delete('users', 'v1', cb, 1);
+        xhr.simulateResponse(204, '');
+      });
+
+      it('method should be GET', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertEquals('DELETE', method);
+          done();
+        };
+        Manager.delete('users', 'v1', goog.nullFunction, 1);
+      });
 
       describe('errors', function() {
 
@@ -176,92 +404,30 @@ describe('UNIT - restmanager', function () {
       });
 
     });
+
     describe('get', function() {
 
-      describe('settings', function() {
+      it('should call callback function after finished', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
+        var cb = function(error, json) {
+          assertFalse(error);
+          assertObjectEquals({ test: 'test' }, json);
+          done();
+        };
+        Manager.get('users', 'v1', cb);
+        var xhr = Manager.xhrPool_.getXhr();
+        xhr.simulateResponse(200, '{"test": "test"}');
+      });
 
-        it('should abort any request first', function(done) {
-          var Manager = remobid.common.net.RestManager.getInstance();
-          Manager.abort = function() {
-            done();
-          };
-          Manager.send = goog.nullFunction;
-          Manager.get('users', 'v1', goog.nullFunction);
-        });
-
-        it('should have all headers', function(done) {
-          var Manager = remobid.common.net.RestManager.getInstance();
-          var specific_headers = {'sp_key': 'sp_value'};
-          var total_headers = {
-            'sp_key': 'sp_value',
-            'Authorization': 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='};
-          Manager.setBasicAuthentication('Aladdin', 'open sesame');
-          Manager.send = function (
-              id, url, method, context, headers) {
-            assertObjectEquals(total_headers, headers);
-            done();
-          };
-          Manager.get('users', 'v1', goog.nullFunction,
-              null, null, specific_headers);
-        });
-
-        it('url should combine baseUrl and resource url', function(done) {
-          var Manager = remobid.common.net.RestManager.getInstance();
-          Manager.send = function (
-            id, url, method, context, headers) {
-            assertEquals('https://api.remobid.com/v1/users', url);
-            done();
-          };
-          Manager.get('users', 'v1', goog.nullFunction);
-        });
-
-        it('url should combine baseUrl, resource url ' +
-          'and id if given', function(done) {
-          var Manager = remobid.common.net.RestManager.getInstance();
-          Manager.send = function (
-            id, url, method, context, headers) {
-            assertEquals('https://api.remobid.com/v1/users/123', url);
-            done();
-          };
-          Manager.get('users', 'v1', goog.nullFunction, 123);
-        });
-
-        it('should add optional parameter to the url', function(done) {
-          var Manager = remobid.common.net.RestManager.getInstance();
-          Manager.send = function (
-            id, url, method, context, headers) {
-            assertEquals(
-              'https://api.remobid.com/v1/users/123?fields=name',
-              url
-            );
-            done();
-          };
-          Manager.get('users', 'v1', goog.nullFunction, 123, '?fields=name');
-        });
-
-        it('method should be GET', function(done) {
-          var Manager = remobid.common.net.RestManager.getInstance();
-          Manager.send = function (
-            id, url, method, context, headers) {
-            assertEquals('GET', method);
-            done();
-          };
-          Manager.get('users', 'v1', goog.nullFunction);
-        });
-
-        it('should call callback function after finished', function(done) {
-          var Manager = remobid.common.net.RestManager.getInstance();
-          Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
-          var cb = function(error, json) {
-            assertFalse(error);
-            assertObjectEquals({ test: 'test' }, json);
-            done();
-          };
-          Manager.get('users', 'v1', cb);
-          var xhr = Manager.xhrPool_.getXhr();
-          xhr.simulateResponse(200, '{"test": "test"}');
-        });
-
+      it('method should be GET', function(done) {
+        var Manager = remobid.common.net.RestManager.getInstance();
+        Manager.send = function (
+          id, url, method, context, headers) {
+          assertEquals('GET', method);
+          done();
+        };
+        Manager.get('users', 'v1', goog.nullFunction);
       });
 
       describe('errors', function() {

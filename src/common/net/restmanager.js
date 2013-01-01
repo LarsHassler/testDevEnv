@@ -81,6 +81,90 @@ remobid.common.net.RestManager.prototype.isAvailable = function() {
 };
 
 /**
+ * starts a request to update data via the rest api.
+ * @param {string} url the url to the data.
+ * @param {string} version version of the rest api.
+ * @param {function(boolean?, *)} callback the callback function, taking a
+ *    boolean status and the fetched data.
+ * @param {(string|number)=} id the id of the resource to delete. Use comma-
+ *    separation to batch multiple updates into one request.
+ * @param {object} data the data to store.
+ * @param {string=} opt_parameters optional parameter to add to the request as
+ *    get parameters.
+ * @param {object.<string, string>=} opt_headers optional headers to send with
+ *    the request.
+ * @return {goog.net.XhrManager.Request} The queued request object.
+ */
+remobid.common.net.RestManager.prototype.put = function(
+  url, version, callback, id, data, opt_parameters, opt_headers) {
+
+  if (!goog.isString(url) ||
+    !goog.isString(version) ||
+    !goog.isFunction(callback) ||
+    (!goog.isString(id) && !goog.isNumber(id)))
+    throw new Error('invalid request parameters');
+
+  return this.startRequest_('PUT', url, version, callback, id, data,
+    opt_parameters, opt_headers);
+};
+
+/**
+ * callback after a put request. Checks Status code and calls the original
+ * call back
+ * @param {function(boolean?)} callback the callback function, as given
+ *    to the delete method.
+ * @param {goog.events.Event} event the original event fire by the xhrmanager.
+ * @private
+ */
+remobid.common.net.RestManager.prototype.handlePut_ = function(
+  callback, event) {
+  var XhrIo = /** @type {goog.net.XhrIo} */ event.target;
+  if (XhrIo.getStatus() == '200' || XhrIo.getStatus() == '201')
+    callback(false);
+};
+
+/**
+ * starts a request to update data via the rest api.
+ * @param {string} url the url to the data.
+ * @param {string} version version of the rest api.
+ * @param {function(boolean?, *)} callback the callback function, taking a
+ *    boolean status and the fetched data.
+ * @param {object} data the data to store.
+ * @param {string=} opt_parameters optional parameter to add to the request as
+ *    get parameters.
+ * @param {object.<string, string>=} opt_headers optional headers to send with
+ *    the request.
+ * @return {goog.net.XhrManager.Request} The queued request object.
+ */
+remobid.common.net.RestManager.prototype.post = function(
+  url, version, callback, data, opt_parameters, opt_headers) {
+
+  if (!goog.isString(url) ||
+    !goog.isString(version) ||
+    !goog.isFunction(callback) ||
+    !goog.isObject(data))
+    throw new Error('invalid request parameters');
+
+  return this.startRequest_('POST', url, version, callback, null, data,
+    opt_parameters, opt_headers);
+};
+
+/**
+ * callback after a post request. Checks Status code and calls the original
+ * call back
+ * @param {function(boolean?)} callback the callback function, as given
+ *    to the delete method.
+ * @param {goog.events.Event} event the original event fire by the xhrmanager.
+ * @private
+ */
+remobid.common.net.RestManager.prototype.handlePost_ = function(
+  callback, event) {
+  var XhrIo = /** @type {goog.net.XhrIo} */ event.target;
+  if (XhrIo.getStatus() == '200')
+    callback(false);
+};
+
+/**
  * starts a request to delete data via the rest api.
  * @param {string} url the url to the data.
  * @param {string} version version of the rest api.
@@ -103,7 +187,7 @@ remobid.common.net.RestManager.prototype.delete = function(
       (!goog.isString(id) && !goog.isNumber(id)))
     throw new Error('invalid request parameters');
 
-  return this.startRequest_('DELETE', url, version, callback, id,
+  return this.startRequest_('DELETE', url, version, callback, id, null,
     opt_parameters, opt_headers);
 };
 
@@ -141,11 +225,13 @@ remobid.common.net.RestManager.prototype.get = function(
   url, version, callback, opt_id, opt_parameters, opt_headers) {
 
   if (!goog.isString(url) ||
-      !goog.isString(version) ||
-      !goog.isFunction(callback))
+    !goog.isString(version) ||
+    !goog.isFunction(callback) ||
+    (goog.isObject(opt_id) ||
+        goog.isArray(opt_id)))
     throw new Error('invalid request parameters');
 
-  return this.startRequest_('GET', url, version, callback, opt_id,
+  return this.startRequest_('GET', url, version, callback, opt_id, null,
       opt_parameters, opt_headers);
 };
 
@@ -173,6 +259,8 @@ remobid.common.net.RestManager.prototype.handleGet_ = function(
  * @param {(string|number)=} opt_id the id of the resource or null if the fetch
  *    a collection. Use comma-separation to batch multiple ids into one
  *    request.
+ * @param {Object|Array=} opt_content optional content to deliver as body of the
+ *    request.
  * @param {string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
  * @param {object.<string, string>=} opt_headers optional headers to send with
@@ -181,7 +269,8 @@ remobid.common.net.RestManager.prototype.handleGet_ = function(
  * @private
  */
 remobid.common.net.RestManager.prototype.startRequest_ = function(
-  method, url, version, callback, opt_id, opt_parameters, opt_headers) {
+  method, url, version, callback, opt_id, opt_content,
+  opt_parameters, opt_headers) {
 
   var restUrl = '/' + version + '/' + url;
   if (goog.isDefAndNotNull(opt_id))
@@ -203,7 +292,9 @@ remobid.common.net.RestManager.prototype.startRequest_ = function(
   return this.send(requestId,
     this.baseUrl_ + restUrl,
     method,
-    undefined,
+    goog.isObject(opt_content) || goog.isArray(opt_content) ?
+      goog.json.serialize(opt_content) :
+      opt_content,
     headers,
     undefined,
     goog.bind(this.handleRequest_, this, method, callback));
@@ -227,6 +318,12 @@ remobid.common.net.RestManager.prototype.handleRequest_ = function(
       break;
     case 'DELETE':
       this.handleDelete_(callback, event);
+      break;
+    case 'PUT':
+      this.handlePut_(callback, event);
+      break;
+    case 'POST':
+      this.handlePost_(callback, event);
       break;
   }
 

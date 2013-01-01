@@ -39,7 +39,7 @@ remobid.common.storage.Rest.prototype.isAvailable = function() {
 /** @override */
 remobid.common.storage.Rest.prototype.load = function(
     callback, id, opt_option) {
-  if (goog.isDefAndNotNull(id) && !this.checkValidId(id, callback))
+  if (!this.checkValidId(id, callback, true))
     return;
 
   if (goog.isArray(id)) {
@@ -53,6 +53,48 @@ remobid.common.storage.Rest.prototype.load = function(
     id,
     this.createParameterUriString(opt_option)
   );
+};
+
+/** @override */
+remobid.common.storage.Rest.prototype.store = function(
+  callback, id, data, opt_option) {
+  if (!this.checkValidId(id, callback, true))
+    return;
+
+  // check for missing data
+  if (!data) {
+    callback(
+      true,
+      {message: remobid.common.storage.StorageErrorType.MISSING_DATA}
+    );
+    return;
+  }
+
+  if (goog.isArray(id)) {
+    id = id.join(',');
+  }
+
+  if (goog.isNull(id) || !goog.isDef(id)) {
+    // new entry should use POST
+    this.restManager_.post(
+      this.resourceId,
+      this.version,
+      callback,
+      data,
+      this.createParameterUriString(opt_option)
+    );
+  } else {
+    // use PUT
+    this.restManager_.put(
+      this.resourceId,
+      this.version,
+      callback,
+      id,
+      data,
+      this.createParameterUriString(opt_option)
+    );
+  }
+
 };
 
 /** @override */
@@ -97,4 +139,13 @@ remobid.common.storage.Rest.prototype.createParameterUriString = function(
     string += '&limit=' + opt_option.limit;
 
   return '?' + string.substr(1);
+};
+
+/** @override */
+remobid.common.storage.Rest.prototype.checkValidId = function(
+    id, errorcallback, opt_allowNull) {
+  if (opt_allowNull && (goog.isNull(id) || !goog.isDef(id)))
+    return true;
+
+  return goog.base(this, 'checkValidId', id, errorcallback);
 };
