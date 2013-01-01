@@ -99,7 +99,8 @@ remobid.common.storage.LocalStorage.prototype.save_ = function(id, data) {
 /**
  * gets data form localstorage for one given key and applies the given options
  * @param {string|number} id id of the resource.
- * @param {Object} opt_option optional options which should be applied.
+ * @param {remobid.common.storage.storageBase.Options=} opt_option optional
+ *    options which should be applied.
  * @param {function(boolean?,Object=)} callback the callback function which is
  *    called after the action is completed.
  * @return {*} the filtered data.

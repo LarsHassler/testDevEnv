@@ -31,9 +31,9 @@ goog.inherits(remobid.common.storage.StorageBase, goog.Disposable);
 
 /**
  * loads data for a given id, set of ids or by a filter
- * @param {function(boolean?,Object=)} callback the callback function which is
+ * @param {function(boolean?,*=)} callback the callback function which is
  *    called after the action is completed.
- * @param {null|string|number|Array} id single id, set of ids or null for all
+ * @param {?(string|number|Array)=} id single id, set of ids or null for all
  *    entries - maybe filtered by the options.
  * @param {remobid.common.storage.storageBase.Options=} opt_option a set of
  *    options.
@@ -63,8 +63,9 @@ remobid.common.storage.StorageBase.prototype.load = function(
 /**
  * gets data for multiple ids. This should be overwritten by the subclass
  * @param {Array} ids ids of the resources.
- * @param {Object} opt_option optional options which should be applied.
- * @param {function(boolean?,Object=)} callback the callback function which is
+ * @param {remobid.common.storage.storageBase.Options=} opt_option optional
+ *    options which should be applied.
+ * @param {function(boolean?,*=)} callback the callback function which is
  *    called after the action is completed.
  * @return {Array} the loaded data.
  * @protected
@@ -81,9 +82,10 @@ remobid.common.storage.StorageBase.prototype.fetchMultipleData = function(
 
 /**
  * gets data. This should be overwritten by the subclass
- * @param {string|number} id id of the resource.
- * @param {Object} opt_option optional options which should be applied.
- * @param {function(boolean?,Object=)} callback the callback function which is
+ * @param {?(string|number)} id id of the resource.
+ * @param {remobid.common.storage.storageBase.Options=} opt_option optional
+ *    options which should be applied.
+ * @param {function(boolean?,*=)} callback the callback function which is
  *    called after the action is completed.
  * @return {*} the filtered data.
  * @protected
@@ -96,7 +98,7 @@ remobid.common.storage.StorageBase.prototype.fetchData = function(
 
 /**
  * checks for wrong input. The actual saving will be done in {@code save}.
- * @param {function(boolean?,Object=)} callback the callback function which is
+ * @param {function(boolean?,*=)} callback the callback function which is
  *    called after the action is completed.
  * @param {string|number|Array.<string>|Array.<number>} id
  *    single id, set of ids.
@@ -122,7 +124,7 @@ remobid.common.storage.StorageBase.prototype.store = function(
 /**
  * stores the given data for the given id. Should be overwritten by the
  *    subclass.
- * @param {function(boolean?,Object=)} callback the callback function which is
+ * @param {function(boolean?,*=)} callback the callback function which is
  *    called after the action is completed.
  * @param {string|number|Array.<string>|Array.<number>} id
  *    single id, set of ids.
@@ -133,7 +135,7 @@ remobid.common.storage.StorageBase.prototype.save = function(
 };
 /**
  * deletes a resource for the given id
- * @param {function(boolean?,Object=)} callback the callback function which is
+ * @param {function(boolean?,*=)} callback the callback function which is
  *    called after the action is completed.
  * @param {string|number|Array} id single id, set of ids.
  */
@@ -199,5 +201,5 @@ remobid.common.storage.StorageBase.prototype.checkValidId = function(
   return validId;
 };
 
-/** @typedef {offset: number?, limit: number?, fields: Array.<string>?} */
+/** @typedef {{offset: number?, limit: number?, fields: Array.<string>?}} */
 remobid.common.storage.storageBase.Options;
