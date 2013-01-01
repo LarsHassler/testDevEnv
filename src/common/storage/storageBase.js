@@ -3,11 +3,15 @@
  */
 
 goog.provide('remobid.common.storage.StorageBase');
+goog.provide('remobid.common.storage.storageBase.Options');
+
+goog.require('goog.Disposable');
 
 /**
  * @param {string} version Rest version url to the data resource.
  * @param {string} resourceId identifier for the resource.
  * @constructor
+ * @extends {goog.Disposable}
  */
 remobid.common.storage.StorageBase = function(version, resourceId) {
   /**
@@ -23,6 +27,7 @@ remobid.common.storage.StorageBase = function(version, resourceId) {
    */
   this.resourceId = resourceId;
 };
+goog.inherits(remobid.common.storage.StorageBase, goog.Disposable);
 
 /**
  * loads data for a given id, set of ids or by a filter
@@ -30,9 +35,8 @@ remobid.common.storage.StorageBase = function(version, resourceId) {
  *    called after the action is completed.
  * @param {null|string|number|Array} id single id, set of ids or null for all
  *    entries - maybe filtered by the options.
- * @param {{offset: number?,
- *     limit: number?,
- *     fields: Array.<string>}=} opt_option a set of options like
+ * @param {remobid.common.storage.storageBase.Options=} opt_option a set of
+ *    options.
  */
 remobid.common.storage.StorageBase.prototype.load = function(
   callback, id, opt_option) {
@@ -91,7 +95,7 @@ remobid.common.storage.StorageBase.prototype.fetchData = function(
 };
 
 /**
- * stores the given data for the given id
+ * checks for wrong input. The actual saving will be done in {@code save}.
  * @param {function(boolean?,Object=)} callback the callback function which is
  *    called after the action is completed.
  * @param {string|number|Array.<string>|Array.<number>} id
@@ -100,9 +104,33 @@ remobid.common.storage.StorageBase.prototype.fetchData = function(
  */
 remobid.common.storage.StorageBase.prototype.store = function(
   callback, id, data) {
+  if (!this.checkValidId(id, callback))
+    return;
 
+  // check for missing data
+  if (!data) {
+    callback(
+      true,
+      {message: remobid.common.storage.StorageErrorType.MISSING_DATA}
+    );
+    return;
+  }
+
+  this.save(callback, id, data);
 };
 
+/**
+ * stores the given data for the given id. Should be overwritten by the
+ *    subclass.
+ * @param {function(boolean?,Object=)} callback the callback function which is
+ *    called after the action is completed.
+ * @param {string|number|Array.<string>|Array.<number>} id
+ *    single id, set of ids.
+ * @param {Object} data the data to store.
+ */
+remobid.common.storage.StorageBase.prototype.save = function(
+  callback, id, data) {
+};
 /**
  * deletes a resource for the given id
  * @param {function(boolean?,Object=)} callback the callback function which is
@@ -170,3 +198,6 @@ remobid.common.storage.StorageBase.prototype.checkValidId = function(
   // abort it self.
   return validId;
 };
+
+/** @typedef {offset: number?, limit: number?, fields: Array.<string>?} */
+remobid.common.storage.storageBase.Options;
