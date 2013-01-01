@@ -107,7 +107,7 @@ remobid.common.storage.Rest.prototype.remove = function(
     id = id.join(',');
   }
 
-  this.restManager_.delete(
+  this.restManager_.startDelete(
     this.resourceId,
     this.version,
     callback,

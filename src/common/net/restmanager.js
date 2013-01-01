@@ -25,7 +25,7 @@ remobid.common.net.RestManager = function(baseUrl) {
 
   /**
    * holds all global headers for this service rest.
-   * @type {object.<string, string>?}
+   * @type {Object.<string, string>?}
    * @private
    */
   this.headers_ = {};
@@ -86,12 +86,12 @@ remobid.common.net.RestManager.prototype.isAvailable = function() {
  * @param {string} version version of the rest api.
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
- * @param {(string|number)=} id the id of the resource to delete. Use comma-
+ * @param {(string|number)} id the id of the resource to delete. Use comma-
  *    separation to batch multiple updates into one request.
- * @param {object} data the data to store.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {Object} data the data to store.
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  */
@@ -129,10 +129,10 @@ remobid.common.net.RestManager.prototype.handlePut_ = function(
  * @param {string} version version of the rest api.
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
- * @param {object} data the data to store.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {Object} data the data to store.
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  */
@@ -170,15 +170,15 @@ remobid.common.net.RestManager.prototype.handlePost_ = function(
  * @param {string} version version of the rest api.
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
- * @param {(string|number)=} id the id of the resource to delete. Use comma-
+ * @param {?(string|number)=} id the id of the resource to delete. Use comma-
  *    separation to batch multiple deletes into one request.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  */
-remobid.common.net.RestManager.prototype.delete = function(
+remobid.common.net.RestManager.prototype.startDelete = function(
   url, version, callback, id, opt_parameters, opt_headers) {
 
   if (!goog.isString(url) ||
@@ -212,12 +212,12 @@ remobid.common.net.RestManager.prototype.handleDelete_ = function(
  * @param {string} version version of the rest api.
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
- * @param {(string|number)=} opt_id the id of the resource or null if the fetch
+ * @param {?(string|number)=} opt_id the id of the resource or null if the fetch
  *    a collection. Use comma-separation to batch multiple ids into one
  *    request.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  */
@@ -256,14 +256,14 @@ remobid.common.net.RestManager.prototype.handleGet_ = function(
  * @param {string} version version of the rest api.
  * @param {function(boolean?, *)} callback the callback function, taking a
  *    boolean status and the fetched data.
- * @param {(string|number)=} opt_id the id of the resource or null if the fetch
+ * @param {?(string|number)=} opt_id the id of the resource or null if the fetch
  *    a collection. Use comma-separation to batch multiple ids into one
  *    request.
- * @param {Object|Array=} opt_content optional content to deliver as body of the
- *    request.
- * @param {string=} opt_parameters optional parameter to add to the request as
+ * @param {?(Object|Array)=} opt_content optional content to deliver as body of
+ *    the request.
+ * @param {?string=} opt_parameters optional parameter to add to the request as
  *    get parameters.
- * @param {object.<string, string>=} opt_headers optional headers to send with
+ * @param {?Object.<string, string>=} opt_headers optional headers to send with
  *    the request.
  * @return {goog.net.XhrManager.Request} The queued request object.
  * @private
@@ -294,7 +294,7 @@ remobid.common.net.RestManager.prototype.startRequest_ = function(
     method,
     goog.isObject(opt_content) || goog.isArray(opt_content) ?
       goog.json.serialize(opt_content) :
-      opt_content,
+      undefined,
     headers,
     undefined,
     goog.bind(this.handleRequest_, this, method, callback));
@@ -304,7 +304,7 @@ remobid.common.net.RestManager.prototype.startRequest_ = function(
  * callback after a request. Checks Status code and calls the original
  * call back.
  * @param {string} method the method of the request.
- * @param {function(*, goog.net.XhrIo)} callback the callback function, as given
+ * @param {function(boolean?, *)} callback the callback function, as given
  *    to the original method.
  * @param {goog.events.Event} event the original event fire by the xhrmanager.
  * @private
@@ -333,7 +333,7 @@ remobid.common.net.RestManager.prototype.handleRequest_ = function(
 
 /**
  * holds all instances of the RestManager.
- * @type {object.<string, remobid.common.net.RestManager>?}
+ * @type {Object.<string, remobid.common.net.RestManager>?}
  * @private
  */
 remobid.common.net.RestManager.instances_;
@@ -341,7 +341,7 @@ remobid.common.net.RestManager.instances_;
 /**
  *
  * holds the ussage counter for each instance
- * @type {object.<string, number>?}
+ * @type {Object.<string, number>?}
  * @private
  */
 remobid.common.net.RestManager.instanceConnections_;

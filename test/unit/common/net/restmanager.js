@@ -348,10 +348,10 @@ describe('UNIT - restmanager', function () {
           if(!--callbackTimes)
             done();
         };
-        Manager.delete('users', 'v1', cb, 1);
+        Manager.startDelete('users', 'v1', cb, 1);
         var xhr = Manager.xhrPool_.getXhr();
         xhr.simulateResponse(200, '');
-        Manager.delete('users', 'v1', cb, 1);
+        Manager.startDelete('users', 'v1', cb, 1);
         xhr.simulateResponse(204, '');
       });
 
@@ -362,7 +362,7 @@ describe('UNIT - restmanager', function () {
           assertEquals('DELETE', method);
           done();
         };
-        Manager.delete('users', 'v1', goog.nullFunction, 1);
+        Manager.startDelete('users', 'v1', goog.nullFunction, 1);
       });
 
       describe('errors', function() {
@@ -373,29 +373,29 @@ describe('UNIT - restmanager', function () {
           Manager.abort = Manager.send = goog.nullFunction;
           assertThrows(
             'request have to have an url',
-            goog.bind(Manager.delete, Manager, null, 'v1', goog.nullFunction, 1)
+            goog.bind(Manager.startDelete, Manager, null, 'v1', goog.nullFunction, 1)
           );
 
           assertThrows(
             'request have to have a version number',
-            goog.bind(Manager.delete, Manager,
+            goog.bind(Manager.startDelete, Manager,
                 'users', null, goog.nullFunction, 1)
           );
 
           assertThrows(
             'request have to have a callback function',
-            goog.bind(Manager.delete, Manager, 'users', 'v1', null, 1)
+            goog.bind(Manager.startDelete, Manager, 'users', 'v1', null, 1)
           );
 
           assertThrows(
             'request have to have a id',
-            goog.bind(Manager.delete, Manager, 'users',
+            goog.bind(Manager.startDelete, Manager, 'users',
                 'v1', goog.nullFunction, null)
           );
 
           assertNotThrows(
             'exception thrown, even if all need parameter are given',
-            goog.bind(Manager.delete, Manager, 'users',
+            goog.bind(Manager.startDelete, Manager, 'users',
               'v1', goog.nullFunction, 1)
           );
 
