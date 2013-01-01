@@ -31,7 +31,7 @@ goog.inherits(remobid.common.storage.StorageBase, goog.Disposable);
 
 /**
  * loads data for a given id, set of ids or by a filter
- * @param {function(boolean?,Object=)} callback the callback function which is
+ * @param {function(boolean?,*=)} callback the callback function which is
  *    called after the action is completed.
  * @param {null|string|number|Array} id single id, set of ids or null for all
  *    entries - maybe filtered by the options.
@@ -63,7 +63,8 @@ remobid.common.storage.StorageBase.prototype.load = function(
 /**
  * gets data for multiple ids. This should be overwritten by the subclass
  * @param {Array} ids ids of the resources.
- * @param {Object} opt_option optional options which should be applied.
+ * @param {remobid.common.storage.storageBase.Options=} opt_option optional
+ *    options which should be applied.
  * @param {function(boolean?,Object=)} callback the callback function which is
  *    called after the action is completed.
  * @return {Array} the loaded data.
@@ -82,7 +83,8 @@ remobid.common.storage.StorageBase.prototype.fetchMultipleData = function(
 /**
  * gets data. This should be overwritten by the subclass
  * @param {string|number} id id of the resource.
- * @param {Object} opt_option optional options which should be applied.
+ * @param {remobid.common.storage.storageBase.Options=} opt_option optional
+ *    options which should be applied.
  * @param {function(boolean?,Object=)} callback the callback function which is
  *    called after the action is completed.
  * @return {*} the filtered data.
@@ -199,5 +201,5 @@ remobid.common.storage.StorageBase.prototype.checkValidId = function(
   return validId;
 };
 
-/** @typedef {offset: number?, limit: number?, fields: Array.<string>?} */
+/** @typedef {{offset: number?, limit: number?, fields: Array.<string>?}} */
 remobid.common.storage.storageBase.Options;
