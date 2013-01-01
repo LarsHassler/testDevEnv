@@ -33,29 +33,10 @@ remobid.common.cache.LocalCache.prototype.setExpireTime = function(ms) {
   this.expireTime_ = parseInt(ms, 10);
 };
 
-/**
- * stores the given data for the given id
- * @param {function(boolean?,Object=)} callback the callback function which is
- *    called after the action is completed.
- * @param {string|number|Array.<string>|Array.<number>} id
- *    single id, set of ids.
- * @param {Object} data the data to store.
- * @param {boolean?} opt_retry if its already the retry.
- */
-remobid.common.cache.LocalCache.prototype.store = function(callback, id, data,
+/** @override */
+remobid.common.cache.LocalCache.prototype.save = function(callback, id, data,
     opt_retry) {
-  if (!this.checkValidId(id, callback))
-    return;
-
-  // check for missing data
-  if (!data) {
-    callback(
-      true,
-      {message: remobid.common.storage.StorageErrorType.MISSING_DATA}
-    );
-    return;
-  }
-  goog.base(this, 'store', goog.bind(function(err) {
+  goog.base(this, 'save', goog.bind(function(err) {
     // if quota exceeded clear expired and try again
     if (err) {
       if (!opt_retry) {
