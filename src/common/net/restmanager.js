@@ -187,7 +187,7 @@ remobid.common.net.RestManager.prototype.startRequest_ = function(
   if (goog.isDefAndNotNull(opt_id))
     restUrl += '/' + opt_id;
   if (goog.isDefAndNotNull(opt_parameters))
-    restUrl += '/' + opt_parameters;
+    restUrl += opt_parameters;
 
   var headers = goog.object.clone(this.headers_);
   if (goog.isDefAndNotNull(opt_headers))

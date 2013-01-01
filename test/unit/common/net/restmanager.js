@@ -231,7 +231,7 @@ describe('UNIT - restmanager', function () {
           Manager.send = function (
             id, url, method, context, headers) {
             assertEquals(
-              'https://api.remobid.com/v1/users/123/?fields=name',
+              'https://api.remobid.com/v1/users/123?fields=name',
               url
             );
             done();
