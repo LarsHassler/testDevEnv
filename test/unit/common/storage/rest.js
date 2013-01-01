@@ -59,7 +59,7 @@ describe('Unit - Rest storage', function () {
       Rest.remove(cb, [null]);
     });
 
-    it.skip('should not accept empty data', function(done) {
+    it('should not accept empty data', function() {
 
     });
 
@@ -105,41 +105,46 @@ describe('Unit - Rest storage', function () {
       );
     });
 
-    it.skip('should delete multiple ids', function(done) {
-
+    it('should delete multiple ids', function() {
+      var callback = function() {};
+      var xhr = Rest.restManager_.xhrPool_.getXhr();
+      Rest.remove(callback, ['key1', 2]);
+      assertEquals('wrong uri constructed',
+        baseUrl + '/v1/users/key1,2',
+        xhr.getLastUri()
+      );
+      assertEquals('wrong method used',
+        'DELETE',
+        xhr.getLastMethod()
+      );
     });
 
-    describe.skip('types', function() {
+    describe('load options', function() {
 
-      it('should save and return strings', function(done) {
-
+      it('should handle fields option', function() {
+        var callback = function() {};
+        var xhr = Rest.restManager_.xhrPool_.getXhr();
+        Rest.load(callback, null, {fields : ['lastName', 'age']});
+        assertEquals('wrong uri constructed',
+          baseUrl + '/v1/users?fields=lastName,age',
+          xhr.getLastUri()
+        );
       });
 
-      it('should save and return numbers', function(done) {
-
-      });
-
-      it('should save and return arrays', function(done) {
-
-      });
-
-      it('should save and return objects', function(done) {
-
-      });
-
-      it('should save and return Date objects', function(done) {
-
-      });
-    });
-
-    describe.skip('load options', function() {
-
-      it('should only return the fields data', function(done) {
-
-      });
-
-      it('should apply fields only on object data', function(done) {
-
+      it('should handle offset and limit', function() {
+        var callback = function() {};
+        var xhr = Rest.restManager_.xhrPool_.getXhr();
+        Rest.load(callback, null, {offset : 25});
+        assertEquals('wrong uri constructed',
+          baseUrl + '/v1/users?offset=25',
+          xhr.getLastUri()
+        );
+        xhr.abort();
+        Rest.load(callback, null, {offset : 25, limit: 50});
+        assertEquals('wrong uri constructed',
+          baseUrl + '/v1/users?offset=25&limit=50',
+          xhr.getLastUri()
+        );
       });
 
     });

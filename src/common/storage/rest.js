@@ -7,6 +7,7 @@ goog.provide('remobid.common.storage.Rest');
 goog.require('remobid.common.net.RestManager');
 goog.require('remobid.common.storage.StorageBase');
 goog.require('remobid.common.storage.StorageErrorType');
+goog.require('remobid.common.storage.storageBase.Options');
 
 
 /**
@@ -38,20 +39,19 @@ remobid.common.storage.Rest.prototype.isAvailable = function() {
 /** @override */
 remobid.common.storage.Rest.prototype.load = function(
     callback, id, opt_option) {
-  if (!this.checkValidId(id, callback))
+  if (goog.isDefAndNotNull(id) && !this.checkValidId(id, callback))
     return;
-
-  var parameter = null;
 
   if (goog.isArray(id)) {
     id = id.join(',');
   }
+
   this.restManager_.get(
     this.resourceId,
     this.version,
     callback,
     id,
-    goog.isDefAndNotNull(parameter) ? parameter : null
+    this.createParameterUriString(opt_option)
   );
 };
 
@@ -61,13 +61,40 @@ remobid.common.storage.Rest.prototype.remove = function(
   if (!this.checkValidId(id, callback))
     return;
 
-  var parameter = null;
+  if (goog.isArray(id)) {
+    id = id.join(',');
+  }
 
   this.restManager_.delete(
     this.resourceId,
     this.version,
     callback,
     id,
-    goog.isDefAndNotNull(parameter) ? parameter : null
+    this.createParameterUriString(opt_option)
   );
+};
+
+/**
+ * creates the parameter string to attach to the url.
+ * @param {remobid.common.storage.storageBase.Options=} opt_option the options
+ *    to create the string from.
+ * @return {string?} the final uri parameter string or null if not applicable.
+ */
+remobid.common.storage.Rest.prototype.createParameterUriString = function(
+    opt_option) {
+  if (!goog.isDefAndNotNull(opt_option) || !goog.isObject(opt_option))
+    return null;
+
+  var string = '';
+
+  if (goog.isDef(opt_option.fields))
+    string += '&fields=' + opt_option.fields.join(',');
+
+  if (goog.isNumber(opt_option.offset))
+    string += '&offset=' + opt_option.offset;
+
+  if (goog.isNumber(opt_option.limit))
+    string += '&limit=' + opt_option.limit;
+
+  return '?' + string.substr(1);
 };
