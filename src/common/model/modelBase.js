@@ -1,0 +1,145 @@
+/**
+ * @fileoverview tests for remobid.common.model.ModelBase.
+ */
+
+goog.provide('remobid.common.model.ModelBase');
+
+goog.require('goog.events.EventTarget');
+goog.provide('remobid.common.model.Registry');
+
+
+/**
+ * @param {string} id the identifier of the resource model.
+ * @constructor
+ * @extends {goog.events.EventTarget}
+ */
+remobid.common.model.ModelBase = function(id) {
+  /**
+   * the identifier of the resource model
+   * @type {string}
+   * @private
+   */
+  this.identifier_ = id;
+
+  /**
+   * the storage engine for this model.
+   * @type {remobid.common.storage.StorageBase?}
+   * @private
+   */
+  this.storage_ = null;
+
+  /**
+   * the cache engine for this model.
+   * @type {remobid.common.storage.StorageBase?}
+   * @private
+   */
+  this.cache_ = null;
+
+  /**
+   * whenever the data for this model was already loaded.
+   * @type {boolean}
+   * @private
+   */
+  this.dataLoaded_ = false;
+
+  /**
+   * whenever the request to load the data for this model was already issued,
+   * but was not completed yet.
+   * @type {boolean}
+   * @private
+   */
+  this.loading_ = false;
+
+  /**
+   * whenever the model should be automatically stored via the storage engine on
+   * every update
+   * @type {boolean}
+   * @private
+   */
+  this.autoStoreEnabled_ = true;
+};
+goog.inherits(remobid.common.model.ModelBase,
+  goog.events.EventTarget);
+
+/**
+ * @param {boolean} enabled should the model be automatically stored on every
+ *    update.
+ */
+remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
+  this.autoStoreEnabled_ = enabled;
+};
+
+/**
+ * @return {boolean} whenever the model should be automatically stored via the
+ * storage engine on every update.
+ */
+remobid.common.model.ModelBase.prototype.isAutoStoreEnabled = function() {
+  return this.autoStoreEnabled_;
+};
+
+/**
+ * @param {string} id the identifier of the resource model.
+ */
+remobid.common.model.ModelBase.prototype.setIdentifier = function(id) {
+  this.identifier_ = id;
+};
+
+/**
+ * @return {string} the id of the resource model.
+ */
+remobid.common.model.ModelBase.prototype.getIdentifier = function() {
+  return this.identifier_;
+};
+
+/**
+ * @param {remobid.common.storage.StorageBase?} engine the new storage engine.
+ */
+remobid.common.model.ModelBase.prototype.setStorage = function(engine) {
+  this.storage_ = engine;
+};
+
+/**
+ * @return {remobid.common.storage.StorageBase?} the storage engine.
+ */
+remobid.common.model.ModelBase.prototype.getStorage = function() {
+  return this.storage_;
+};
+
+/**
+ * @param {remobid.common.storage.StorageBase?} engine the new cache engine.
+ */
+remobid.common.model.ModelBase.prototype.setCache = function(engine) {
+  this.cache_ = engine;
+};
+
+/**
+ * @return {remobid.common.storage.StorageBase?} the cache engine.
+ */
+remobid.common.model.ModelBase.prototype.getCache = function() {
+  return this.cache_;
+};
+
+/**
+ * @param {boolean} loaded is the data already loaded.
+ */
+remobid.common.model.ModelBase.prototype.setDataLoaded = function(loaded) {
+  this.dataLoaded_ = loaded;
+};
+
+/**
+ * @return {boolean} whenever the model data is already loaded.
+ */
+remobid.common.model.ModelBase.prototype.isDataLoaded = function() {
+  return this.dataLoaded_;
+};
+
+/**
+ * @return {boolean} whenever the model is loading its data.
+ */
+remobid.common.model.ModelBase.prototype.isLoading = function() {
+  return this.loading_;
+};
+
+
+
+/* ####### static ####### */
