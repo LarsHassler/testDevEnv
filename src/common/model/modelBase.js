@@ -78,6 +78,7 @@ goog.inherits(remobid.common.model.ModelBase,
 
 /** @override */
 remobid.common.model.ModelBase.prototype.disposeInternal = function() {
+  this.dispatchEvent(remobid.common.model.modelBase.EventType.DELETED);
   this.mappings_ = null;
 };
 

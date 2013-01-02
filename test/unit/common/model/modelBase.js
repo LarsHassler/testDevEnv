@@ -9,21 +9,24 @@ try {
 } catch (e) {
 }
 
+goog.require('goog.events');
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.model.ModelBase');
+goog.require('remobid.common.model.modelBase.EventType');
 
 describe('UNIT - ModelBase', function() {
+  var Model;
+
+  beforeEach(function(){
+    Model = new remobid.common.model.ModelBase();
+  });
+
+  afterEach(function() {
+    if(!Model.isDisposed())
+      Model.dispose();
+  });
 
   describe('mappings functionality', function() {
-    var Model;
-
-    beforeEach(function(){
-      Model = new remobid.common.model.ModelBase();
-    });
-
-    afterEach(function() {
-      Model.dispose();
-    });
 
     it('should use the setterHelper', function(done) {
       var mappingsToDo = 2,
@@ -80,5 +83,26 @@ describe('UNIT - ModelBase', function() {
       });
     });
 
+    it('should remove the reference' +
+        'to the mappings on disposal', function() {
+      Model.dispose();
+      assertNull('reference should be deleted',
+        Model.mappings_);
+    });
+
+  });
+
+  describe('Events', function() {
+
+    it('should dispatch DELETED Event on dispose', function(done) {
+      goog.events.listenOnce(
+        Model,
+        remobid.common.model.modelBase.EventType.DELETED,
+        function() {
+          done();
+        }
+      );
+      Model.dispose();
+    });
   });
 });
