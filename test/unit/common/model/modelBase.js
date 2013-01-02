@@ -67,12 +67,17 @@ describe('UNIT - ModelBase', function() {
           setter: setter
         },
         {
-          name: 'unknown',
+          name: 'notGiven',
           getter: goog.nullFunction,
-          setter: setter
+          setter: setter,
+          setterHelper: setterHelper
         }
       ];
-      Model.updateDataViaMappings({'id': 123, 'href': 'www.test.de', 'a': 'b'});
+      Model.updateDataViaMappings({
+        'id': 123,
+        'href': 'www.test.de',
+        'unknown': 'b'
+      });
     });
 
   });

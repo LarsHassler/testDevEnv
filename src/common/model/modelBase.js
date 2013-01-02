@@ -193,11 +193,11 @@ remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
   goog.array.forEach(this.mappings_, function(mapping) {
     // check if there is anything to update for this mapping
     if (goog.isDef(data[mapping.name])) {
-      // if is defined use the helper function first
+      var value = data[mapping.name];
+      // if is defined use the helper function on the given value before calling
+      // the setter of the data model instance
       if (goog.isDef(mapping.setterHelper))
-        var value = mapping.setterHelper(data[mapping.name]);
-      else
-        var value = data[mapping.name];
+        value = mapping.setterHelper(value);
 
       // call the setter function with the new value
       mapping.setter.call(this, value);
@@ -230,3 +230,22 @@ remobid.common.model.ModelBase.attributeMappings = [
  *   getterHelper?, setterHelper?, autoStore?}}
  */
 remobid.common.model.modelBase.Mapping;
+
+/** @enum {string} */
+remobid.common.model.modelBase.EventType = {
+  // if the model instance will be deleted
+  DELETED: 'deleted',
+  // if the model was changed due to new data from the server
+  CHANGED: 'changed',
+  // if the model was changed due to action within the view
+  LOCALLY_CHANGED: 'local_changed',
+  // if the data was stored successfully on the server
+  STORED: 'stored',
+  // if the data couldn't be transmitted onto the server, but was queued locally
+  // so it can be transmitted later when the connection can be established
+  LOCALLY_STORED: 'local_stored',
+  // if the data was stored in the cache
+  CACHED: 'cached',
+  // if the request to load the data from a server was successful
+  LOADED: 'loaded'
+};
