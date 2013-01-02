@@ -3,9 +3,10 @@
  */
 
 goog.provide('remobid.common.model.ModelBase');
+goog.provide('remobid.common.model.modelBase.Mapping');
 
 goog.require('goog.events.EventTarget');
-goog.provide('remobid.common.model.Registry');
+goog.require('remobid.common.model.Registry');
 
 
 /**
@@ -64,9 +65,21 @@ remobid.common.model.ModelBase = function(id) {
    * @private
    */
   this.autoStoreEnabled_ = true;
+
+  /**
+   * a reference to the attribute mappings of this resource type.
+   * @type {Array.<remobid.common.model.modelBase.Mapping>}
+   * @private
+   */
+  this.mappings_ = remobid.common.model.ModelBase.attributeMappings;
 };
 goog.inherits(remobid.common.model.ModelBase,
   goog.events.EventTarget);
+
+/** @override */
+remobid.common.model.ModelBase.prototype.disposeInternal = function() {
+  this.mappings_ = null;
+};
 
 /**
  * @param {boolean} enabled should the model be automatically stored on every
@@ -169,12 +182,35 @@ remobid.common.model.ModelBase.prototype.isLoading = function() {
 };
 
 
+/* mapping functionality */
+
+/**
+ * sets the data of this model to the given data via the attributeMappings.
+ * @param {Object} data the new data.
+ */
+remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
+    data) {
+  goog.array.forEach(this.mappings_, function(mapping) {
+    // check if there is anything to update for this mapping
+    if (goog.isDef(data[mapping.name])) {
+      // if is defined use the helper function first
+      if (goog.isDef(mapping.setterHelper))
+        var value = mapping.setterHelper(data[mapping.name]);
+      else
+        var value = data[mapping.name];
+
+      // call the setter function with the new value
+      mapping.setter.call(this, value);
+    }
+  });
+};
+
 
 /* ####### static ####### */
 
 /**
  * holds all attribute mappings for this resource type.
- * @type {Array.<remobid.common.model.ModelBase.MAPPING>}
+ * @type {Array.<remobid.common.model.modelBase.Mapping>}
  */
 remobid.common.model.ModelBase.attributeMappings = [
   {
@@ -193,4 +229,4 @@ remobid.common.model.ModelBase.attributeMappings = [
  * @typedef {{name, getter, setter,
  *   getterHelper?, setterHelper?, autoStore?}}
  */
-remobid.common.model.ModelBase.MAPPING;
+remobid.common.model.modelBase.Mapping;
