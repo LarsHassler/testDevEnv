@@ -22,6 +22,13 @@ remobid.common.model.ModelBase = function(id) {
   this.identifier_ = id;
 
   /**
+   * the unique rest url of the resource
+   * @type {string?}
+   * @private
+   */
+  this.restUrl_ = null;
+
+  /**
    * the storage engine for this model.
    * @type {remobid.common.storage.StorageBase?}
    * @private
@@ -92,6 +99,27 @@ remobid.common.model.ModelBase.prototype.getIdentifier = function() {
 };
 
 /**
+ * @param {string} url the rest url of the resource model.
+ */
+remobid.common.model.ModelBase.prototype.setRestUrl = function(url) {
+  this.restUrl_ = url;
+};
+
+/**
+ * @return {string} the rest url of the resource model.
+ */
+remobid.common.model.ModelBase.prototype.getRestUrl = function() {
+  return this.restUrl_;
+};
+
+/**
+ * @return {boolean} whenever the resource has a URL already.
+ */
+remobid.common.model.ModelBase.prototype.hasRestUrl = function() {
+  return !goog.isNull(this.restUrl_);
+};
+
+/**
  * @param {remobid.common.storage.StorageBase?} engine the new storage engine.
  */
 remobid.common.model.ModelBase.prototype.setStorage = function(engine) {
@@ -143,3 +171,26 @@ remobid.common.model.ModelBase.prototype.isLoading = function() {
 
 
 /* ####### static ####### */
+
+/**
+ * holds all attribute mappings for this resource type.
+ * @type {Array.<remobid.common.model.ModelBase.MAPPING>}
+ */
+remobid.common.model.ModelBase.attributeMappings = [
+  {
+    name: 'id',
+    getter: remobid.common.model.ModelBase.prototype.getIdentifier,
+    setter: remobid.common.model.ModelBase.prototype.setIdentifier
+  },
+  {
+    name: 'href',
+    getter: remobid.common.model.ModelBase.prototype.getRestUrl,
+    setter: remobid.common.model.ModelBase.prototype.setRestUrl
+  }
+];
+
+/**
+ * @typedef {{name, getter, setter,
+ *   getterHelper?, setterHelper?, autoStore?}}
+ */
+remobid.common.model.ModelBase.MAPPING;
