@@ -12,7 +12,7 @@ try {
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.model.Registry');
 
-describe('UNIT - Model directory', function () {
+describe('UNIT - Model Registry ', function () {
   var registry;
 
   beforeEach(function() {
