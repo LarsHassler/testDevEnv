@@ -79,6 +79,15 @@ describe('UNIT - ModelBase', function() {
       clock.dispose();
     });
 
+    it('should throw an error if there are unsaved attributes', function() {
+      Model.setIdentifier('a');
+      assertThrows(
+        goog.bind(Model.dispose, Model)
+      );
+      assertNotThrows(
+        goog.bind(Model.dispose, Model, true)
+      );
+    });
   });
 
   describe('supressed', function() {
