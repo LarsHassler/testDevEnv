@@ -27,6 +27,7 @@ describe('UNIT - ModelBase', function() {
   afterEach(function() {
     if(!Model.isDisposed())
       Model.dispose();
+    goog.events.removeAll();
   });
 
   describe('mappings functionality', function() {
@@ -129,7 +130,7 @@ describe('UNIT - ModelBase', function() {
       var clock = new goog.testing.MockClock(true),
         dispatchCounter = 0;
 
-      goog.events.listenOnce(
+      goog.events.listen(
         Model,
         remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
         function() {
@@ -147,7 +148,7 @@ describe('UNIT - ModelBase', function() {
         0,
         dispatchCounter
       );
-      clock.tick(99);
+      clock.tick(Model.changedEventDelay_ - 1);
       assertEquals(
         'Event should not be dispatched yet',
         0,
@@ -160,7 +161,56 @@ describe('UNIT - ModelBase', function() {
         dispatchCounter
       );
 
-      clock.uninstall();
+      clock.dispose();
+    });
+    
+    it('should only dispatch only one LOCALLY_CHANGED Event if to setters' +
+        'are called within the delay', function(done) {
+      var clock = new goog.testing.MockClock(true),
+        dispatchCounter = 1;
+
+      goog.events.listen(
+        Model,
+        remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+        function() {
+          if(--dispatchCounter <= 0)
+            done();
+        }
+      );
+
+      Model.setIdentifier(123);
+      Model.setRestUrl('www.test.de');
+      assertEquals('there should be to 2 timer set',
+        2,
+        clock.getTimeoutsMade()
+      );
+      clock.tick(Model.changedEventDelay_);
+
+      clock.dispose();
+    });
+
+    it('should dispatch a CHANGED Event if the data is set via' +
+        'the updateFromExternal function', function(done) {
+      var clock = new goog.testing.MockClock(true),
+        dispatchCounter = 1;
+      goog.events.listen(
+        Model,
+        remobid.common.model.ModelBase.EventType.CHANGED,
+        function() {
+          if(--dispatchCounter <= 0)
+            done();
+        }
+      );
+      Model.updateFromExternal({
+        'id': 123
+      });
+      clock.tick(Model.changedEventDelay_);
+      Model.setRestUrl('www.test.de');
+      assertEquals('there should be to 2 timer set',
+        2,
+        clock.getTimeoutsMade()
+      );
+      clock.tick(Model.changedEventDelay_);
     });
   });
 });

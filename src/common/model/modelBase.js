@@ -61,12 +61,34 @@ remobid.common.model.ModelBase = function(id) {
   this.loading_ = false;
 
   /**
+   * delay for the changed Event
+   * @type {number}
+   * @private
+   */
+  this.changedEventDelay_ = remobid.common.model.ModelBase.changedEventDelay_;
+
+  /**
    * whenever the model should be automatically stored via the storage engine on
    * every update
    * @type {boolean}
    * @private
    */
   this.autoStoreEnabled_ = true;
+
+  /**
+   * whenever this instance should not dispatch a changed event. Used for bulk
+   * updates
+   * @type {boolean}
+   * @private
+   */
+  this.supressChangeEvent_ = false;
+
+  /**
+   * the id of the timeout for the changed Delay
+   * @type {number?}
+   * @private
+   */
+  this.changedEventTimerId_ = null;
 
   /**
    * a reference to the attribute mappings of this resource type.
@@ -108,6 +130,7 @@ remobid.common.model.ModelBase.prototype.isAutoStoreEnabled = function() {
  */
 remobid.common.model.ModelBase.prototype.setIdentifier = function(id) {
   this.identifier_ = id;
+  this.prepareChangeEvent();
 };
 
 /**
@@ -122,6 +145,7 @@ remobid.common.model.ModelBase.prototype.getIdentifier = function() {
  */
 remobid.common.model.ModelBase.prototype.setRestUrl = function(url) {
   this.restUrl_ = url;
+  this.prepareChangeEvent();
 };
 
 /**
@@ -191,12 +215,32 @@ remobid.common.model.ModelBase.prototype.isLoading = function() {
 /* mapping functionality */
 
 /**
+ * sets the data like {@code updateDataViaMappings} but dispatches a CHANGED
+ * Event when finished.
+ * @param {Object} data the new data recieved from the server.
+ */
+remobid.common.model.ModelBase.prototype.updateFromExternal = function(
+  data) {
+  goog.events.listenOnce(this,
+    remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+    goog.bind(
+      this.dispatchEvent,
+      this,
+      remobid.common.model.ModelBase.EventType.CHANGED
+    )
+  );
+  this.updateDataViaMappings(data);
+};
+/**
  * sets the data of this model to the given data via the attributeMappings.
  * @param {Object} data the new data.
  */
 remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
     data) {
+
+  this.supressChangeEvent_ = true;
   var changedSomething = false;
+
   goog.array.forEach(this.mappings_, function(mapping) {
     // check if there is anything to update for this attribute
     if (goog.isDef(data[mapping.name])) {
@@ -211,6 +255,7 @@ remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
       changedSomething = true;
     }
   }, this);
+  this.supressChangeEvent_ = false;
   if (changedSomething)
     this.prepareChangeEvent();
 };
@@ -219,18 +264,31 @@ remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
  * sets the timer for the {@code LOCALLY_CHANGED} Event.
  */
 remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
-  goog.Timer.callOnce(
-    goog.bind(
-      this.dispatchEvent,
-      this,
-      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
-    ),
-    100
-  );
+  if (this.supressChangeEvent_)
+    return;
+
+  goog.Timer.clear(this.changedEventTimerId_);
+
+  this.changedEventTimerId_ = goog.Timer.callOnce(
+      goog.bind(
+        this.dispatchEvent,
+        this,
+        remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
+      ),
+      this.changedEventDelay_
+    );
 };
 
 
 /* ####### static ####### */
+
+/**
+ * default delay for the changed Event
+ * @type {number}
+ * @const
+ * @private
+ */
+remobid.common.model.ModelBase.changedEventDelay_ = 100;
 
 /**
  * holds all attribute mappings for this resource type.
