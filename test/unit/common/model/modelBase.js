@@ -3,16 +3,19 @@
  */
 
 /** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {
+if (typeof module !== 'undefined' && module.exports) {
+  require('nclosure');
 }
 
 goog.require('goog.events');
 goog.require('goog.testing.asserts');
+goog.require('goog.testing.MockClock');
 goog.require('remobid.common.model.ModelBase');
-goog.require('remobid.common.model.modelBase.EventType');
+goog.require('remobid.common.model.ModelBase.EventType');
+
+if (typeof module !== 'undefined' && module.exports) {
+  goog.Timer.defaultTimerObject = goog.global;
+}
 
 describe('UNIT - ModelBase', function() {
   var Model;
@@ -27,6 +30,22 @@ describe('UNIT - ModelBase', function() {
   });
 
   describe('mappings functionality', function() {
+
+    it('should update all known given attributes', function() {
+      Model.updateDataViaMappings({
+        'id': 123,
+        'href': 'www.test.de',
+        'unknown': 'b'
+      });
+      assertEquals('id was not changed',
+        123,
+        Model.getIdentifier()
+      );
+      assertEquals('url was not changed',
+        'www.test.de',
+        Model.getRestUrl()
+      );
+    });
 
     it('should use the setterHelper', function(done) {
       var mappingsToDo = 2,
@@ -97,12 +116,51 @@ describe('UNIT - ModelBase', function() {
     it('should dispatch DELETED Event on dispose', function(done) {
       goog.events.listenOnce(
         Model,
-        remobid.common.model.modelBase.EventType.DELETED,
+        remobid.common.model.ModelBase.EventType.DELETED,
         function() {
           done();
         }
       );
       Model.dispose();
+    });
+
+    it('should dispatch the LOCALLY_CHANGED ' +
+        'Event with the set delay', function() {
+      var clock = new goog.testing.MockClock(true),
+        dispatchCounter = 0;
+
+      goog.events.listenOnce(
+        Model,
+        remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+        function() {
+          dispatchCounter++;
+        }
+      );
+      // we have to update some data, otherwise the event would not
+      // be dispatched
+      Model.updateDataViaMappings({
+        'id': 123
+      });
+
+      assertEquals(
+        'Event should not be dispatched yet',
+        0,
+        dispatchCounter
+      );
+      clock.tick(99);
+      assertEquals(
+        'Event should not be dispatched yet',
+        0,
+        dispatchCounter
+      );
+      clock.tick(1);
+      assertEquals(
+        'Event not dispatched after delay',
+        1,
+        dispatchCounter
+      );
+
+      clock.uninstall();
     });
   });
 });

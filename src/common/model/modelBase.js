@@ -3,8 +3,10 @@
  */
 
 goog.provide('remobid.common.model.ModelBase');
-goog.provide('remobid.common.model.modelBase.Mapping');
+goog.provide('remobid.common.model.ModelBase.EventType');
+goog.provide('remobid.common.model.ModelBase.Mapping');
 
+goog.require('goog.Timer');
 goog.require('goog.events.EventTarget');
 goog.require('remobid.common.model.Registry');
 
@@ -68,7 +70,7 @@ remobid.common.model.ModelBase = function(id) {
 
   /**
    * a reference to the attribute mappings of this resource type.
-   * @type {Array.<remobid.common.model.modelBase.Mapping>}
+   * @type {Array.<remobid.common.model.ModelBase.Mapping>}
    * @private
    */
   this.mappings_ = remobid.common.model.ModelBase.attributeMappings;
@@ -76,9 +78,12 @@ remobid.common.model.ModelBase = function(id) {
 goog.inherits(remobid.common.model.ModelBase,
   goog.events.EventTarget);
 
-/** @override */
+/**
+ * dispatches an {@code DELETED} Event before disposing of the instance.
+ * @override
+ * */
 remobid.common.model.ModelBase.prototype.disposeInternal = function() {
-  this.dispatchEvent(remobid.common.model.modelBase.EventType.DELETED);
+  this.dispatchEvent(remobid.common.model.ModelBase.EventType.DELETED);
   this.mappings_ = null;
 };
 
@@ -191,19 +196,37 @@ remobid.common.model.ModelBase.prototype.isLoading = function() {
  */
 remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
     data) {
+  var changedSomething = false;
   goog.array.forEach(this.mappings_, function(mapping) {
-    // check if there is anything to update for this mapping
+    // check if there is anything to update for this attribute
     if (goog.isDef(data[mapping.name])) {
       var value = data[mapping.name];
-      // if is defined use the helper function on the given value before calling
-      // the setter of the data model instance
+      // if a helper function is defined use it on the given value before
+      // calling the setter of the data model instance
       if (goog.isDef(mapping.setterHelper))
         value = mapping.setterHelper(value);
 
       // call the setter function with the new value
       mapping.setter.call(this, value);
+      changedSomething = true;
     }
-  });
+  }, this);
+  if (changedSomething)
+    this.prepareChangeEvent();
+};
+
+/**
+ * sets the timer for the {@code LOCALLY_CHANGED} Event.
+ */
+remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
+  goog.Timer.callOnce(
+    goog.bind(
+      this.dispatchEvent,
+      this,
+      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
+    ),
+    100
+  );
 };
 
 
@@ -211,7 +234,7 @@ remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
 
 /**
  * holds all attribute mappings for this resource type.
- * @type {Array.<remobid.common.model.modelBase.Mapping>}
+ * @type {Array.<remobid.common.model.ModelBase.Mapping>}
  */
 remobid.common.model.ModelBase.attributeMappings = [
   {
@@ -230,10 +253,10 @@ remobid.common.model.ModelBase.attributeMappings = [
  * @typedef {{name, getter, setter,
  *   getterHelper?, setterHelper?, autoStore?}}
  */
-remobid.common.model.modelBase.Mapping;
+remobid.common.model.ModelBase.Mapping;
 
 /** @enum {string} */
-remobid.common.model.modelBase.EventType = {
+remobid.common.model.ModelBase.EventType = {
   // if the model instance will be deleted
   DELETED: 'deleted',
   // if the model was changed due to new data from the server
