@@ -61,6 +61,13 @@ remobid.common.model.ModelBase = function(id) {
   this.loading_ = false;
 
   /**
+   * holds all listener keys for the internals event listener
+   * @type {number}
+   * @private
+   */
+  this.listenerKeys_ = [];
+
+  /**
    * delay for the changed Event
    * @type {number}
    * @private
@@ -74,6 +81,8 @@ remobid.common.model.ModelBase = function(id) {
    * @private
    */
   this.autoStoreEnabled_ = true;
+  // call the setter to set up the listener
+  this.setAutoStore(this.autoStoreEnabled_);
 
   /**
    * whenever this instance should not dispatch a changed event. Used for bulk
@@ -82,6 +91,22 @@ remobid.common.model.ModelBase = function(id) {
    * @private
    */
   this.supressChangeEvent_ = false;
+
+  /**
+   * whenever this instance should not track which variables are changed but not
+   * stored yet {@code trackedAttributes_}.
+   * @type {boolean}
+   * @private
+   */
+  this.supressChangeTracking_ = false;
+
+  /**
+   * holds all attributes which have been changed since the last time this
+   * resource was stored
+   * @type {Array.<remobid.common.model.ModelBase.Mapping>}
+   * @private
+   */
+  this.trackedAttributes_ = [];
 
   /**
    * the id of the timeout for the changed Delay
@@ -101,20 +126,68 @@ goog.inherits(remobid.common.model.ModelBase,
   goog.events.EventTarget);
 
 /**
+ * @param {boolean} forced supresses the Exception {@code UNSAVED}.
+ * @override
+ */
+remobid.common.model.ModelBase.prototype.dispose = function(forced) {
+  if (!forced && this.trackedAttributes_.length)
+    throw new Error(remobid.common.model.ModelBase.ErrorType.UNSAVED);
+  goog.base(this, 'dispose');
+};
+/**
  * dispatches an {@code DELETED} Event before disposing of the instance.
  * @override
  * */
 remobid.common.model.ModelBase.prototype.disposeInternal = function() {
+
   this.dispatchEvent(remobid.common.model.ModelBase.EventType.DELETED);
   this.mappings_ = null;
+  this.trackedAttributes_ = null;
+  goog.array.forEach(this.listenerKeys_, function(key) {
+    goog.events.unlistenByKey(key);
+  });
+  this.listenerKeys_ = null;
+  goog.Timer.clear(this.changedEventTimerId_);
 };
 
 /**
+ * @param {goog.event.Event} event the {@code LOCALLY_CHANGED} Event.
+ */
+remobid.common.model.ModelBase.prototype.handleAutoStore = function(event) {
+  // this.store();
+};
+
+/**
+ * sets the flag for the autostore ability and sets up or tears down the
+ * appropriate listeners.
  * @param {boolean} enabled should the model be automatically stored on every
  *    update.
  */
 remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
   this.autoStoreEnabled_ = enabled;
+  var key;
+
+  if (this.autoStoreEnabled_) {
+    key = goog.events.listen(
+      this,
+      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+      this.handleAutoStore,
+      false,
+      this
+    );
+    this.listenerKeys_.push(key);
+  } else {
+    key = goog.events.getListener(
+      this,
+      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+      this.handleAutoStore,
+      false,
+      this
+    );
+    goog.events.unlistenByKey(key);
+    goog.array.remove(this.listenerKeys_, key);
+  }
+
 };
 
 /**
@@ -126,11 +199,57 @@ remobid.common.model.ModelBase.prototype.isAutoStoreEnabled = function() {
 };
 
 /**
+ * @param {boolean} supressed whenever the model does fire a LOCALLY_CHANGED
+ * Event.
+ */
+remobid.common.model.ModelBase.prototype.setSupressChangeEvent = function(
+    supressed) {
+  this.supressChangeEvent_ = supressed;
+};
+
+/**
+ * @return {boolean} whenever the model does fire a LOCALLY_CHANGED Event.
+ */
+remobid.common.model.ModelBase.prototype.isSupressChangeEvent = function() {
+  return this.supressChangeEvent_;
+};
+
+/**
+ * @param {boolean} supressed whenever the model does not track which attributes
+ * are changed.
+ */
+remobid.common.model.ModelBase.prototype.setSupressChangeTracking = function(
+    supressed) {
+  this.supressChangeTracking_ = supressed;
+};
+
+/**
+ * @return {boolean} whenever the model does not track which attributes are
+ * changed.
+ */
+remobid.common.model.ModelBase.prototype.isSupressChangeTracking = function() {
+  return this.supressChangeTracking_;
+};
+
+/**
+ *
+ * @param {remobid.common.model.ModelBase.Mapping} attributeMapping the mappings
+ *    for the attribute to change.
+ */
+remobid.common.model.ModelBase.prototype.handleChangedAttribute = function(
+    attributeMapping) {
+  if (!this.supressChangeTracking_)
+    this.trackedAttributes_.push(attributeMapping);
+  if (!this.supressChangeEvent_)
+    this.prepareChangeEvent();
+};
+/**
  * @param {string} id the identifier of the resource model.
  */
 remobid.common.model.ModelBase.prototype.setIdentifier = function(id) {
   this.identifier_ = id;
-  this.prepareChangeEvent();
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.ID);
 };
 
 /**
@@ -145,7 +264,8 @@ remobid.common.model.ModelBase.prototype.getIdentifier = function() {
  */
 remobid.common.model.ModelBase.prototype.setRestUrl = function(url) {
   this.restUrl_ = url;
-  this.prepareChangeEvent();
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.HREF);
 };
 
 /**
@@ -221,7 +341,7 @@ remobid.common.model.ModelBase.prototype.isLoading = function() {
  */
 remobid.common.model.ModelBase.prototype.updateFromExternal = function(
   data) {
-  goog.events.listenOnce(this,
+  var listenerKey = goog.events.listenOnce(this,
     remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
     goog.bind(
       this.dispatchEvent,
@@ -230,6 +350,7 @@ remobid.common.model.ModelBase.prototype.updateFromExternal = function(
     )
   );
   this.updateDataViaMappings(data);
+  this.listenerKeys_.push(listenerKey);
 };
 /**
  * sets the data of this model to the given data via the attributeMappings.
@@ -241,7 +362,7 @@ remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
   this.supressChangeEvent_ = true;
   var changedSomething = false;
 
-  goog.array.forEach(this.mappings_, function(mapping) {
+  goog.object.forEach(this.mappings_, function(mapping) {
     // check if there is anything to update for this attribute
     if (goog.isDef(data[mapping.name])) {
       var value = data[mapping.name];
@@ -292,20 +413,20 @@ remobid.common.model.ModelBase.changedEventDelay_ = 100;
 
 /**
  * holds all attribute mappings for this resource type.
- * @type {Array.<remobid.common.model.ModelBase.Mapping>}
+ * @type {Object.<remobid.common.model.ModelBase.Mapping>}
  */
-remobid.common.model.ModelBase.attributeMappings = [
-  {
+remobid.common.model.ModelBase.attributeMappings = {
+  ID: {
     name: 'id',
     getter: remobid.common.model.ModelBase.prototype.getIdentifier,
     setter: remobid.common.model.ModelBase.prototype.setIdentifier
   },
-  {
+  HREF: {
     name: 'href',
     getter: remobid.common.model.ModelBase.prototype.getRestUrl,
     setter: remobid.common.model.ModelBase.prototype.setRestUrl
   }
-];
+};
 
 /**
  * @typedef {{name, getter, setter,
@@ -330,4 +451,11 @@ remobid.common.model.ModelBase.EventType = {
   CACHED: 'cached',
   // if the request to load the data from a server was successful
   LOADED: 'loaded'
+};
+
+/** @enum {string} */
+remobid.common.model.ModelBase.ErrorType = {
+  // will be thrown whenever the model is about to be disposed but was not
+  // stored yet.
+  UNSAVED: 'unsaved'
 };

@@ -22,12 +22,93 @@ describe('UNIT - ModelBase', function() {
 
   beforeEach(function(){
     Model = new remobid.common.model.ModelBase();
+    Model.setAutoStore(false);
   });
 
   afterEach(function() {
     if(!Model.isDisposed())
-      Model.dispose();
+      Model.dispose(true);
     goog.events.removeAll();
+  });
+
+  describe('dispose', function() {
+
+    it('should free all references', function() {
+      Model.dispose();
+      assertNull('trackedAttributes not cleared',
+        Model.trackedAttributes_
+      );
+      assertNull('mappings not cleared',
+        Model.mappings_
+      );
+      assertNull('mappings not cleared',
+        Model.changedEventTimerId_
+      );
+      assertNull('listener keys not cleared',
+        Model.listenerKeys_
+      );
+    });
+
+    it('should unlisten from all events', function() {
+      var length = Model.listenerKeys_.length;
+      Model.setAutoStore(true);
+      assertEquals('should added one listener',
+        length + 1,
+        Model.listenerKeys_.length
+      );
+      var listenerKey = Model.listenerKeys_[0];
+      Model.dispose();
+      assertNull('should cleared listener reference',
+        Model.listenerKeys_
+      );
+      assertFalse('the event listener should already be removed',
+        goog.events.unlistenByKey(listenerKey)
+      );
+    });
+
+    it('should remove all timers', function() {
+      var clock = new goog.testing.MockClock(true);
+
+      Model.prepareChangeEvent();
+      var timerId = Model.changedEventTimerId_;
+      Model.dispose();
+      assertFalse('timer should be deleted',
+        clock.isTimeoutSet(timerId)
+      );
+
+      clock.dispose();
+    });
+
+  });
+
+  describe('supressed', function() {
+
+    it('should not track changes', function() {
+      Model.setSupressChangeTracking(true);
+      Model.setIdentifier(123);
+      assertEquals('there should be no attribute tracked',
+        0,
+        Model.trackedAttributes_.length
+      );
+    });
+
+    it('should not fire changeEvents', function() {
+      var clock = new goog.testing.MockClock(true);
+
+      Model.setSupressChangeEvent(true);
+      Model.setIdentifier(123);
+      assertEquals('timer should not be created',
+        0,
+        clock.getTimeoutsMade()
+      );
+      Model.prepareChangeEvent();
+      assertEquals('timer should not be created',
+        0,
+        clock.getTimeoutsMade()
+      );
+
+      clock.dispose();
+    });
   });
 
   describe('mappings functionality', function() {
@@ -103,13 +184,17 @@ describe('UNIT - ModelBase', function() {
       });
     });
 
-    it('should remove the reference' +
-        'to the mappings on disposal', function() {
-      Model.dispose();
-      assertNull('reference should be deleted',
-        Model.mappings_);
+    it('should track the changed variables', function() {
+      Model.updateDataViaMappings({
+        'id': 123,
+        'href': 'www.test.de',
+        'unknown': 'b'
+      });
+      assertArrayEquals('wrong attributes tracked',
+        goog.object.getValues(Model.mappings_),
+        Model.trackedAttributes_
+      )
     });
-
   });
 
   describe('Events', function() {
@@ -212,5 +297,7 @@ describe('UNIT - ModelBase', function() {
       );
       clock.tick(Model.changedEventDelay_);
     });
+
+
   });
 });
