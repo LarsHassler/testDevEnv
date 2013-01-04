@@ -12,15 +12,17 @@ goog.require('goog.testing.asserts');
 goog.require('goog.testing.MockClock');
 goog.require('remobid.common.model.ModelBase');
 goog.require('remobid.common.model.ModelBase.EventType');
+goog.require('remobid.common.storage.StorageBase');
 
 if (typeof module !== 'undefined' && module.exports) {
   goog.Timer.defaultTimerObject = goog.global;
 }
 
 describe('UNIT - ModelBase', function() {
-  var Model;
+  var Model, clock;
 
   beforeEach(function(){
+    clock = new goog.testing.MockClock(true)
     Model = new remobid.common.model.ModelBase();
     Model.setAutoStore(false);
   });
@@ -28,10 +30,11 @@ describe('UNIT - ModelBase', function() {
   afterEach(function() {
     if(!Model.isDisposed())
       Model.dispose(true);
+    clock.dispose();
     goog.events.removeAll();
   });
 
-  describe('dispose', function() {
+  describe('dispose - ', function() {
 
     it('should free all references', function() {
       Model.dispose();
@@ -46,6 +49,12 @@ describe('UNIT - ModelBase', function() {
       );
       assertNull('listener keys not cleared',
         Model.listenerKeys_
+      );
+      assertNull('cache reference not cleared',
+        Model.cache_
+      );
+      assertNull('storage reference not cleared',
+        Model.storage_
       );
     });
 
@@ -67,7 +76,6 @@ describe('UNIT - ModelBase', function() {
     });
 
     it('should remove all timers', function() {
-      var clock = new goog.testing.MockClock(true);
 
       Model.prepareChangeEvent();
       var timerId = Model.changedEventTimerId_;
@@ -75,8 +83,6 @@ describe('UNIT - ModelBase', function() {
       assertFalse('timer should be deleted',
         clock.isTimeoutSet(timerId)
       );
-
-      clock.dispose();
     });
 
     it('should throw an error if there are unsaved attributes', function() {
@@ -90,7 +96,7 @@ describe('UNIT - ModelBase', function() {
     });
   });
 
-  describe('supressed', function() {
+  describe('supressed - ', function() {
 
     it('should not track changes', function() {
       Model.setSupressChangeTracking(true);
@@ -102,7 +108,6 @@ describe('UNIT - ModelBase', function() {
     });
 
     it('should not fire changeEvents', function() {
-      var clock = new goog.testing.MockClock(true);
 
       Model.setSupressChangeEvent(true);
       Model.setIdentifier(123);
@@ -115,12 +120,10 @@ describe('UNIT - ModelBase', function() {
         0,
         clock.getTimeoutsMade()
       );
-
-      clock.dispose();
     });
   });
 
-  describe('mappings functionality', function() {
+  describe('mappings functionality - ', function() {
 
     it('should update all known given attributes', function() {
       Model.updateDataViaMappings({
@@ -206,7 +209,7 @@ describe('UNIT - ModelBase', function() {
     });
   });
 
-  describe('Events', function() {
+  describe('Events - ', function() {
 
     it('should dispatch DELETED Event on dispose', function(done) {
       goog.events.listenOnce(
@@ -221,8 +224,7 @@ describe('UNIT - ModelBase', function() {
 
     it('should dispatch the LOCALLY_CHANGED ' +
         'Event with the set delay', function() {
-      var clock = new goog.testing.MockClock(true),
-        dispatchCounter = 0;
+      var dispatchCounter = 0;
 
       goog.events.listen(
         Model,
@@ -254,21 +256,19 @@ describe('UNIT - ModelBase', function() {
         1,
         dispatchCounter
       );
-
-      clock.dispose();
     });
     
     it('should only dispatch only one LOCALLY_CHANGED Event if to setters' +
         'are called within the delay', function(done) {
-      var clock = new goog.testing.MockClock(true),
-        dispatchCounter = 1;
+      var dispatchCounter = 1;
 
       goog.events.listen(
         Model,
         remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
         function() {
-          if(--dispatchCounter <= 0)
+          if(--dispatchCounter <= 0) {
             done();
+          }
         }
       );
 
@@ -279,20 +279,18 @@ describe('UNIT - ModelBase', function() {
         clock.getTimeoutsMade()
       );
       clock.tick(Model.changedEventDelay_);
-
-      clock.dispose();
     });
 
     it('should dispatch a CHANGED Event if the data is set via' +
         'the updateFromExternal function', function(done) {
-      var clock = new goog.testing.MockClock(true),
-        dispatchCounter = 1;
+      var dispatchCounter = 1;
       goog.events.listen(
         Model,
         remobid.common.model.ModelBase.EventType.CHANGED,
         function() {
-          if(--dispatchCounter <= 0)
+          if(--dispatchCounter <= 0) {
             done();
+          }
         }
       );
       Model.updateFromExternal({
@@ -309,4 +307,46 @@ describe('UNIT - ModelBase', function() {
 
 
   });
+
+  describe('Storage - ', function() {
+
+    it('should automaticly store the model', function() {
+      var Model2 = new remobid.common.model.ModelBase();
+      assertTrue('autoStore should be enabled from the start',
+        Model2.isAutoStoreEnabled()
+      );
+      assertTrue('no listeners set',
+        goog.events.hasListener(
+          Model2,
+          remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
+        )
+      );
+      Model2.setAutoStore(false);
+      assertFalse('autoStore should not be enabled',
+        Model2.isAutoStoreEnabled()
+      );
+      assertFalse('there should be no listeners set',
+        goog.events.hasListener(
+          Model2,
+          remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
+        )
+      );
+    });
+
+    it('should throw an error if now storage is set', function() {
+      var exception = assertThrows('no error thrown if now storage is set',
+        goog.bind(Model.store, Model)
+      );
+      assertEquals('wrong exception thrown',
+        remobid.common.model.ModelBase.ErrorType.NO_STORAGE_ENGINE,
+        exception.message
+      );
+      Model.setStorage(new remobid.common.storage.StorageBase());
+      assertNotThrows('error thrown even when there is a storage engine set',
+        goog.bind(Model.store, Model)
+      );
+    });
+    
+  });
+
 });

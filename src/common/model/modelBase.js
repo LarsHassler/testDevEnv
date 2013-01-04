@@ -154,7 +154,15 @@ remobid.common.model.ModelBase.prototype.disposeInternal = function() {
  * @param {goog.event.Event} event the {@code LOCALLY_CHANGED} Event.
  */
 remobid.common.model.ModelBase.prototype.handleAutoStore = function(event) {
-  // this.store();
+  this.store();
+};
+
+/**
+ * tries to store a
+ */
+remobid.common.model.ModelBase.prototype.store = function() {
+  if (goog.isNull(this.storage_))
+    throw new Error(remobid.common.model.ModelBase.ErrorType.NO_STORAGE_ENGINE);
 };
 
 /**
@@ -177,13 +185,15 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
     );
     this.listenerKeys_.push(key);
   } else {
-    key = goog.events.getListener(
+    var eventListener = goog.events.getListener(
       this,
       remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
       this.handleAutoStore,
       false,
       this
     );
+    var key = eventListener.key;
+
     goog.events.unlistenByKey(key);
     goog.array.remove(this.listenerKeys_, key);
   }
@@ -429,8 +439,8 @@ remobid.common.model.ModelBase.attributeMappings = {
 };
 
 /**
- * @typedef {{name, getter, setter,
- *   getterHelper?, setterHelper?, autoStore?}}
+ * @typedef {{name: string, getter: Function, setter: Function,
+ *   getterHelper, setterHelper, autoStore}}
  */
 remobid.common.model.ModelBase.Mapping;
 
@@ -457,5 +467,6 @@ remobid.common.model.ModelBase.EventType = {
 remobid.common.model.ModelBase.ErrorType = {
   // will be thrown whenever the model is about to be disposed but was not
   // stored yet.
-  UNSAVED: 'unsaved'
+  UNSAVED: 'unsaved',
+  NO_STORAGE_ENGINE: 'no storage engine'
 };
