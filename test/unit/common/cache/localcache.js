@@ -349,26 +349,36 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should remove expired values if Limit reached', function(done) {
+      LC.storage_ = new remobid.test.mock.browser.LocalStorage();
       var org_store = LC.storage_.setItem;
       var org_clearExpire = LC.clearExpired;
+      var errorThrown = false;
       LC.setExpireTime(-10);
       LC.store(function(err) {
-        assertNull(err);
+        assertNull('first storing operation should work fine',
+          err);
         LC.storage_.setItem = function() {
-          throw new Error('QUOTA');
+          if(!errorThrown) {
+            errorThrown = true;
+            throw new Error({ name: 'QuotaExceededError'});
+          }
+          else
+            org_store.apply(LC.storage_, arguments);
         };
-        LC.clearExpired = function(cb) {
-          LC.storage_.setItem = org_store;
-          org_clearExpire.apply(LC, arguments);
-        };
-        LC.store(function(err) {
-          assertNull(err);
-          assertNull(LC.storage_.getItem('LC-' + version + '-' + url + '-key'));
-          assertEquals('test2',
+        LC.store(function(err, data) {
+          assertNull('since the setItem not longer throws an error, this should work',
+            err
+          );
+          assertNull('the old data should be deleted',
+            LC.storage_.getItem('LC-' + version + '-' + url + '-key')
+          );
+          assertEquals('the new data should still be there',
+            'test2',
             LC.storage_.getItem('LC-' + version + '-' + url + '-key2'));
           done();
         }, 'key2', 'test2');
       }, 'key', 'test');
+
     });
 
   });
