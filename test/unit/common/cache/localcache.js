@@ -13,17 +13,19 @@ goog.require('goog.testing.asserts');
 goog.require('remobid.common.cache.LocalCache');
 goog.require('remobid.common.storage.LocalStorage');
 goog.require('remobid.test.mock.browser.LocalStorage');
+goog.require('remobid.test.mock.Utilities');
 
 describe('Localstorage Cache - UNIT', function () {
   var LC,
       version = 'v1',
       url = 'users';
 
-  beforeEach(function(){
+  beforeEach(function(done){
     LC = new remobid.common.cache.LocalCache(version, url);
     if(!LC.isAvailable() && (typeof module !== 'undefined' && module.exports)) {
       LC.storage_ = /** @type {Storage} */ remobid.test.mock.browser.LocalStorage.getInstance();
     }
+    remobid.test.mock.Utilities.clearStack(done);
   });
 
   afterEach(function(){

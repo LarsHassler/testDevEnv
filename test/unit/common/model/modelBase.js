@@ -13,25 +13,15 @@ goog.require('goog.testing.MockClock');
 goog.require('remobid.common.model.ModelBase');
 goog.require('remobid.common.model.ModelBase.EventType');
 goog.require('remobid.common.storage.StorageBase');
+goog.require('remobid.test.mock.Utilities');
 
 describe('UNIT - ModelBase', function() {
-  var Model, mockClock;
+  var Model;
 
-  before(function() {
-    if (!goog.isDefAndNotNull(goog.global['mockClock'])) {
-      goog.Timer.defaultTimerObject = goog.global;
-      mockClock = new goog.testing.MockClock(true);
-    } else {
-      mockClock = goog.global['mockClock'];
-    }
-  });
-
-  after(function() {
-  });
-
-  beforeEach(function(){
+  beforeEach(function(done){
     Model = new remobid.common.model.ModelBase();
     Model.setAutoStore(false);
+    remobid.test.mock.Utilities.clearStack(done);
   });
 
   afterEach(function() {

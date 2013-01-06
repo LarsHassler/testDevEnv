@@ -10,4 +10,5 @@ goog.addDependency('../../../../src/common/storage/rest.js', ['remobid.common.st
 goog.addDependency('../../../../src/common/storage/storageBase.js', ['remobid.common.storage.StorageBase', 'remobid.common.storage.storageBase.Options'], ['goog.Disposable']);
 goog.addDependency('../../../../src/common/storage/storageErrorType_enum.js', ['remobid.common.storage.StorageErrorType'], []);
 goog.addDependency('../../../../src/common/storage/storage_interface.js', ['remobid.common.storage.StorageInterface'], []);
+goog.addDependency('../../../../test/mock/Utilities.js', ['remobid.test.mock.Utilities'], []);
 goog.addDependency('../../../../test/mock/browser/localstorage.js', ['remobid.test.mock.browser.LocalStorage'], ['goog.object']);

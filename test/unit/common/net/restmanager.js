@@ -12,8 +12,13 @@ goog.require('goog.object');
 goog.require('goog.testing.asserts');
 goog.require('goog.testing.net.XhrIoPool');
 goog.require('remobid.common.net.RestManager');
+goog.require('remobid.test.mock.Utilities');
 
 describe('UNIT - restmanager', function () {
+
+  beforeEach(function(done) {
+    remobid.test.mock.Utilities.clearStack(done);
+  });
 
   afterEach(function() {
     if(remobid.common.net.RestManager.instances_) {

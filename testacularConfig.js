@@ -1,16 +1,17 @@
 
 // base path, that will be used to resolve files and exclude
+
 basePath = '';
 
   files = [
     MOCHA,
     MOCHA_ADAPTER,
     'test/unit/common/net/restmanager.js',
-    'test/unit/common/cache/localcache.js',
-    'test/unit/common/storage/localstorage.js',
     'test/unit/common/storage/rest.js',
     'test/unit/common/model/registry.js',
-    'test/unit/common/model/modelBase.js'
+    'test/unit/common/model/modelBase.js',
+    'test/unit/common/storage/localstorage.js',
+    'test/unit/common/cache/localcache.js'
   ];
 
   // list of files to exclude
@@ -51,7 +52,7 @@ basePath = '';
   // - PhantomJS
   // - IE (only Windows)
   // CLI --browsers Chrome,Firefox,Safari
-  browsers = ['Safari'];
+  browsers = ['Firefox'];
 
   // If browser does not capture in given timeout [ms], kill it
   // CLI --capture-timeout 5000
@@ -71,4 +72,3 @@ basePath = '';
   };
 
 
-// java -jar /Library/WebServer/Documents/c4ms/closure/plovr/plovr.jar build plovrConfig.json

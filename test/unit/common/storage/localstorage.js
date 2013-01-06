@@ -13,12 +13,16 @@ goog.require('goog.userAgent');
 goog.require('remobid.common.storage.LocalStorage');
 goog.require('remobid.common.storage.StorageErrorType');
 goog.require('remobid.test.mock.browser.LocalStorage');
+goog.require('remobid.test.mock.Utilities');
 
 describe('Unit - localstorage', function() {
   var Storage;
   var s_url = 'users';
   var s_version = 'v1';
 
+  beforeEach(function(done) {
+    remobid.test.mock.Utilities.clearStack(done);
+  });
 
   describe('base storage tests', function() {
 
@@ -296,7 +300,7 @@ describe('Unit - localstorage', function() {
     it('should be available in newer browsers', function() {
       Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
       if (goog.userAgent.WEBKIT && goog.userAgent.isVersion('532.5') ||
-        goog.userAgent.GECKO && goog.userAgent.isVersion('1.9.1') ||
+        goog.userAgent.GECKO && goog.userAgent.isVersion('12') ||
         goog.userAgent.IE && goog.userAgent.isVersion('8') ||
         goog.userAgent.OPERA && goog.userAgent.isVersion('12.1')) {
         assertTrue(Storage.isAvailable());
