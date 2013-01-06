@@ -2,10 +2,12 @@
 // Please do not edit.
 goog.addDependency('../../../../devEnv/testRunner.js', ['remobid.devEnv.TestRunner'], ['goog.array']);
 goog.addDependency('../../../../src/common/cache/localcache.js', ['remobid.common.cache.LocalCache'], ['remobid.common.storage.LocalStorage']);
-goog.addDependency('../../../../src/common/net/restmanager.js', ['remobid.common.net.RestManager'], ['goog.crypt.base64', 'goog.net.XhrManager']);
+goog.addDependency('../../../../src/common/model/modelBase.js', ['remobid.common.model.ModelBase', 'remobid.common.model.ModelBase.EventType', 'remobid.common.model.ModelBase.Mapping'], ['goog.Timer', 'goog.events.EventTarget', 'remobid.common.model.Registry']);
+goog.addDependency('../../../../src/common/model/registry.js', ['remobid.common.model.Registry', 'remobid.common.model.Registry.ErrorType'], ['goog.Disposable', 'goog.object']);
+goog.addDependency('../../../../src/common/net/restmanager.js', ['remobid.common.net.RestManager'], ['goog.crypt.base64', 'goog.json', 'goog.net.XhrManager']);
 goog.addDependency('../../../../src/common/storage/localstorage.js', ['remobid.common.storage.LocalStorage', 'remobid.common.storage.LocalStorage.DataType'], ['goog.array', 'goog.json', 'goog.object', 'remobid.common.storage.StorageBase', 'remobid.common.storage.StorageErrorType']);
-goog.addDependency('../../../../src/common/storage/rest.js', ['remobid.common.storage.Rest'], ['remobid.common.net.RestManager', 'remobid.common.storage.StorageBase', 'remobid.common.storage.StorageErrorType']);
-goog.addDependency('../../../../src/common/storage/storageBase.js', ['remobid.common.storage.StorageBase'], ['goog.Disposable']);
+goog.addDependency('../../../../src/common/storage/rest.js', ['remobid.common.storage.Rest'], ['remobid.common.net.RestManager', 'remobid.common.storage.StorageBase', 'remobid.common.storage.StorageErrorType', 'remobid.common.storage.storageBase.Options']);
+goog.addDependency('../../../../src/common/storage/storageBase.js', ['remobid.common.storage.StorageBase', 'remobid.common.storage.storageBase.Options'], ['goog.Disposable']);
 goog.addDependency('../../../../src/common/storage/storageErrorType_enum.js', ['remobid.common.storage.StorageErrorType'], []);
 goog.addDependency('../../../../src/common/storage/storage_interface.js', ['remobid.common.storage.StorageInterface'], []);
 goog.addDependency('../../../../test/mock/browser/localstorage.js', ['remobid.test.mock.browser.LocalStorage'], ['goog.object']);
