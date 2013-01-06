@@ -27,9 +27,7 @@ describe('Unit - localstorage', function() {
 
     beforeEach(function() {
       Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
-      try {
-        var t = window && window.localStorage && window.localStorage.getItem;
-      } catch (e) {
+      if(!Storage.isAvailable() && (typeof module !== 'undefined' && module.exports)) {
         Storage.storage_ = /** @type {Storage} */ remobid.test.mock.browser.LocalStorage.getInstance();
       }
     });
@@ -41,34 +39,41 @@ describe('Unit - localstorage', function() {
 
     it('should only except a string,' +
         'number or and array of strings|numbers as ids', function(done) {
-        var moreTests = 12;
-        var cb = function(err, data) {
-          assertTrue(err);
-          assertEquals(
-            remobid.common.storage.StorageErrorType.INVALID_KEY,
-            data.message
-          );
-          if (!--moreTests)
-            done();
-        };
+      if (!Storage.isAvailable())
+        return done();
 
-        Storage.store(cb, {});
-        Storage.store(cb, null);
-        Storage.store(cb);
-        Storage.store(cb, [null]);
 
-        Storage.load(cb, {});
-        Storage.load(cb, null);
-        Storage.load(cb);
-        Storage.load(cb, [null]);
+      var moreTests = 12;
+      var cb = function(err, data) {
+        assertTrue(err);
+        assertEquals(
+          remobid.common.storage.StorageErrorType.INVALID_KEY,
+          data.message
+        );
+        if (!--moreTests)
+          done();
+      };
 
-        Storage.remove(cb, {});
-        Storage.remove(cb, null);
-        Storage.remove(cb);
-        Storage.remove(cb, [null]);
+      Storage.store(cb, {});
+      Storage.store(cb, null);
+      Storage.store(cb);
+      Storage.store(cb, [null]);
+
+      Storage.load(cb, {});
+      Storage.load(cb, null);
+      Storage.load(cb);
+      Storage.load(cb, [null]);
+
+      Storage.remove(cb, {});
+      Storage.remove(cb, null);
+      Storage.remove(cb);
+      Storage.remove(cb, [null]);
     });
 
     it('should not accept empty data', function(done) {
+      if (!Storage.isAvailable())
+        return done();
+
       var cb = function(err, data) {
         assertTrue(err);
         assertEquals(
@@ -81,6 +86,9 @@ describe('Unit - localstorage', function() {
     });
 
     it('should load a single id', function(done) {
+      if (!Storage.isAvailable())
+        return done();
+
       var key = '3',
           data = 'name_3',
           saved_key = 'rb-' + s_version + '-' + s_url + '-' + key;
@@ -95,6 +103,9 @@ describe('Unit - localstorage', function() {
     });
 
     it('should load multiple ids', function(done) {
+      if (!Storage.isAvailable())
+        return done();
+
       var keys = ['1', '2'],
         data = ['name_1', 'name_2'];
       for (var i = 0, end = keys.length; i < end; i++) {
@@ -111,6 +122,9 @@ describe('Unit - localstorage', function() {
     });
 
     it('should delete a single id', function(done) {
+      if (!Storage.isAvailable())
+        return done();
+
       var keys = ['1', '2'],
         data = ['name_1', 'name_2'];
       for (var i = 0, end = keys.length; i < end; i++) {
@@ -128,6 +142,9 @@ describe('Unit - localstorage', function() {
     });
 
     it('should delete multiple ids', function(done) {
+      if (!Storage.isAvailable())
+        return done();
+
       var keys = ['1', '2', '3', '4'],
         data = ['name_1', 'name_2', 'name_3', 'name_4'];
       for (var i = 0, end = keys.length; i < end; i++) {
@@ -149,6 +166,9 @@ describe('Unit - localstorage', function() {
 
     describe('types', function() {
       it('should save and return strings', function(done) {
+        if (!Storage.isAvailable())
+          return done();
+
         var key = '1',
             data = 'string';
         Storage.store(function(err) {
@@ -163,6 +183,9 @@ describe('Unit - localstorage', function() {
       });
 
       it('should save and return numbers', function(done) {
+        if (!Storage.isAvailable())
+          return done();
+
         var key = '1',
           data = 100;
         Storage.store(function(err) {
@@ -177,6 +200,9 @@ describe('Unit - localstorage', function() {
       });
 
       it('should save and return arrays', function(done) {
+        if (!Storage.isAvailable())
+          return done();
+
         var key = '1',
           data = [100, 102, 205];
         Storage.store(function(err) {
@@ -191,6 +217,9 @@ describe('Unit - localstorage', function() {
       });
 
       it('should save and return objects', function(done) {
+        if (!Storage.isAvailable())
+          return done();
+
         var key = '1',
           data = {key1: 'string', key2: 1, key3: [1, '2']};
         Storage.store(function(err) {
@@ -205,6 +234,9 @@ describe('Unit - localstorage', function() {
       });
 
       it('should save and return Date objects', function(done) {
+        if (!Storage.isAvailable())
+          return done();
+
         var key = '1',
           data = new Date();
         Storage.store(function(err) {
@@ -222,6 +254,9 @@ describe('Unit - localstorage', function() {
     describe('load options', function() {
 
       it('should only return the fields data', function(done) {
+        if (!Storage.isAvailable())
+          return done();
+
         var key = 'key',
           data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12};
         Storage.store(function(err) {
@@ -236,6 +271,9 @@ describe('Unit - localstorage', function() {
       });
 
       it('should apply fields only on object data', function(done) {
+        if (!Storage.isAvailable())
+          return done();
+
         var key = 'key',
           data = 'test';
         Storage.store(function(err) {
