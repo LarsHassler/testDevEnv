@@ -8,8 +8,12 @@ Realoaded before every execution run.
 <head>
   <title></title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <script src="http://localhost/testDevEnv/deps/closure-library/closure/goog/base.js"></script>
-  <script src="http://localhost/testDevEnv/remobidDeps.js"></script>
+  <script src="http://169.254.192.41/testDevEnv/deps/closure-library/closure/goog/base.js"></script>
+  <script src="http://169.254.192.41/testDevEnv/remobidDeps.js"></script>
+  <script>
+    goog.require('goog.Timer');
+    goog.require('goog.testing.MockClock');
+  </script>
 </head>
 <body>
   <!-- The scripts need to be at the end of body, so that some test running frameworks
@@ -27,6 +31,11 @@ Realoaded before every execution run.
   <!-- Dynamically replaced with <script> tags -->
   %SCRIPTS%
   <script type="text/javascript">
+
+    // store the original clock functions
+    var originalClock = {
+      setTimeout: goog.global.setTimeout
+    };
     goog.Timer.defaultTimerObject = goog.global;
     var mockClock = new goog.testing.MockClock(true);
     window.__testacular__.loaded();

@@ -12,6 +12,7 @@ try {
 goog.require('goog.testing.asserts');
 goog.require('goog.testing.net.XhrIoPool');
 goog.require('remobid.common.storage.Rest');
+goog.require('remobid.test.mock.Utilities');
 
 describe('Unit - Rest storage', function () {
   var Rest,
@@ -19,10 +20,11 @@ describe('Unit - Rest storage', function () {
       url = 'users',
       baseUrl;
 
-  beforeEach(function() {
+  beforeEach(function(done) {
     baseUrl = remobid.common.net.RestManager.defaultBase_ = 'https://api.remobid.com';
     Rest = new remobid.common.storage.Rest(version, url);
     Rest.restManager_.xhrPool_ = new goog.testing.net.XhrIoPool();
+    remobid.test.mock.Utilities.clearStack(done);
   });
 
   describe('base storage tests', function() {

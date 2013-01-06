@@ -13,23 +13,24 @@ goog.require('goog.testing.asserts');
 goog.require('remobid.common.cache.LocalCache');
 goog.require('remobid.common.storage.LocalStorage');
 goog.require('remobid.test.mock.browser.LocalStorage');
+goog.require('remobid.test.mock.Utilities');
 
 describe('Localstorage Cache - UNIT', function () {
   var LC,
       version = 'v1',
       url = 'users';
 
-  beforeEach(function(){
+  beforeEach(function(done){
     LC = new remobid.common.cache.LocalCache(version, url);
-    try {
-       var t = window && window.localStorage && window.localStorage.getItem;
-    } catch (e) {
+    if(!LC.isAvailable() && (typeof module !== 'undefined' && module.exports)) {
       LC.storage_ = /** @type {Storage} */ remobid.test.mock.browser.LocalStorage.getInstance();
     }
+    remobid.test.mock.Utilities.clearStack(done);
   });
 
   afterEach(function(){
-    LC.storage_.clear();
+    if (LC.isAvailable())
+      LC.storage_.clear();
   });
 
   describe('base storage tests', function() {
@@ -39,6 +40,9 @@ describe('Localstorage Cache - UNIT', function () {
 
     it('should only except a string,' +
       'number or and array of strings|numbers as ids', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       var moreTests = 12;
       var cb = function(err, returnData) {
         assertTrue(err);
@@ -67,6 +71,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should not accept empty data', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       var cb = function(err, data) {
         assertTrue(err);
         assertEquals(
@@ -79,6 +86,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should load a single id', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       var key = '1',
         data = 'string',
         saved_key = 'LC-' + version + '-' + url + '-' + key;
@@ -94,6 +104,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should load multiple ids', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       var keys = ['1', '2'],
         data = ['string', 'string2'];
       for (var i = 0, end = keys.length; i < end; i++) {
@@ -111,6 +124,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should delete a single id', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       var keys = ['1', '2'],
         data = ['name_1', 'name_2'];
       for (var i = 0, end = keys.length; i < end; i++) {
@@ -131,6 +147,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should delete multiple ids', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       var keys = ['1', '2', '3', '4'],
         data = ['name_1', 'name_2', 'name_3', 'name_4'];
       for (var i = 0, end = keys.length; i < end; i++) {
@@ -154,6 +173,9 @@ describe('Localstorage Cache - UNIT', function () {
     describe('types', function() {
 
       it('should save and return strings', function(done) {
+        if (!LC.isAvailable())
+          return done();
+
         var key = '1',
           data = 'string';
         LC.store(function(err) {
@@ -168,6 +190,9 @@ describe('Localstorage Cache - UNIT', function () {
       });
 
       it('should save and return numbers', function(done) {
+        if (!LC.isAvailable())
+          return done();
+
         var key = '1',
           data = 100;
         LC.store(function(err) {
@@ -182,6 +207,9 @@ describe('Localstorage Cache - UNIT', function () {
       });
 
       it('should save and return arrays', function(done) {
+        if (!LC.isAvailable())
+          return done();
+
         var key = '1',
           data = [100, 102, 205];
         LC.store(function(err) {
@@ -196,6 +224,9 @@ describe('Localstorage Cache - UNIT', function () {
       });
 
       it('should save and return objects', function(done) {
+        if (!LC.isAvailable())
+          return done();
+
         var key = '1',
           data = {key1: 'string', key2: 1, key3: [1, '2']};
         LC.store(function(err) {
@@ -210,6 +241,9 @@ describe('Localstorage Cache - UNIT', function () {
       });
 
       it('should save and return Date objects', function(done) {
+        if (!LC.isAvailable())
+          return done();
+
         var key = '1',
           data = new Date();
         LC.store(function(err) {
@@ -228,6 +262,9 @@ describe('Localstorage Cache - UNIT', function () {
     describe('load options', function() {
 
       it('should only return the fields data', function(done) {
+        if (!LC.isAvailable())
+          return done();
+
         var key = 'key',
           data = { 'firstName': 'Jon', 'lastName': 'Doe', 'age': 12};
         LC.store(function(err) {
@@ -242,6 +279,9 @@ describe('Localstorage Cache - UNIT', function () {
       });
 
       it('should apply fields only on object data', function(done) {
+        if (!LC.isAvailable())
+          return done();
+
         var key = 'key',
           data = 'test';
         LC.store(function(err) {
@@ -262,6 +302,9 @@ describe('Localstorage Cache - UNIT', function () {
   describe('cache tests', function() {
 
     it('should return non expired values', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       LC.store(function(err) {
         assertNull(err);
         LC.load(function(err, data) {
@@ -273,6 +316,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should not return expired values', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       LC.store(function(err) {
         assertNull(err);
         LC.setExpireTime(-10);
@@ -285,6 +331,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should return array', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       LC.store(function(err) {
         assertNull(err);
         LC.store(function(err) {
@@ -299,6 +348,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should remove expired values on load', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       LC.store(function(err) {
         assertNull(err);
         LC.setExpireTime(-10);
@@ -312,6 +364,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should not load unknown key', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       LC.store(function(err) {
         assertNull(err);
         LC.load(function(err, data) {
@@ -323,6 +378,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should remove all and only expired values on clear', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       LC.storage_.setItem('akeep1', 'alive');
       LC.storage_.setItem('zkeep1', 'alive');
       LC.setExpireTime(-10);
@@ -349,6 +407,9 @@ describe('Localstorage Cache - UNIT', function () {
     });
 
     it('should remove expired values if Limit reached', function(done) {
+      if (!LC.isAvailable())
+        return done();
+
       LC.storage_ = new remobid.test.mock.browser.LocalStorage();
       var org_store = LC.storage_.setItem,
           errorThrown = false;
