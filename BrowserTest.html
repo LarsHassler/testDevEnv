@@ -7,12 +7,30 @@
 </head>
 <body>
 <div id="mocha"></div>
+<script>
+    // store the original clock functions
+    var originalClock = {
+        setTimeout: setTimeout
+    };
+</script>
 <script src="node_modules/mocha/mocha.js"></script>
 <script>mocha.setup('bdd')</script>
 <script src="deps/closure-library/closure/goog/base.js"></script>
-<script src="remobidDeps.js"></script>
-<script src="test/unit/common/model/modelBase.js"></script>
 <script>
+    goog.require('goog.Timer');
+    goog.require('goog.testing.MockClock');
+</script>
+<script src="remobidDeps.js"></script>
+<script src="test/unit/common/net/restmanager.js"></script>
+<script src="test/unit/common/storage/rest.js"></script>
+<script src="test/unit/common/model/registry.js"></script>
+<script src="test/unit/common/model/modelBase.js"></script>
+<script src="test/unit/common/storage/localstorage.js"></script>
+<script src="test/unit/common/cache/localcache.js"></script>
+<script>
+    goog.Timer.defaultTimerObject = this;
+    var mockClock = new goog.testing.MockClock(true);
+
     mocha.run();
 </script>
 </body>

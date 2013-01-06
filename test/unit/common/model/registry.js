@@ -11,12 +11,14 @@ try {
 
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.model.Registry');
+goog.require('remobid.test.mock.Utilities');
 
 describe('UNIT - Model Registry ', function () {
   var registry;
 
-  beforeEach(function() {
+  beforeEach(function(done) {
     registry = new remobid.common.model.Registry();
+    remobid.test.mock.Utilities.clearStack(done);
   });
 
   afterEach(function(){
