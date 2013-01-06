@@ -39,6 +39,7 @@ describe('UNIT - restmanager', function () {
       );
       var Manager2 = remobid.common.net.RestManager.getInstance();
       assertEquals(Manager, Manager2);
+      Manager2.dispose();
     });
 
     it('should store all Instances', function() {
@@ -65,6 +66,7 @@ describe('UNIT - restmanager', function () {
         'test',
         Manager2.baseUrl_
       );
+      Manager2.dispose();
     });
 
     it('should be deleted if disposed', function() {
@@ -203,15 +205,19 @@ describe('UNIT - restmanager', function () {
       it('should call callback function after finished', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
         Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
-        var callbackTimes = 1;
+        var callbackTimes = 0;
         var cb = function(error, json) {
           assertFalse(error);
-          if(!--callbackTimes)
-            done();
+          callbackTimes++;
         };
         Manager.put('users', 'v1', cb, 1, {});
         var xhr = Manager.xhrPool_.getXhr();
         xhr.simulateResponse(200, '');
+        assertEquals('callback should be called exactly one time',
+          1,
+          callbackTimes
+        );
+        done();
       });
 
       it('method should be PUT', function(done) {
@@ -276,15 +282,19 @@ describe('UNIT - restmanager', function () {
       it('should call callback function after finished', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
         Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
-        var callbackTimes = 1;
+        var callbackTimes = 0;
         var cb = function(error, json) {
           assertFalse(error);
-          if(!--callbackTimes)
-            done();
+          callbackTimes++;
         };
         Manager.post('users', 'v1', cb, {});
         var xhr = Manager.xhrPool_.getXhr();
         xhr.simulateResponse(200, '');
+        assertEquals('callback should be called exactly one time',
+          1,
+          callbackTimes
+        );
+        done();
       });
 
       it('method should be POST', function(done) {
@@ -342,17 +352,21 @@ describe('UNIT - restmanager', function () {
       it('should call callback function after finished', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
         Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
-        var callbackTimes = 2;
+        var callbackTimes = 0;
         var cb = function(error, json) {
           assertFalse(error);
-          if(!--callbackTimes)
-            done();
+          callbackTimes++;
         };
         Manager.startDelete('users', 'v1', cb, 1);
         var xhr = Manager.xhrPool_.getXhr();
         xhr.simulateResponse(200, '');
         Manager.startDelete('users', 'v1', cb, 1);
         xhr.simulateResponse(204, '');
+        assertEquals('callback should be called exactly two times',
+          2,
+          callbackTimes
+        );
+        done();
       });
 
       it('method should be GET', function(done) {
@@ -409,15 +423,21 @@ describe('UNIT - restmanager', function () {
 
       it('should call callback function after finished', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
+        var callbackTimes = 0;
         Manager.xhrPool_ = new goog.testing.net.XhrIoPool();
         var cb = function(error, json) {
           assertFalse(error);
           assertObjectEquals({ test: 'test' }, json);
-          done();
+          callbackTimes++;
         };
         Manager.get('users', 'v1', cb);
         var xhr = Manager.xhrPool_.getXhr();
         xhr.simulateResponse(200, '{"test": "test"}');
+        assertEquals('callback should be called exactly one time',
+          1,
+          callbackTimes
+        );
+        done();
       });
 
       it('method should be GET', function(done) {
