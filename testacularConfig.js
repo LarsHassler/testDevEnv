@@ -8,7 +8,9 @@ basePath = '';
     'test/unit/common/net/restmanager.js',
     'test/unit/common/cache/localcache.js',
     'test/unit/common/storage/localstorage.js',
-    'test/unit/common/storage/rest.js'
+    'test/unit/common/storage/rest.js',
+    'test/unit/common/model/registry.js',
+    'test/unit/common/model/modelBase.js'
   ];
 
   // list of files to exclude

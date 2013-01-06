@@ -36,10 +36,12 @@ remobid.common.cache.LocalCache.prototype.setExpireTime = function(ms) {
 /** @override */
 remobid.common.cache.LocalCache.prototype.save = function(callback, id, data,
     opt_retry) {
-  goog.base(this, 'save', goog.bind(function(err) {
+  goog.base(this, 'save', goog.bind(function(err, returnData) {
     // if quota exceeded clear expired and try again
     if (err) {
-      if (!opt_retry) {
+      var errorType = remobid.common.storage.StorageErrorType.QUOTA_EXCEEDED;
+      if (!opt_retry &&
+          returnData.message == errorType) {
         this.clearExpired(goog.bind(function(err) {
           if (err) {
             callback(err);
@@ -47,7 +49,8 @@ remobid.common.cache.LocalCache.prototype.save = function(callback, id, data,
           }
 
           // try again
-          this.store(callback, id, data, true);
+          this.save(callback, id, data, true);
+          return;
         }, this));
       }
       else callback(err);
@@ -79,7 +82,7 @@ remobid.common.cache.LocalCache.prototype.load = function(
       results = this.fetchData(id, opt_option, callback);
     }
   } catch (e) {
-    callback(true, {message: e.message});
+    callback(true, e);
     return;
   }
 
@@ -131,21 +134,19 @@ remobid.common.cache.LocalCache.prototype.remove = function(callback, id) {
 remobid.common.cache.LocalCache.prototype.clearExpired = function(callback) {
   var reg = new RegExp(
     '^LC-([0-9a-zA-Z]*)-([0-9a-zA-Z]*)-([0-9a-zA-Z]*):d$');
-  var storageSize = this.storage_.length;
-  var i = 0;
+  var storageSize = this.storage_.length,
+    i = 0,
+    entries = [];
   var matches;
 
   while (i < storageSize) {
-    var key = this.storage_.key(i);
+    var key = '' + this.storage_.key(i);
     if (matches = key.match(reg)) {
-      this.remove(goog.bind(function() {
-        storageSize = this.storage_.length;
-        i--;
-      }, this), matches[3]);
+      entries.push(matches[3]);
     }
-    else
-      i++;
+    i++;
   }
+  this.remove(goog.nullFunction, entries);
   callback(null);
 };
 
