@@ -82,7 +82,7 @@ remobid.common.cache.LocalCache.prototype.load = function(
       results = this.fetchData(id, opt_option, callback);
     }
   } catch (e) {
-    callback(true, {message: e.message});
+    callback(true, e);
     return;
   }
 

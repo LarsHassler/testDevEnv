@@ -350,13 +350,13 @@ describe('Localstorage Cache - UNIT', function () {
 
     it('should remove expired values if Limit reached', function(done) {
       LC.storage_ = new remobid.test.mock.browser.LocalStorage();
-      var org_store = LC.storage_.setItem;
-      var org_clearExpire = LC.clearExpired;
-      var errorThrown = false;
+      var org_store = LC.storage_.setItem,
+          errorThrown = false;
       LC.setExpireTime(-10);
       LC.store(function(err) {
         assertNull('first storing operation should work fine',
           err);
+        // one time stub to throw an QuotaExceededError Exception
         LC.storage_.setItem = function() {
           if(!errorThrown) {
             errorThrown = true;
@@ -366,7 +366,8 @@ describe('Localstorage Cache - UNIT', function () {
             org_store.apply(LC.storage_, arguments);
         };
         LC.store(function(err, data) {
-          assertNull('since the setItem not longer throws an error, this should work',
+          assertNull('since the setItem not longer throws an error,' +
+            ' there should be no error',
             err
           );
           assertNull('the old data should be deleted',

@@ -192,6 +192,10 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
       false,
       this
     );
+
+    if (!eventListener)
+      return;
+
     var key = eventListener.key;
 
     goog.events.unlistenByKey(key);
@@ -401,13 +405,13 @@ remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
   goog.Timer.clear(this.changedEventTimerId_);
 
   this.changedEventTimerId_ = goog.Timer.callOnce(
-      goog.bind(
-        this.dispatchEvent,
-        this,
-        remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
-      ),
-      this.changedEventDelay_
-    );
+    goog.bind(
+      this.dispatchEvent,
+      this,
+      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
+    ),
+    this.changedEventDelay_
+  );
 };
 
 

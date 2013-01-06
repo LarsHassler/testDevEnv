@@ -14,15 +14,22 @@ goog.require('remobid.common.model.ModelBase');
 goog.require('remobid.common.model.ModelBase.EventType');
 goog.require('remobid.common.storage.StorageBase');
 
-if (typeof module !== 'undefined' && module.exports) {
-  goog.Timer.defaultTimerObject = goog.global;
-}
-
 describe('UNIT - ModelBase', function() {
-  var Model, clock;
+  var Model, mockClock;
+
+  before(function() {
+    if (!goog.isDefAndNotNull(goog.global['mockClock'])) {
+      goog.Timer.defaultTimerObject = goog.global;
+      mockClock = new goog.testing.MockClock(true);
+    } else {
+      mockClock = goog.global['mockClock'];
+    }
+  });
+
+  after(function() {
+  });
 
   beforeEach(function(){
-    clock = new goog.testing.MockClock(true)
     Model = new remobid.common.model.ModelBase();
     Model.setAutoStore(false);
   });
@@ -30,7 +37,6 @@ describe('UNIT - ModelBase', function() {
   afterEach(function() {
     if(!Model.isDisposed())
       Model.dispose(true);
-    clock.dispose();
     goog.events.removeAll();
   });
 
@@ -58,6 +64,7 @@ describe('UNIT - ModelBase', function() {
       );
     });
 
+
     it('should unlisten from all events', function() {
       var length = Model.listenerKeys_.length;
       Model.setAutoStore(true);
@@ -76,13 +83,20 @@ describe('UNIT - ModelBase', function() {
     });
 
     it('should remove all timers', function() {
+      var Model2 = new remobid.common.model.ModelBase();
 
-      Model.prepareChangeEvent();
-      var timerId = Model.changedEventTimerId_;
-      Model.dispose();
-      assertFalse('timer should be deleted',
-        clock.isTimeoutSet(timerId)
+      Model2.prepareChangeEvent();
+      var timerId = Model2.changedEventTimerId_;
+      assertTrue('timer should be set',
+        mockClock.isTimeoutSet(timerId)
       );
+
+      Model2.dispose();
+      assertFalse('timer should be deleted',
+        mockClock.isTimeoutSet(timerId)
+      );
+
+
     });
 
     it('should throw an error if there are unsaved attributes', function() {
@@ -109,17 +123,20 @@ describe('UNIT - ModelBase', function() {
 
     it('should not fire changeEvents', function() {
 
+      var prevTimerCount = mockClock.getTimeoutsMade();
       Model.setSupressChangeEvent(true);
       Model.setIdentifier(123);
       assertEquals('timer should not be created',
-        0,
-        clock.getTimeoutsMade()
+        prevTimerCount,
+        mockClock.getTimeoutsMade()
       );
       Model.prepareChangeEvent();
       assertEquals('timer should not be created',
-        0,
-        clock.getTimeoutsMade()
+        prevTimerCount,
+        mockClock.getTimeoutsMade()
       );
+
+
     });
   });
 
@@ -244,65 +261,83 @@ describe('UNIT - ModelBase', function() {
         0,
         dispatchCounter
       );
-      clock.tick(Model.changedEventDelay_ - 1);
+      mockClock.tick(Model.changedEventDelay_ - 1);
       assertEquals(
         'Event should not be dispatched yet',
         0,
         dispatchCounter
       );
-      clock.tick(1);
+      mockClock.tick(1);
       assertEquals(
         'Event not dispatched after delay',
         1,
         dispatchCounter
       );
+
+
     });
     
-    it('should only dispatch only one LOCALLY_CHANGED Event if to setters' +
+    it('should only dispatch only one LOCALLY_CHANGED Event if to setters ' +
         'are called within the delay', function(done) {
-      var dispatchCounter = 1;
+      var dispatchCounter = 0;
 
+      var Model2 = new remobid.common.model.ModelBase();
+      Model2.setAutoStore(false);
       goog.events.listen(
-        Model,
+        Model2,
         remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
         function() {
-          if(--dispatchCounter <= 0) {
-            done();
-          }
+          dispatchCounter++;
         }
       );
 
-      Model.setIdentifier(123);
-      Model.setRestUrl('www.test.de');
-      assertEquals('there should be to 2 timer set',
-        2,
-        clock.getTimeoutsMade()
+      Model2.setIdentifier(123);
+      var firstTimer = Model2.changedEventTimerId_;
+      assertTrue('first timer should be set',
+        mockClock.isTimeoutSet(firstTimer)
       );
-      clock.tick(Model.changedEventDelay_);
+      Model2.setRestUrl('www.test.de');
+      var secondTimer = Model2.changedEventTimerId_;
+      assertFalse('first timer should not longer be set',
+        mockClock.isTimeoutSet(firstTimer)
+      );
+      assertTrue('second timer should be set',
+        mockClock.isTimeoutSet(secondTimer)
+      );
+      mockClock.tick(Model2.changedEventDelay_ * 2);
+      assertEquals('event fired multiple times',
+        1,
+        dispatchCounter
+      );
+      done();
     });
 
     it('should dispatch a CHANGED Event if the data is set via' +
         'the updateFromExternal function', function(done) {
       var dispatchCounter = 1;
+      var prevTimerCount = mockClock.getTimeoutsMade();
       goog.events.listen(
         Model,
         remobid.common.model.ModelBase.EventType.CHANGED,
         function() {
-          if(--dispatchCounter <= 0) {
-            done();
-          }
+          dispatchCounter--;
+          assertEquals('event fired multiple times',
+            0,
+            dispatchCounter
+          );
         }
       );
       Model.updateFromExternal({
         'id': 123
       });
-      clock.tick(Model.changedEventDelay_);
+      mockClock.tick(Model.changedEventDelay_);
       Model.setRestUrl('www.test.de');
       assertEquals('there should be to 2 timer set',
-        2,
-        clock.getTimeoutsMade()
+        prevTimerCount + 2,
+        mockClock.getTimeoutsMade()
       );
-      clock.tick(Model.changedEventDelay_);
+      mockClock.tick(Model.changedEventDelay_ * 2);
+      done();
     });
 
 
