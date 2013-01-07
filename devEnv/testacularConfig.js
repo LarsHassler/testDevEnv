@@ -1,7 +1,7 @@
 
 // base path, that will be used to resolve files and exclude
 
-basePath = '';
+basePath = '../';
 
   files = [
     MOCHA,
