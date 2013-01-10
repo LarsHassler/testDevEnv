@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+<div id="sandbox"></div>
+<script src="deps/closure-library/closure/goog/base.js"></script>
+<script src="remobidDeps.js"></script>
+<script>
+    goog.require('remobid.common.ui.control.ControlBase');
+    goog.require('remobid.common.model.ModelBase');
+</script>
+<script>
+    var Model = new remobid.common.model.ModelBase('123');
+    Model.setAutoStore(false);
+    Model.setRestUrl('http://www.google.de');
+
+    var Control = new remobid.common.ui.control.ControlBase(Model);
+    Control.render(goog.dom.getElement('sandbox'));
+</script>
+</body>
+</html>
