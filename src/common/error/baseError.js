@@ -11,7 +11,9 @@ goog.require('goog.debug.Error');
 /**
  * remobit base class for custom error objects.
  * @param {string} errorType
- * @param {*=} opt_msg The message associated with the error.
+ *    The type of the error.
+ * @param {*=} opt_msg
+ *    The message associated with the error.
  * @constructor
  * @extends {goog.debug.Error}
  */
@@ -25,8 +27,7 @@ remobid.common.error.BaseError = function(errorType, opt_msg) {
 
   goog.base(this, opt_msg);
 
-}
-
+};
 goog.inherits(remobid.common.error.BaseError, goog.debug.Error);
 
 /** @override */
