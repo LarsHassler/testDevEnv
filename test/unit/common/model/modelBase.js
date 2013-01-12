@@ -5,6 +5,10 @@
 /** @preserveTry */
 if (typeof module !== 'undefined' && module.exports) {
   require('nclosure');
+  originalClock = {
+    setTimeout: setTimeout
+  };
+  mockClock = null;
 }
 
 goog.require('goog.events');
@@ -17,6 +21,13 @@ goog.require('remobid.test.mock.Utilities');
 
 describe('UNIT - ModelBase', function() {
   var Model;
+
+  before(function() {
+    if (typeof module !== 'undefined' && module.exports) {
+      goog.Timer.defaultTimerObject = goog.global;
+      mockClock = new goog.testing.MockClock(true);
+    }
+  });
 
   beforeEach(function(done){
     Model = new remobid.common.model.ModelBase();
