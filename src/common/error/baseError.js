@@ -1,15 +1,12 @@
-/** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {}
+/**
+ * @fileoverview base class for custom errors.
+ */
 
 goog.provide('remobid.common.error.BaseError');
 
 goog.require('goog.debug.Error');
 
 /**
- * remobit base class for custom error objects.
  * @param {string} errorType
  *    The type of the error.
  * @param {*=} opt_msg
@@ -18,17 +15,14 @@ goog.require('goog.debug.Error');
  * @extends {goog.debug.Error}
  */
 remobid.common.error.BaseError = function(errorType, opt_msg) {
+  goog.base(this, opt_msg);
 
   /**
-   *
+   * a string to identify which type of error
    * @type {string}
    */
   this.errorType = errorType;
 
-  goog.base(this, opt_msg);
-
+  this.name = 'RemobidError';
 };
 goog.inherits(remobid.common.error.BaseError, goog.debug.Error);
-
-/** @override */
-remobid.common.error.BaseError.prototype.name = 'RemobidError';
