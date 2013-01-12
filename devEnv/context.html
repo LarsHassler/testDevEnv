@@ -10,7 +10,15 @@ Realoaded before every execution run.
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache"/>
   <script src="http://169.254.10.10/testDevEnv/deps/closure-library/closure/goog/base.js"></script>
-  <script src="http://169.254.10.10/testDevEnv/remobidDeps.js?v=1"></script>
+  <script>
+    if(typeof goog === 'undefined') {
+      document.write('<script src="http://localhost/testDevEnv/deps/closure-library/closure/goog/base.js"><\/script>');
+      document.write('<script src="http://localhost/testDevEnv/remobidDeps.js?' + (0+Date()) + '"><\/script>');
+    }
+    else {
+      document.write('<script src="http://169.254.10.10/testDevEnv/remobidDeps.js?' + (0+Date()) + '"><\/script>');
+    }
+  </script>
   <script>
     goog.require('goog.Timer');
     goog.require('goog.testing.MockClock');
@@ -18,19 +26,34 @@ Realoaded before every execution run.
 </head>
 <body>
     <div id="sandBox"></div>
-  <!-- The scripts need to be at the end of body, so that some test running frameworks
-       (Angular Scenario, for example) need the body to be loaded so that it can insert its magic
-       into it. If it is before body, then it fails to find the body and crashes and burns in an epic
-       manner. -->
-  <script type="text/javascript">
-    window.__testacular__ = window.parent.testacular;
+    <!-- The scripts need to be at the end of body, so that some test running frameworks
+         (Angular Scenario, for example) need the body to be loaded so that it can insert its magic
+         into it. If it is before body, then it fails to find the body and crashes and burns in an epic
+         manner. -->
+    <script type="text/javascript">
+        // TODO(vojta): extract this into context.js
+        window.__testacular__ = window.parent.testacular;
 
-    // This causes memory leak in Chrome (17.0.963.66)
-    window.onerror = function() {
-      return window.__testacular__.error.apply(window.__testacular__, arguments);
-    };
-  </script>
-  <!-- Dynamically replaced with <script> tags -->
+        // This causes memory leak in Chrome (17.0.963.66)
+        window.onerror = function() {
+            return window.__testacular__.error.apply(window.__testacular__, arguments);
+        };
+
+        // patch the console
+        (function(window, tc) {
+            var console = window.console = window.console || {log: function() {}};
+            var browserConsoleLog = console.log;
+
+            console.log = function() {
+                tc.info({dump: Array.prototype.slice.call(arguments, 0)});
+                return browserConsoleLog.apply(console, arguments);
+            };
+        })(window, window.__testacular__);
+
+        // All served files with the latest timestamps
+        %MAPPINGS%
+    </script>
+    <!-- Dynamically replaced with <script> tags -->
   %SCRIPTS%
   <script type="text/javascript">
 
