@@ -7,3 +7,7 @@ node_modules
 
 #dependencies
 deps
+remobidDeps.js
+
+#test files
+test/mysql_temp.js

@@ -1,30 +1,35 @@
 /**
- * @fileoverview a base class for all data models.
+ * @fileoverview tests for remobid.common.model.ModelBase.
  */
 
 goog.provide('remobid.common.model.ModelBase');
-goog.provide('remobid.common.model.modelBase.ErrorType');
-goog.provide('remobid.common.model.modelBase.EventType');
+goog.provide('remobid.common.model.ModelBase.EventType');
 goog.provide('remobid.common.model.modelBase.Mapping');
 
 goog.require('goog.Timer');
-goog.require('remobid.common.model.Base');
+goog.require('goog.events.EventTarget');
 goog.require('remobid.common.model.Registry');
 
 
 /**
  * @param {string} id the identifier of the resource model.
  * @constructor
- * @extends {remobid.common.model.Base}
+ * @extends {goog.events.EventTarget}
  */
 remobid.common.model.ModelBase = function(id) {
-  goog.base(this);
   /**
    * the identifier of the resource model
    * @type {string}
    * @private
    */
   this.identifier_ = id;
+
+  /**
+   * the unique rest url of the resource
+   * @type {string?}
+   * @private
+   */
+  this.restUrl_ = null;
 
   /**
    * the storage engine for this model.
@@ -39,6 +44,21 @@ remobid.common.model.ModelBase = function(id) {
    * @private
    */
   this.cache_ = null;
+
+  /**
+   * whenever the data for this model was already loaded.
+   * @type {boolean}
+   * @private
+   */
+  this.dataLoaded_ = false;
+
+  /**
+   * whenever the request to load the data for this model was already issued,
+   * but was not completed yet.
+   * @type {boolean}
+   * @private
+   */
+  this.loading_ = false;
 
   /**
    * holds all listener keys for the internals event listener
@@ -83,7 +103,7 @@ remobid.common.model.ModelBase = function(id) {
   /**
    * holds all attributes which have been changed since the last time this
    * resource was stored
-   * @type {Array.<remobid.common.model.ModelBase.Mapping>}
+   * @type {Array.<remobid.common.model.modelBase.Mapping>}
    * @private
    */
   this.trackedAttributes_ = [];
@@ -97,13 +117,25 @@ remobid.common.model.ModelBase = function(id) {
 
   /**
    * a reference to the attribute mappings of this resource type.
-   * @type {Array.<remobid.common.model.ModelBase.Mapping>}
+   * @type {Object.<remobid.common.model.modelBase.Mapping>}
    * @private
    */
   this.mappings_ = remobid.common.model.ModelBase.attributeMappings;
+
+  /**
+   * The persistant storage that the model is b.
+   * @type {remobid.common.storage.StorageBase}
+   */
+  this.persistantStorage = null;
+
+  /**
+   * The cache that the model is using.
+   * @type {null}
+   */
+  this.cacheStorage = null;
 };
 goog.inherits(remobid.common.model.ModelBase,
-  remobid.common.model.Base);
+  goog.events.EventTarget);
 
 /**
  * @param {boolean} forced supresses the Exception {@code UNSAVED}.
@@ -111,7 +143,7 @@ goog.inherits(remobid.common.model.ModelBase,
  */
 remobid.common.model.ModelBase.prototype.dispose = function(forced) {
   if (!forced && this.trackedAttributes_.length)
-    throw new Error(remobid.common.model.modelBase.ErrorType.UNSAVED);
+    throw new Error(remobid.common.model.ModelBase.ErrorType.UNSAVED);
   goog.base(this, 'dispose');
 };
 /**
@@ -119,7 +151,8 @@ remobid.common.model.ModelBase.prototype.dispose = function(forced) {
  * @override
  * */
 remobid.common.model.ModelBase.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
+
+  this.dispatchEvent(remobid.common.model.ModelBase.EventType.DELETED);
   this.mappings_ = null;
   this.trackedAttributes_ = null;
   goog.array.forEach(this.listenerKeys_, function(key) {
@@ -141,7 +174,7 @@ remobid.common.model.ModelBase.prototype.handleAutoStore = function(event) {
  */
 remobid.common.model.ModelBase.prototype.store = function() {
   if (goog.isNull(this.storage_))
-    throw new Error(remobid.common.model.modelBase.ErrorType.NO_STORAGE_ENGINE);
+    throw new Error(remobid.common.model.ModelBase.ErrorType.NO_STORAGE_ENGINE);
 };
 
 /**
@@ -157,7 +190,7 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
   if (this.autoStoreEnabled_) {
     key = goog.events.listen(
       this,
-      remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
       this.handleAutoStore,
       false,
       this
@@ -166,7 +199,7 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
   } else {
     var eventListener = goog.events.getListener(
       this,
-      remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
       this.handleAutoStore,
       false,
       this
@@ -175,7 +208,7 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
     if (!eventListener)
       return;
 
-    key = eventListener.key;
+    var key = eventListener.key;
 
     goog.events.unlistenByKey(key);
     goog.array.remove(this.listenerKeys_, key);
@@ -226,7 +259,7 @@ remobid.common.model.ModelBase.prototype.isSupressChangeTracking = function() {
 
 /**
  *
- * @param {remobid.common.model.ModelBase.Mapping} attributeMapping the mappings
+ * @param {remobid.common.model.modelBase.Mapping} attributeMapping the mappings
  *    for the attribute to change.
  */
 remobid.common.model.ModelBase.prototype.handleChangedAttribute = function(
@@ -236,16 +269,6 @@ remobid.common.model.ModelBase.prototype.handleChangedAttribute = function(
   if (!this.supressChangeEvent_)
     this.prepareChangeEvent();
 };
-
-/**
- * @param {string} url the rest url of the resource model.
- */
-remobid.common.model.Base.prototype.setRestUrl = function(url) {
-  this.restUrl_ = url;
-  this.handleChangedAttribute(
-    remobid.common.model.ModelBase.attributeMappings.HREF);
-};
-
 /**
  * @param {string} id the identifier of the resource model.
  */
@@ -260,6 +283,29 @@ remobid.common.model.ModelBase.prototype.setIdentifier = function(id) {
  */
 remobid.common.model.ModelBase.prototype.getIdentifier = function() {
   return this.identifier_;
+};
+
+/**
+ * @param {string} url the rest url of the resource model.
+ */
+remobid.common.model.ModelBase.prototype.setRestUrl = function(url) {
+  this.restUrl_ = url;
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.HREF);
+};
+
+/**
+ * @return {string} the rest url of the resource model.
+ */
+remobid.common.model.ModelBase.prototype.getRestUrl = function() {
+  return this.restUrl_;
+};
+
+/**
+ * @return {boolean} whenever the resource has a URL already.
+ */
+remobid.common.model.ModelBase.prototype.hasRestUrl = function() {
+  return !goog.isNull(this.restUrl_);
 };
 
 /**
@@ -290,6 +336,28 @@ remobid.common.model.ModelBase.prototype.getCache = function() {
   return this.cache_;
 };
 
+/**
+ * @param {boolean} loaded is the data already loaded.
+ */
+remobid.common.model.ModelBase.prototype.setDataLoaded = function(loaded) {
+  this.dataLoaded_ = loaded;
+};
+
+/**
+ * @return {boolean} whenever the model data is already loaded.
+ */
+remobid.common.model.ModelBase.prototype.isDataLoaded = function() {
+  return this.dataLoaded_;
+};
+
+/**
+ * @return {boolean} whenever the model is loading its data.
+ */
+remobid.common.model.ModelBase.prototype.isLoading = function() {
+  return this.loading_;
+};
+
+
 /* mapping functionality */
 
 /**
@@ -300,17 +368,16 @@ remobid.common.model.ModelBase.prototype.getCache = function() {
 remobid.common.model.ModelBase.prototype.updateFromExternal = function(
   data) {
   var listenerKey = goog.events.listenOnce(this,
-    remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+    remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
     goog.bind(
       this.dispatchEvent,
       this,
-      remobid.common.model.modelBase.EventType.CHANGED
+      remobid.common.model.ModelBase.EventType.CHANGED
     )
   );
   this.updateDataViaMappings(data);
   this.listenerKeys_.push(listenerKey);
 };
-
 /**
  * sets the data of this model to the given data via the attributeMappings.
  * @param {Object} data the new data.
@@ -353,10 +420,18 @@ remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
     goog.bind(
       this.dispatchEvent,
       this,
-      remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+      remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
     ),
     this.changedEventDelay_
   );
+};
+
+/**
+ *
+ * @param {Array} attributMappingKeys The keys of the attributeMappings.
+ */
+remobid.common.model.ModelBase.prototype.load = function(attributMappingKeys) {
+
 };
 
 
@@ -389,12 +464,14 @@ remobid.common.model.ModelBase.attributeMappings = {
 
 /**
  * @typedef {{name: string, getter: Function, setter: Function,
- *   getterHelper, setterHelper}}
+ *   getterHelper, setterHelper, autoStore}}
  */
 remobid.common.model.modelBase.Mapping;
 
 /** @enum {string} */
-remobid.common.model.modelBase.EventType = {
+remobid.common.model.ModelBase.EventType = {
+  // if the model instance will be deleted
+  DELETED: 'deleted',
   // if the model was changed due to new data from the server
   CHANGED: 'changed',
   // if the model was changed due to action within the view
@@ -405,14 +482,15 @@ remobid.common.model.modelBase.EventType = {
   // so it can be transmitted later when the connection can be established
   LOCALLY_STORED: 'local_stored',
   // if the data was stored in the cache
-  CACHED: 'cached'
+  CACHED: 'cached',
+  // if the request to load the data from a server was successful
+  LOADED: 'loaded'
 };
 
 /** @enum {string} */
-remobid.common.model.modelBase.ErrorType = {
+remobid.common.model.ModelBase.ErrorType = {
   // will be thrown whenever the model is about to be disposed but was not
   // stored yet.
   UNSAVED: 'unsaved',
-  // will be thrown whenever
   NO_STORAGE_ENGINE: 'no storage engine'
 };
