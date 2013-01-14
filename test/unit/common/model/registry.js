@@ -27,7 +27,7 @@ describe('UNIT - Model Registry ', function () {
 
   it('should return only registered models', function() {
     var modelConstructor = function() {};
-
+    modelConstructor.getResourceById = goog.nullFunction;
     registry.registerModel('users', modelConstructor);
 
     assertEquals('wrong constructor returned',
@@ -49,7 +49,9 @@ describe('UNIT - Model Registry ', function () {
 
   it('should not overwrite constructors', function() {
     var modelConstructor = function() {};
+    modelConstructor.getResourceById = goog.nullFunction;
     var modelConstructor2 = function() {};
+    modelConstructor2.getResourceById = goog.nullFunction;
 
     registry.registerModel('users', modelConstructor);
 
@@ -83,7 +85,7 @@ describe('UNIT - Model Registry ', function () {
       done();
     }
     registry.registerModel('users', modelConstructor);
-    registry.getResource('users', 'asdjnfnsgh');
+    registry.getResourceById('users', 'asdjnfnsgh');
   });
 
 });

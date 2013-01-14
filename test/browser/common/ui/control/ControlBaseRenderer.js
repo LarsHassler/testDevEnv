@@ -149,6 +149,70 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         bindingOptions['href'][0].classForExternal
       );
     });
+
+    it('should update without a helper function', function() {
+      var element = renderer.createDom(control);
+      var binding = 'href,text,0,0';
+      goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
+      var bindingOptions = renderer.parseBinding(element, control.mappings_);
+      model.restUrl_ = 'https://www.testtest.co.uk';
+      renderer.handleChangeEvent('href', false, bindingOptions, control);
+      assertEquals('wrong updates applied',
+        'https://www.testtest.co.uk',
+        goog.dom.getTextContent(element.children[0])
+      );
+    });
+
+    it('should update without a helper function', function() {
+      var helperCalled = false;
+      var element = renderer.createDom(control);
+      var binding = 'href,html,1,0';
+      goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
+      var bindingOptions = renderer.parseBinding(element, control.mappings_);
+      model.restUrl_ = 'https://www.testtest.co.uk';
+      bindingOptions['href'][0].mappings.getterHelper = function(value) {
+        helperCalled = true;
+        return '#' + value + '!';
+      };
+
+      renderer.handleChangeEvent('href', false, bindingOptions, control);
+
+      assertTrue('helper function not called',
+        helperCalled
+      );
+
+      assertEquals('wrong updates applied',
+        '#https://www.testtest.co.uk!',
+        element.children[0].innerHTML
+      );
+
+    });
+
+    it('should not call helper function if flag not set', function() {
+      var helperCalled = false;
+      var element = renderer.createDom(control);
+      var binding = 'href,html,0,0';
+      goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
+      var bindingOptions = renderer.parseBinding(element, control.mappings_);
+      model.restUrl_ = 'https://www.testtest.co.uk';
+      bindingOptions['href'][0].mappings.getterHelper = function(value) {
+        helperCalled = true;
+        return '#' + value + '!';
+      };
+
+      renderer.handleChangeEvent('href', false, bindingOptions, control);
+
+      assertFalse('helper function should not be called',
+        helperCalled
+      );
+
+      assertEquals('wrong updates applied',
+        'https://www.testtest.co.uk',
+        element.children[0].innerHTML
+      );
+
+    });
+
   });
 
 });

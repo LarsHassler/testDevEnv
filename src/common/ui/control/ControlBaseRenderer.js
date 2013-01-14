@@ -138,8 +138,33 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
   });
 };
 
-// add eventhandler
+/**
+ * applies all binding to the appropriate elements
+ * @param {string} attribute
+ *    the attribute of the model which was changed.
+ * @param {boolean} external
+ *    whenever the the change was triggered from external.
+ * @param {Object.<string, Array>} bindOptions
+ *    all bind options of the control.
+ * @param {remobid.common.ui.control.ControlBase} control
+ *    the control.
+ */
+remobid.common.ui.control.ControlBaseRenderer.prototype.handleChangeEvent =
+    function(attribute, external, bindOptions, control) {
+  bindOptions = bindOptions[attribute];
+  if (!bindOptions)
+    return;
 
+  goog.array.forEach(bindOptions, function(options) {
+    var value = options.mappings.getter.call(control.getModel());
+    if (options.useHelper && goog.isDef(options.mappings.getterHelper)) {
+      value = options.mappings.getterHelper(value);
+    }
+    options.method(value, options.element, options.control);
+  });
+
+
+};
 //
 
 /**
@@ -147,8 +172,12 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
  * @type {Object.<string, function>}
  */
 remobid.common.ui.control.controlBaseRenderer.bindMethods = {
-  'html': goog.nullFunction,
-  'text': goog.nullFunction,
+  'html': function(value, element, control) {
+    element.innerHTML = value;
+  },
+  'text': function(value, element, control) {
+    goog.dom.setTextContent(element, value);
+  },
   'tglClass': goog.nullFunction,
   'chAttr': goog.nullFunction,
   'control': goog.nullFunction

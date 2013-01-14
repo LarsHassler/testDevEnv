@@ -212,7 +212,7 @@ remobid.common.ui.control.ControlBase.prototype.getBindFunction = function(
 
 /**
  * @typedef {{name: string, getter: Function, setter: Function,
- *   getterHelper, setterHelper, autoStore}}
+ *   getterHelper, setterHelper}}
  */
 remobid.common.ui.control.ControlBase.Mapping;
 
