@@ -43,7 +43,32 @@ describe('UNIT - ModelBase', function() {
 
   describe('dispose - ', function() {
 
-    it('should free all references', function() {
+    it('should only dispose if there are no references' +
+      ' to this model left', function() {
+      assertEquals('there should be only one reference at the start',
+        1,
+        Model.referenceCounter_
+      );
+      Model.increaseReferenceCounter();
+      assertEquals('reference counter not increased',
+        2,
+        Model.referenceCounter_
+      );
+      Model.dispose();
+      assertEquals('reference counter not decreased',
+        1,
+        Model.referenceCounter_
+      );
+      assertFalse('model should not been disposed of yet',
+        Model.isDisposed()
+      );
+      Model.dispose();
+      assertTrue('model should now been disposed of yet',
+        Model.isDisposed()
+      );
+    });
+
+    it('should free all internal references', function() {
       Model.dispose();
       assertNull('trackedAttributes not cleared',
         Model.trackedAttributes_
@@ -64,7 +89,6 @@ describe('UNIT - ModelBase', function() {
         Model.storage_
       );
     });
-
 
     it('should unlisten from all events', function() {
       var length = Model.listenerKeys_.length;

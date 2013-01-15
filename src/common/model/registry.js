@@ -38,8 +38,14 @@ remobid.common.model.Registry.prototype.disposeInternal = function() {
  */
 remobid.common.model.Registry.prototype.registerModel = function(id, constr) {
   if (goog.object.containsKey(this.registry_, id)) {
+    // TODO change to remobid error instance
     throw new Error(
       remobid.common.model.Registry.ErrorType.ALREADY_REGISTERED);
+  }
+  if (!goog.isFunction(constr.getResourceById)) {
+    // TODO change to remobid error instance
+    throw new Error(
+      remobid.common.model.Registry.ErrorType.MISSING_FUNCTION);
   }
   goog.object.add(this.registry_, id, constr);
 };
@@ -55,6 +61,7 @@ remobid.common.model.Registry.prototype.getConstructorById = function(id) {
     return this.registry_[id];
   }
 
+  // TODO change to remobid error instance
   throw new Error(remobid.common.model.Registry.ErrorType.NOT_FOUND);
 };
 
@@ -65,10 +72,15 @@ remobid.common.model.Registry.prototype.getConstructorById = function(id) {
  * @return {remobid.common.model.ModelBase} the instance for the given
  *    combination.
  */
-remobid.common.model.Registry.prototype.getResource = function(
+remobid.common.model.Registry.prototype.getResourceById = function(
     modelId, resourceId) {
   var constr = this.getConstructorById(modelId);
 
+  if (!constr) {
+    // TODO change to remobid error instance
+    throw new Error(
+      remobid.common.model.Registry.ErrorType.NOT_FOUND);
+  }
   return constr.getResourceById(resourceId);
 };
 
@@ -78,5 +90,6 @@ remobid.common.model.Registry.prototype.getResource = function(
  */
 remobid.common.model.Registry.ErrorType = {
   NOT_FOUND: 'constructor not found',
-  ALREADY_REGISTERED: 'this id is already registered'
+  ALREADY_REGISTERED: 'this id is already registered',
+  MISSING_FUNCTION: 'constructor is missing the getResourceById fucntion'
 };
