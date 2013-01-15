@@ -121,6 +121,13 @@ remobid.common.model.ModelBase = function(id) {
    * @private
    */
   this.mappings_ = remobid.common.model.ModelBase.attributeMappings;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.referenceCounter_ = 1;
 };
 goog.inherits(remobid.common.model.ModelBase,
   goog.events.EventTarget);
@@ -130,9 +137,12 @@ goog.inherits(remobid.common.model.ModelBase,
  * @override
  */
 remobid.common.model.ModelBase.prototype.dispose = function(forced) {
-  if (!forced && this.trackedAttributes_.length)
-    throw new Error(remobid.common.model.ModelBase.ErrorType.UNSAVED);
-  goog.base(this, 'dispose');
+  if (!--this.referenceCounter_)
+  {
+    if (!forced && this.trackedAttributes_.length)
+      throw new Error(remobid.common.model.ModelBase.ErrorType.UNSAVED);
+    goog.base(this, 'dispose');
+  }
 };
 /**
  * dispatches an {@code DELETED} Event before disposing of the instance.
@@ -150,6 +160,12 @@ remobid.common.model.ModelBase.prototype.disposeInternal = function() {
   goog.Timer.clear(this.changedEventTimerId_);
 };
 
+/**
+ * increases the reference counter
+ */
+remobid.common.model.ModelBase.prototype.increaseReferenceCounter = function() {
+  this.referenceCounter_++;
+};
 /**
  * @param {goog.event.Event} event the {@code LOCALLY_CHANGED} Event.
  */
@@ -196,7 +212,7 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
     if (!eventListener)
       return;
 
-    var key = eventListener.key;
+    key = eventListener.key;
 
     goog.events.unlistenByKey(key);
     goog.array.remove(this.listenerKeys_, key);
@@ -444,7 +460,7 @@ remobid.common.model.ModelBase.attributeMappings = {
 
 /**
  * @typedef {{name: string, getter: Function, setter: Function,
- *   getterHelper, setterHelper, autoStore}}
+ *   getterHelper, setterHelper}}
  */
 remobid.common.model.ModelBase.Mapping;
 
