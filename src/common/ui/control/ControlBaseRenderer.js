@@ -94,13 +94,15 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
 
   bindValues = goog.dom.dataset.get(node, 'rbBindGet').split('|');
   goog.array.forEach(bindValues, function(values) {
-    var bindOptions, name, method, errorTypes;
+    if (values == '')
+      return;
 
-    bindOptions = values.split(',');
-    name = bindOptions[0];
+    var bindOptions = values.split(',');
+    var name = bindOptions[0];
     var mapping = goog.object.findValue(mappings, function(mapping) {
       return mapping.name == name;
     });
+
     // an unknown mapping name was found
     if (!mapping) {
       // todo change to remobid error instance
@@ -108,13 +110,14 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
       throw new Error(errorTypes.UNKNOWN_BINDING_NAME);
       return;
     }
-    method = bindOptions[1].split(':');
+
+    var method = bindOptions[1].split(':');
     // an unknown method was found
     if (!goog.object.containsKey(
           remobid.common.ui.control.controlBaseRenderer.bindMethods,
           method[0])) {
       // todo change to remobid error instance
-      errorTypes = remobid.common.ui.control.controlBaseRenderer.ErrorType;
+      var errorTypes = remobid.common.ui.control.controlBaseRenderer.ErrorType;
       throw new Error(errorTypes.UNKNOWN_BINDING_METHOD);
       return;
     }
@@ -122,12 +125,46 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
     if (!goog.object.containsKey(bindings, name)) {
       bindings[name] = [];
     }
-    bindings[name].push(bindOptions);
+    bindings[name].push({
+      mappings: mapping,
+      method: remobid.common.ui.control.controlBaseRenderer.bindMethods[method],
+      element: node,
+      control: method === 'control' ? true : null,
+      useHelper: bindOptions[2] === '1',
+      markParent: bindOptions[3] === '1',
+      classForExternal: !!bindOptions[4] ? bindOptions[4] : null
+    });
+
   });
 };
 
-// add eventhandler
+/**
+ * applies all binding to the appropriate elements
+ * @param {string} attribute
+ *    the attribute of the model which was changed.
+ * @param {boolean} external
+ *    whenever the the change was triggered from external.
+ * @param {Object.<string, Array>} bindOptions
+ *    all bind options of the control.
+ * @param {remobid.common.ui.control.ControlBase} control
+ *    the control.
+ */
+remobid.common.ui.control.ControlBaseRenderer.prototype.handleChangeEvent =
+    function(attribute, external, bindOptions, control) {
+  bindOptions = bindOptions[attribute];
+  if (!bindOptions)
+    return;
 
+  goog.array.forEach(bindOptions, function(options) {
+    var value = options.mappings.getter.call(control.getModel());
+    if (options.useHelper && goog.isDef(options.mappings.getterHelper)) {
+      value = options.mappings.getterHelper(value);
+    }
+    options.method(value, options.element, options.control);
+  });
+
+
+};
 //
 
 /**
@@ -135,8 +172,12 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
  * @type {Object.<string, function>}
  */
 remobid.common.ui.control.controlBaseRenderer.bindMethods = {
-  'html': goog.nullFunction,
-  'text': goog.nullFunction,
+  'html': function(value, element, control) {
+    element.innerHTML = value;
+  },
+  'text': function(value, element, control) {
+    goog.dom.setTextContent(element, value);
+  },
   'tglClass': goog.nullFunction,
   'chAttr': goog.nullFunction,
   'control': goog.nullFunction
