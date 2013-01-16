@@ -48,17 +48,15 @@ goog.inherits(remobid.common.model.Base,
  */
 remobid.common.model.Base.prototype.dispose = function() {
   if (--this.referenceCounter_ == 0)
-  {
     goog.base(this, 'dispose');
-  }
 };
 /**
  * dispatches an {@code DELETED} Event before disposing of the instance.
  * @override
  * */
 remobid.common.model.Base.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
   this.dispatchEvent(remobid.common.model.base.EventType.DELETED);
+  goog.base(this, 'disposeInternal');
 };
 
 /**
@@ -81,6 +79,13 @@ remobid.common.model.Base.prototype.setRestUrl = function(url) {
  */
 remobid.common.model.Base.prototype.getRestUrl = function() {
   return this.restUrl_;
+};
+
+/**
+ * @return {boolean} whenever the resource has a URL already.
+ */
+remobid.common.model.Base.prototype.hasRestUrl = function() {
+  return !goog.isNull(this.restUrl_);
 };
 
 /**
