@@ -4,7 +4,9 @@ goog.addDependency('../../../../deps/soy/soyutils_usegoog.js', ['soy', 'soy.Stri
 goog.addDependency('../../../../devEnv/testRunner.js', ['remobid.devEnv.TestRunner'], ['goog.array']);
 goog.addDependency('../../../../src/common/cache/localcache.js', ['remobid.common.cache.LocalCache'], ['remobid.common.storage.LocalStorage']);
 goog.addDependency('../../../../src/common/error/baseError.js', ['remobid.common.error.BaseError'], ['goog.debug.Error']);
-goog.addDependency('../../../../src/common/model/modelBase.js', ['remobid.common.model.ModelBase', 'remobid.common.model.ModelBase.EventType', 'remobid.common.model.modelBase.Mapping'], ['goog.Timer', 'goog.events.EventTarget', 'remobid.common.model.Registry']);
+goog.addDependency('../../../../src/common/model/base.js', ['remobid.common.model.Base', 'remobid.common.model.base.EventType'], ['goog.events.EventTarget']);
+goog.addDependency('../../../../src/common/model/collection.js', ['remobid.common.model.Collection', 'remobid.common.model.collection.ErrorType', 'remobid.common.model.collection.Event', 'remobid.common.model.collection.EventType'], ['goog.asserts', 'goog.events.Event', 'remobid.common.error.BaseError', 'remobid.common.model.Base']);
+goog.addDependency('../../../../src/common/model/modelBase.js', ['remobid.common.model.ModelBase', 'remobid.common.model.modelBase.EventType', 'remobid.common.model.modelBase.Mapping'], ['goog.Timer', 'goog.events.EventTarget', 'remobid.common.model.Registry']);
 goog.addDependency('../../../../src/common/model/registry.js', ['remobid.common.model.Registry', 'remobid.common.model.Registry.ErrorType'], ['goog.Disposable', 'goog.object']);
 goog.addDependency('../../../../src/common/net/mySqlConnection.js', ['remobid.common.net.MySqlConnection', 'remobid.common.net.mySqlConnection.Data'], ['goog.Disposable', 'goog.array', 'remobid.common.error.BaseError', 'remobid.common.storage.StorageErrorType']);
 goog.addDependency('../../../../src/common/net/restmanager.js', ['remobid.common.net.RestManager'], ['goog.crypt.base64', 'goog.json', 'goog.net.XhrManager']);
@@ -15,7 +17,7 @@ goog.addDependency('../../../../src/common/storage/rest.js', ['remobid.common.st
 goog.addDependency('../../../../src/common/storage/storageBase.js', ['remobid.common.storage.StorageBase', 'remobid.common.storage.storageBase.Options'], ['goog.Disposable']);
 goog.addDependency('../../../../src/common/storage/storageErrorType_enum.js', ['remobid.common.storage.StorageErrorType'], []);
 goog.addDependency('../../../../src/common/storage/storage_interface.js', ['remobid.common.storage.StorageInterface'], []);
-goog.addDependency('../../../../src/common/ui/control/ControlBase.js', ['remobid.common.ui.control.ControlBase'], ['goog.dom', 'goog.dom.dataset', 'goog.ui.Control', 'remobid.common.model.ModelBase.EventType', 'remobid.common.ui.control.ControlBaseRenderer']);
+goog.addDependency('../../../../src/common/ui/control/ControlBase.js', ['remobid.common.ui.control.ControlBase'], ['goog.dom', 'goog.dom.dataset', 'goog.ui.Control', 'remobid.common.model.modelBase.EventType', 'remobid.common.ui.control.ControlBaseRenderer']);
 goog.addDependency('../../../../src/common/ui/control/ControlBaseRenderer.js', ['remobid.common.ui.control.ControlBaseRenderer', 'remobid.common.ui.control.controlBaseRenderer'], ['goog.soy', 'goog.ui.ControlRenderer', 'remobid.templates.test']);
 goog.addDependency('../../../../templates/_compiled/testTemplate.soy.js', ['remobid.templates.test'], ['soy', 'soydata']);
 goog.addDependency('../../../../test/mock/Utilities.js', ['remobid.test.mock.Utilities'], []);

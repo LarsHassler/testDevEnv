@@ -7,7 +7,7 @@ goog.provide('remobid.common.ui.control.ControlBase');
 goog.require('goog.dom');
 goog.require('goog.dom.dataset');
 goog.require('goog.ui.Control');
-goog.require('remobid.common.model.ModelBase.EventType');
+goog.require('remobid.common.model.modelBase.EventType');
 goog.require('remobid.common.ui.control.ControlBaseRenderer');
 
 
@@ -143,7 +143,7 @@ remobid.common.ui.control.ControlBase.prototype.bindNode_ = function(node) {
     this.getHandler()
       .listen(
         this.getModel(),
-        remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
         goog.bind(
           this.getBindFunction(attributes['rbBindType']),
           this,
