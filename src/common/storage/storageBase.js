@@ -165,7 +165,7 @@ remobid.common.storage.StorageBase.prototype.createKey = function(id) {
  * @param {string|number|Array.<string>|Array.<number>} id the id to check.
  * @param {function(boolean?,Object=)} errorcallback callback function to use if
  *    the id is not valid.
- * @return {boolean} whenever the id is valid or not.
+ * @return {boolean} Wether the id is valid or not.
  * @protected
  */
 remobid.common.storage.StorageBase.prototype.checkValidId = function(
