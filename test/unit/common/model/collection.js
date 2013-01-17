@@ -9,6 +9,7 @@ if (typeof module !== 'undefined' && module.exports)
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.model.ModelBase');
 goog.require('remobid.common.model.Collection');
+goog.require('remobid.common.model.collection.ErrorType');
 goog.require('remobid.common.model.collection.Event');
 goog.require('remobid.common.model.collection.EventType');
 goog.require('remobid.test.mock.Utilities');
@@ -73,8 +74,8 @@ describe('UNIT - Collection', function () {
         goog.bind(Coll.addItem, Coll, item)
       );
       assertEquals('wrong Exception thrown',
-        'invalid type',
-        e.message
+        remobid.common.model.collection.ErrorType.WRONG_TYPE,
+        e.errorType
       );
     });
 
@@ -84,9 +85,10 @@ describe('UNIT - Collection', function () {
         goog.bind(Coll.addItem, Coll, item)
       );
       assertEquals('wrong Exception thrown',
-        'keine ID',
-        e.message
+        remobid.common.model.collection.ErrorType.NO_ID,
+        e.errorType
       );
+      item.dispose();
     });
 
     it('should fire an Collection-ADDED event', function() {
@@ -111,6 +113,7 @@ describe('UNIT - Collection', function () {
         1,
         cbCounter
       );
+      item.dispose();
     });
 
     it('should increment the reference counter ' +
@@ -142,21 +145,77 @@ describe('UNIT - Collection', function () {
 
   describe('removing item', function() {
 
-    it.skip('should fire an Collection-REMOVED event', function(done) {
-
+    it('should fire an Collection-REMOVED event', function() {
+      var cbCounter = 0;
+      var item = new remobid.common.model.ModelBase(1);
+      Coll.addItem(item);
+      goog.events.listen(
+        Coll,
+        remobid.common.model.collection.EventType.REMOVED,
+        function(event) {
+          assertTrue('wrong Event instance dispatched',
+            event instanceof remobid.common.model.collection.Event
+          );
+          assertEquals('wrong item attached to the event',
+            item,
+            event.getItem()
+          );
+          cbCounter++;
+        }
+      );
+      Coll.removeItem(item);
+      assertEquals('REMOVED Event was not call at all or called to often',
+        1,
+        cbCounter
+      );
+      item.dispose();
     });
 
-    it.skip('should decrement the reference counter ' +
-        'or dispose of the added item', function(done) {
-
+    it('should decrement the reference counter ' +
+        'or dispose of the added item', function() {
+      var item = new remobid.common.model.ModelBase(1);
+      Coll.addItem(item);
+      Coll.removeItem(item);
+      assertEquals('item reference counter should be decreamented',
+        1,
+        item.referenceCounter_
+      );
+      item.dispose();
     });
 
-    it.skip('should be removed from the collection', function(done) {
-
+    it('should be removed from the collection', function() {
+      var item = new remobid.common.model.ModelBase(1);
+      Coll.addItem(item);
+      assertTrue('item not added to collection',
+        Coll.contains(item)
+      );
+      Coll.removeItem(item);
+      assertFalse('item not removed to collection',
+        Coll.contains(item)
+      );
+      item.dispose();
     });
 
-    it.skip('should be able to remove all items', function(done) {
-
+    it('should be able to remove all items', function() {
+      var item = new remobid.common.model.ModelBase(1);
+      var item2 = new remobid.common.model.ModelBase(2);
+      Coll.addItem(item);
+      Coll.addItem(item2);
+      Coll.removeAll();
+      assertEquals('item reference counter should be decreamented',
+        1,
+        item.referenceCounter_
+      );
+      assertEquals('item2 reference counter should be decreamented',
+        1,
+        item2.referenceCounter_
+      );
+      assertObjectEquals('items not removed from the collection',
+        {},
+        Coll.items_
+      );
+      item.dispose();
+      item2.dispose();
     });
 
   });

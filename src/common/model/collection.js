@@ -1,13 +1,15 @@
 /**
- * @fileoverview
+ * @fileoverview a base implementation for a collection of models.
  */
 
 goog.provide('remobid.common.model.Collection');
+goog.provide('remobid.common.model.collection.ErrorType');
 goog.provide('remobid.common.model.collection.Event');
 goog.provide('remobid.common.model.collection.EventType');
 
 goog.require('goog.asserts');
 goog.require('goog.events.Event');
+goog.require('remobid.common.error.BaseError');
 goog.require('remobid.common.model.Base');
 
 /**
@@ -40,16 +42,20 @@ remobid.common.model.Collection.prototype.disposeInternal = function() {
 
 /**
  * adds an instance of remobid.common.model.ModelBase to the collection
- * the Item has to have an identifier set. Dispatches an {@CODE ADDED} Event
+ * the Item has to have an identifier set. Dispatches an {@code ADDED} Event
  * @param {remobid.common.model.ModelBase} item
  *    the item to add.
  */
 remobid.common.model.Collection.prototype.addItem = function(item) {
-  if(!(item instanceof remobid.common.model.ModelBase))
-    throw Error('invalid type');
+  if (!(item instanceof remobid.common.model.ModelBase))
+    throw new remobid.common.error.BaseError(
+      remobid.common.model.collection.ErrorType.WRONG_TYPE
+    );
 
   if (!item.getIdentifier())
-     throw Error('keine ID');
+     throw new remobid.common.error.BaseError(
+       remobid.common.model.collection.ErrorType.NO_ID
+     );
 
   goog.object.add(this.items_, item.getIdentifier(), item);
   item.increaseReferenceCounter();
@@ -58,6 +64,28 @@ remobid.common.model.Collection.prototype.addItem = function(item) {
     item
   );
   this.dispatchEvent(event);
+};
+
+/**
+ * removes an item from the collection. Dispatches an {@code REMOVED} Event
+ * @param {remobid.common.model.ModelBase} item
+ *    the item to remove.
+ */
+remobid.common.model.Collection.prototype.removeItem = function(item) {
+  goog.object.remove(this.items_, item.getIdentifier());
+  var event = new remobid.common.model.collection.Event(
+    remobid.common.model.collection.EventType.REMOVED,
+    item
+  );
+  this.dispatchEvent(event);
+  item.dispose();
+};
+
+/**
+ * removes all items from this collection.
+ */
+remobid.common.model.Collection.prototype.removeAll = function() {
+  goog.object.forEach(this.items_, this.removeItem, this);
 };
 
 /**
@@ -101,6 +129,12 @@ remobid.common.model.collection.Event.prototype.getItem = function() {
 
 /** @enum {string} */
 remobid.common.model.collection.EventType = {
-  DELETED: 'item deleted',
+  REMOVED: 'item deleted',
   ADDED: 'item added'
+};
+
+/** @enum {string} */
+remobid.common.model.collection.ErrorType = {
+  NO_ID: 'item has no id',
+  WRONG_TYPE: 'item is no ModelBase'
 };
