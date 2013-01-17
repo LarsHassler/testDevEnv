@@ -15,7 +15,7 @@ goog.require('goog.events');
 goog.require('goog.testing.asserts');
 goog.require('goog.testing.MockClock');
 goog.require('remobid.common.model.ModelBase');
-goog.require('remobid.common.model.ModelBase.EventType');
+goog.require('remobid.common.model.modelBase.EventType');
 goog.require('remobid.common.storage.StorageBase');
 goog.require('remobid.test.mock.Utilities');
 
@@ -256,7 +256,7 @@ describe('UNIT - ModelBase', function() {
     it('should dispatch DELETED Event on dispose', function(done) {
       goog.events.listenOnce(
         Model,
-        remobid.common.model.ModelBase.EventType.DELETED,
+        remobid.common.model.base.EventType.DELETED,
         function() {
           done();
         }
@@ -270,7 +270,7 @@ describe('UNIT - ModelBase', function() {
 
       goog.events.listen(
         Model,
-        remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
         function() {
           dispatchCounter++;
         }
@@ -310,7 +310,7 @@ describe('UNIT - ModelBase', function() {
       Model2.setAutoStore(false);
       goog.events.listen(
         Model2,
-        remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED,
+        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
         function() {
           dispatchCounter++;
         }
@@ -343,7 +343,7 @@ describe('UNIT - ModelBase', function() {
       var prevTimerCount = mockClock.getTimeoutsMade();
       goog.events.listen(
         Model,
-        remobid.common.model.ModelBase.EventType.CHANGED,
+        remobid.common.model.modelBase.EventType.CHANGED,
         function() {
           dispatchCounter--;
           assertEquals('event fired multiple times',
@@ -378,7 +378,7 @@ describe('UNIT - ModelBase', function() {
       assertTrue('no listeners set',
         goog.events.hasListener(
           Model2,
-          remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
+          remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
         )
       );
       Model2.setAutoStore(false);
@@ -388,7 +388,7 @@ describe('UNIT - ModelBase', function() {
       assertFalse('there should be no listeners set',
         goog.events.hasListener(
           Model2,
-          remobid.common.model.ModelBase.EventType.LOCALLY_CHANGED
+          remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
         )
       );
     });
@@ -398,7 +398,7 @@ describe('UNIT - ModelBase', function() {
         goog.bind(Model.store, Model)
       );
       assertEquals('wrong exception thrown',
-        remobid.common.model.ModelBase.ErrorType.NO_STORAGE_ENGINE,
+        remobid.common.model.modelBase.ErrorType.NO_STORAGE_ENGINE,
         exception.message
       );
       Model.setStorage(new remobid.common.storage.StorageBase());
