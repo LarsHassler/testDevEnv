@@ -68,8 +68,9 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         goog.bind(renderer.parseBinding, renderer, element, control.mappings_)
       );
 
+      var errorType = remobid.common.ui.control.controlBaseRenderer.ErrorType;
       assertEquals('wrong exception thrown',
-        remobid.common.ui.control.controlBaseRenderer.ErrorType.UNKNOWN_BINDING_NAME,
+        errorType.UNKNOWN_BINDING_NAME,
         exception.message
       );
     });
@@ -78,13 +79,18 @@ describe('UNIT - ControlBaseRenderer - ', function() {
     it('should not accept unknown methods', function() {
       var element, exception;
       element = renderer.createDom(control);
-      goog.dom.dataset.set(element.children[0], 'rbBindGet', 'href,lalaFunction,1,0');
+      goog.dom.dataset.set(
+        element.children[0],
+        'rbBindGet',
+        'href,lalaFunction,1,0'
+      );
       exception = assertThrows('unknown method accepted',
         goog.bind(renderer.parseBinding, renderer, element, control.mappings_)
       );
 
+      var errorType = remobid.common.ui.control.controlBaseRenderer.ErrorType;
       assertEquals('wrong exception thrown',
-        remobid.common.ui.control.controlBaseRenderer.ErrorType.UNKNOWN_BINDING_METHOD,
+        errorType.UNKNOWN_BINDING_METHOD,
         exception.message
       );
     });

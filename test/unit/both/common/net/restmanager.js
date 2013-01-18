@@ -1,27 +1,24 @@
 /**
- * @fileoverview
+ * @fileoverview the test for the restmananger.
  */
 
-/** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {
-}
+if (typeof module !== 'undefined' && module.exports)
+  require('nclosure');
+
 goog.require('goog.object');
 goog.require('goog.testing.asserts');
 goog.require('goog.testing.net.XhrIoPool');
 goog.require('remobid.common.net.RestManager');
 goog.require('remobid.test.mock.Utilities');
 
-describe('UNIT - restmanager', function () {
+describe('UNIT - restmanager', function() {
 
   beforeEach(function(done) {
     remobid.test.mock.Utilities.clearStack(done);
   });
 
   afterEach(function() {
-    if(remobid.common.net.RestManager.instances_) {
+    if (remobid.common.net.RestManager.instances_) {
       goog.object.forEach(
         remobid.common.net.RestManager.instances_,
         function(Manager, index) {
@@ -33,7 +30,7 @@ describe('UNIT - restmanager', function () {
   });
 
   describe('Multi Singleton', function() {
-    
+
     it('should return the same Instance', function() {
       var Manager = remobid.common.net.RestManager.getInstance();
       assertNotNull(remobid.common.net.RestManager.instances_);
@@ -160,7 +157,7 @@ describe('UNIT - restmanager', function () {
           'sp_key': 'sp_value',
           'Authorization': 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='};
         Manager.setBasicAuthentication('Aladdin', 'open sesame');
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertObjectEquals(total_headers, headers);
           done();
@@ -171,7 +168,7 @@ describe('UNIT - restmanager', function () {
 
       it('url should combine baseUrl and resource url', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertEquals('https://api.remobid.com/v1/users', url);
           done();
@@ -182,7 +179,7 @@ describe('UNIT - restmanager', function () {
       it('url should combine baseUrl, resource url ' +
         'and id if given', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertEquals('https://api.remobid.com/v1/users/123', url);
           done();
@@ -192,7 +189,7 @@ describe('UNIT - restmanager', function () {
 
       it('should add optional parameter to the url', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertEquals(
             'https://api.remobid.com/v1/users/123?fields=name',
@@ -227,7 +224,7 @@ describe('UNIT - restmanager', function () {
 
       it('method should be PUT', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertEquals('PUT', method);
           done();
@@ -304,7 +301,7 @@ describe('UNIT - restmanager', function () {
 
       it('method should be POST', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertEquals('POST', method);
           done();
@@ -376,7 +373,7 @@ describe('UNIT - restmanager', function () {
 
       it('method should be GET', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertEquals('DELETE', method);
           done();
@@ -392,7 +389,13 @@ describe('UNIT - restmanager', function () {
           Manager.abort = Manager.send = goog.nullFunction;
           assertThrows(
             'request have to have an url',
-            goog.bind(Manager.startDelete, Manager, null, 'v1', goog.nullFunction, 1)
+            goog.bind(
+              Manager.startDelete,
+              Manager,
+              null,
+              'v1',
+              goog.nullFunction,
+              1)
           );
 
           assertThrows(
@@ -447,7 +450,7 @@ describe('UNIT - restmanager', function () {
 
       it('method should be GET', function(done) {
         var Manager = remobid.common.net.RestManager.getInstance();
-        Manager.send = function (
+        Manager.send = function(
           id, url, method, context, headers) {
           assertEquals('GET', method);
           done();
