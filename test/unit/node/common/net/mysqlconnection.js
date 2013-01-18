@@ -25,7 +25,7 @@ describe('Unit - MySql wrapper', function() {
       'database': 'some database'
     };
 
-    Db = new remobid.common.net.MySqlConnection(connectionData)
+    Db = new remobid.common.net.MySqlConnection(connectionData);
   });
 
   it('should store the connection data', function() {
@@ -50,10 +50,10 @@ describe('Unit - MySql wrapper', function() {
     }
 
     var data = {
-      'col1':'data1',
-      'col2':'data2',
-      'col3':'data3'
-    }
+      'col1': 'data1',
+      'col2': 'data2',
+      'col3': 'data3'
+    };
 
     Db.insert(goog.nullFunction(), 'test', data);
 
@@ -78,10 +78,10 @@ describe('Unit - MySql wrapper', function() {
     }
 
     var data = {
-      'col1':'data1',
-      'col2':'data2',
-      'col3':'data3'
-    }
+      'col1': 'data1',
+      'col2': 'data2',
+      'col3': 'data3'
+    };
 
     var where = '`oranges` = \'blue\'';
 
@@ -94,8 +94,8 @@ describe('Unit - MySql wrapper', function() {
     );
 
     var values = {
-      'fruit':'oranges',
-      'color':'blue'
+      'fruit': 'oranges',
+      'color': 'blue'
     };
 
     where = '`{{fruit}}` = \'{{color}}\'';
@@ -132,8 +132,8 @@ describe('Unit - MySql wrapper', function() {
     );
 
     var values = {
-      'fruit':'oranges',
-      'color':'blue'
+      'fruit': 'oranges',
+      'color': 'blue'
     };
 
     where = '`{{fruit}}` = \'{{color}}\'';

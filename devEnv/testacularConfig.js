@@ -8,8 +8,8 @@ basePath = '../';
   files = [
     MOCHA,
     MOCHA_ADAPTER,
-    'test/unit/**/*.js',
-    'test/browser/**/*.js',
+    'test/unit/both/**/*.js',
+    'test/unit/browser/**/*.js',
     {pattern: 'src/**/*.js', included: false, served: false}
   ];
 
