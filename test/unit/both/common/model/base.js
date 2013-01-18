@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for
+ * @fileoverview Tests for the base class.
  */
 
 if (typeof module !== 'undefined' && module.exports)
@@ -10,10 +10,10 @@ goog.require('goog.testing.asserts');
 goog.require('remobid.common.model.Base');
 goog.require('remobid.test.mock.Utilities');
 
-describe('UNIT - Base class - ', function () {
+describe('UNIT - Base class - ', function() {
   var Model;
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     Model = new remobid.common.model.Base();
     remobid.test.mock.Utilities.clearStack(done);
   });

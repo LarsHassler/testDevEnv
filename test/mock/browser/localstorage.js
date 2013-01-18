@@ -5,6 +5,7 @@
 goog.provide('remobid.test.mock.browser.LocalStorage');
 
 goog.require('goog.object');
+
 /**
  * Signleton implementation for a Localstorage mock.
  * @constructor
@@ -17,8 +18,10 @@ goog.addSingletonGetter(remobid.test.mock.browser.LocalStorage);
 
 /**
  * load an item from storage.
- * @param {*} key the key where the data is stored.
- * @return {*}
+ * @param {*} key
+ *    the key where the data is stored.
+ * @return {string}
+ *    the stored data as a string.
  */
 remobid.test.mock.browser.LocalStorage.prototype.getItem = function(key) {
   return this.objectStore[key] || null;
@@ -26,8 +29,10 @@ remobid.test.mock.browser.LocalStorage.prototype.getItem = function(key) {
 
 /**
  * stores the given data at the given key. data will be covnerted to string.
- * @param {*} key the key where the data should be stored.
- * @param {*} data data to store.
+ * @param {*} key
+ *    the key where the data should be stored.
+ * @param {*} data
+ *    data to store.
  */
 remobid.test.mock.browser.LocalStorage.prototype.setItem = function(key, data) {
   this.objectStore[key] = data.toString();
@@ -54,6 +59,9 @@ remobid.test.mock.browser.LocalStorage.prototype.clear = function() {
 /**
  * returns the key at a given position within the storage.
  * @param {number} position
+ *    the position at which we want the get the key.
+ * @return {string}
+ *    the key at this position.
  */
 remobid.test.mock.browser.LocalStorage.prototype.key = function(position) {
   var keys = goog.object.getKeys(this.objectStore);

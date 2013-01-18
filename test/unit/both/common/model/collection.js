@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for
+ * @fileoverview Tests for the base collection class.
  */
 
 if (typeof module !== 'undefined' && module.exports)
@@ -14,15 +14,15 @@ goog.require('remobid.common.model.collection.Event');
 goog.require('remobid.common.model.collection.EventType');
 goog.require('remobid.test.mock.Utilities');
 
-describe('UNIT - Collection', function () {
+describe('UNIT - Collection', function() {
   var Coll;
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     Coll = new remobid.common.model.Collection();
     remobid.test.mock.Utilities.clearStack(done);
   });
 
-  afterEach(function () {
+  afterEach(function() {
     goog.events.removeAll(Coll);
     if (!Coll.isDisposed()) {
       Coll.dispose();
@@ -45,7 +45,7 @@ describe('UNIT - Collection', function () {
       Coll.dispose();
       assertTrue('the item schould be disposed',
         Item.isDisposed()
-      )
+      );
     });
 
     it('should fire an base-DELETED Event', function() {
