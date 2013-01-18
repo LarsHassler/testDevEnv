@@ -76,6 +76,7 @@ remobid.devEnv.TestRunner.prototype.run = function(callback) {
   goog.array.forEach(this.srcFiles_, function(file) {
     goog.array.forEach(this.testTypes_, function(type) {
       var fileName = path.join('test', type, file);
+      console.log(fileName);
       if(fs.existsSync(fileName))
         this.mocha.addFile(fileName);
     }, this);
