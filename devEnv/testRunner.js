@@ -61,7 +61,7 @@ remobid.devEnv.TestRunner.prototype.addFiles = function(var_args) {
 remobid.devEnv.TestRunner.prototype.addTypes = function(var_args) {
   for (var i = 0, len = arguments.length; i < len; i++) {
     var type = arguments[i];
-    if(goog.array.contains(['unit','integration','browser'], type))
+    if(goog.array.contains(['unit/both','unit/node','unit/browser'], type))
       goog.array.insert(this.testTypes_, type);
     else
       throw new Error('unknown test type');
@@ -76,6 +76,7 @@ remobid.devEnv.TestRunner.prototype.run = function(callback) {
   goog.array.forEach(this.srcFiles_, function(file) {
     goog.array.forEach(this.testTypes_, function(type) {
       var fileName = path.join('test', type, file);
+      console.log(fileName);
       if(fs.existsSync(fileName))
         this.mocha.addFile(fileName);
     }, this);
