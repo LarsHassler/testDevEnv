@@ -2,11 +2,8 @@
  * @fileoverview tests for a html5 localstorage engine.
 */
 
-/** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {}
+if (typeof module !== 'undefined' && module.exports)
+  require('nclosure');
 
 goog.require('goog.testing.asserts');
 goog.require('goog.userAgent');
@@ -31,8 +28,10 @@ describe('Unit - localstorage', function() {
 
     beforeEach(function() {
       Storage = new remobid.common.storage.LocalStorage(s_version, s_url);
-      if(!Storage.isAvailable() && (typeof module !== 'undefined' && module.exports)) {
-        Storage.storage_ = /** @type {Storage} */ remobid.test.mock.browser.LocalStorage.getInstance();
+      if (!Storage.isAvailable() &&
+          (typeof module !== 'undefined' && module.exports)) {
+        Storage.storage_ = /** @type {Storage} */
+          remobid.test.mock.browser.LocalStorage.getInstance();
       }
     });
 

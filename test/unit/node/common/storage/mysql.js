@@ -2,12 +2,8 @@
  * @fileoverview Tests for the MySql storage.
  */
 
-/** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {
-}
+if (typeof module !== 'undefined' && module.exports)
+  require('nclosure');
 
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.storage.Constant');
@@ -55,7 +51,7 @@ describe('Unit - MySql storage', function() {
       );
 
       //we do only have to check the sql query string
-      var someData = {'some_id':'some data, it does not matter'};
+      var someData = {'some_id': 'some data, it does not matter'};
       if (sql == expectedSql) return someData;
     };
 
@@ -259,11 +255,11 @@ describe('Unit - MySql storage', function() {
     it('should throw an error when storing invalid data', function() {
 
       var testInput = [];
-      testInput.push({'data':null, 'type':'null'});
-      testInput.push({'data':undefined, 'type':'undefined'});
-      testInput.push({'data':'test', 'type':'string'});
-      testInput.push({'data':9, 'type':'number'});
-      testInput.push({'data':{}, 'type':'empty object'});
+      testInput.push({'data': null, 'type': 'null'});
+      testInput.push({'data': undefined, 'type': 'undefined'});
+      testInput.push({'data': 'test', 'type': 'string'});
+      testInput.push({'data': 9, 'type': 'number'});
+      testInput.push({'data': {}, 'type': 'empty object'});
 
       goog.array.forEach(testInput, function(input) {
         var error = assertThrows('no error thrown, if data is ' + input.type,
@@ -272,7 +268,7 @@ describe('Unit - MySql storage', function() {
         );
 
         assertEquals(
-          input.type +': wrong error type',
+          input.type + ': wrong error type',
           remobid.common.storage.StorageErrorType.INVALID_DATA,
           error.errorType
         );
@@ -280,12 +276,12 @@ describe('Unit - MySql storage', function() {
 
       it('sould throw an error, when using invalid callbacks', function() {
         var testInput = [];
-        testInput.push({'data':null, 'type':'null'});
-        testInput.push({'data':undefined, 'type':'undefined'});
-        testInput.push({'data':'test', 'type':'string'});
-        testInput.push({'data':9, 'type':'number'});
-        testInput.push({'data':{}, 'type':'empty object'});
-        testInput.push({'data':[], 'type':'empty object'});
+        testInput.push({'data': null, 'type': 'null'});
+        testInput.push({'data': undefined, 'type': 'undefined'});
+        testInput.push({'data': 'test', 'type': 'string'});
+        testInput.push({'data': 9, 'type': 'number'});
+        testInput.push({'data': {}, 'type': 'empty object'});
+        testInput.push({'data': [], 'type': 'empty object'});
 
         goog.array.forEach(testInput, function(input) {
           var error = assertThrows('no error thrown, if data is ' + input.type,
@@ -294,7 +290,7 @@ describe('Unit - MySql storage', function() {
           );
 
           assertEquals(
-            input.type +': wrong error type',
+            input.type + ': wrong error type',
             remobid.common.storage.StorageErrorType.INVALID_CALLBACK,
             error.errorType
           );
@@ -306,7 +302,7 @@ describe('Unit - MySql storage', function() {
           );
 
           assertEquals(
-            input.type +': wrong error type',
+            input.type + ': wrong error type',
             remobid.common.storage.StorageErrorType.INVALID_CALLBACK,
             error.errorType
           );
@@ -318,20 +314,20 @@ describe('Unit - MySql storage', function() {
           );
 
           assertEquals(
-            input.type +': wrong error type',
+            input.type + ': wrong error type',
             remobid.common.storage.StorageErrorType.INVALID_CALLBACK,
             error.errorType
           );
         });
       });
 
-      it('should throw an error, when using invalid resource ids', function () {
+      it('should throw an error, when using invalid resource ids', function() {
         var testInput = [];
-        testInput.push({'data':null, 'type':'null'});
-        testInput.push({'data':undefined, 'type':'undefined'});
-        testInput.push({'data':9, 'type':'number'});
-        testInput.push({'data':{}, 'type':'empty object'});
-        testInput.push({'data':[], 'type':'empty object'});
+        testInput.push({'data': null, 'type': 'null'});
+        testInput.push({'data': undefined, 'type': 'undefined'});
+        testInput.push({'data': 9, 'type': 'number'});
+        testInput.push({'data': {}, 'type': 'empty object'});
+        testInput.push({'data': [], 'type': 'empty object'});
 
         goog.array.forEach(testInput, function(input) {
           var error = assertThrows('no error thrown, if data is ' + input.type,
@@ -340,7 +336,7 @@ describe('Unit - MySql storage', function() {
           );
 
           assertEquals(
-            input.type +': wrong error type',
+            input.type + ': wrong error type',
             remobid.common.storage.StorageErrorType.INVALID_RESOURCE,
             error.errorType
           );
@@ -352,7 +348,7 @@ describe('Unit - MySql storage', function() {
           );
 
           assertEquals(
-            input.type +': wrong error type',
+            input.type + ': wrong error type',
             remobid.common.storage.StorageErrorType.INVALID_RESOURCE,
             error.errorType
           );
@@ -364,7 +360,7 @@ describe('Unit - MySql storage', function() {
           );
 
           assertEquals(
-            input.type +': wrong error type',
+            input.type + ': wrong error type',
             remobid.common.storage.StorageErrorType.INVALID_RESOURCE,
             error.errorType
           );
@@ -390,8 +386,8 @@ describe('Unit - MySql storage', function() {
         );
 
         var options = {
-          fields:['first_names','second_name'] //should have been 'first_name'
-        }
+          fields: ['first_names', 'second_name'] //should have been 'first_name'
+        };
 
         error = assertThrows('load: no error thrown, if column is invalid',
           goog.bind(storage.load, storage, goog.nullFunction, 'test', 1,
@@ -417,10 +413,10 @@ describe('Unit - MySql storage', function() {
 
     it('should load multiple ids', function() {
       expectedSql = 'SELECT * FROM `test` WHERE `id` IN (1, 2, 3)';
-      storage.load(callback, 'test', [1,2,3]);
+      storage.load(callback, 'test', [1, 2, 3]);
 
       expectedSql = 'SELECT * FROM `test` WHERE `id` IN (\'1\', \'2\', \'3\')';
-      storage.load(callback, 'test', ['1','2','3']);
+      storage.load(callback, 'test', ['1', '2', '3']);
     });
 
     it('should load everything without an id', function() {
@@ -441,10 +437,10 @@ describe('Unit - MySql storage', function() {
 
     it('should delete multiple ids', function() {
       expectedSql = 'DELETE FROM `test` WHERE `id` IN (1, 2, 3)';
-      storage.remove(callback, 'test', [1,2,3]);
+      storage.remove(callback, 'test', [1, 2, 3]);
 
       expectedSql = 'DELETE FROM `test` WHERE `id` IN (\'1\', \'2\', \'3\')';
-      storage.remove(callback, 'test', ['1','2','3']);
+      storage.remove(callback, 'test', ['1', '2', '3']);
     });
 
 
@@ -461,18 +457,18 @@ describe('Unit - MySql storage', function() {
     it('should add a new entry', function() {
       expectedSql = 'INSERT INTO `test` SET `first_name`=\'Jane\', ' +
         '`second_name`=\'Doe\'';
-      storage.store(callback, 'test',remobid.common.storage.Constant.NEW_ENTRY,
+      storage.store(callback, 'test', remobid.common.storage.Constant.NEW_ENTRY,
         data);
     });
 
     it('should store multiple ids', function() {
       expectedSql = 'UPDATE `test` SET `first_name`=\'Jane\', ' +
         '`second_name`=\'Doe\' WHERE `id` IN (1, 2, 3)';
-      storage.store(callback, 'test', [1,2,3], data);
+      storage.store(callback, 'test', [1, 2, 3], data);
 
       expectedSql = 'UPDATE `test` SET `first_name`=\'Jane\', ' +
         '`second_name`=\'Doe\' WHERE `id` IN (\'1\', \'2\', \'3\')';
-      storage.store(callback, 'test', ['1','2','3'], data);
+      storage.store(callback, 'test', ['1', '2', '3'], data);
     });
 
 
@@ -481,61 +477,61 @@ describe('Unit - MySql storage', function() {
         expectedSql = 'SELECT `first_name`, `second_name` ' +
           'FROM `test` WHERE `id` = 1';
         storage.load(callback, 'test', 1,
-          {fields:['first_name','second_name']});
+          {fields: ['first_name', 'second_name']});
 
         expectedSql = 'SELECT `first_name`, `second_name` ' +
           'FROM `test` WHERE `id` = \'1\'';
         storage.load(callback, 'test', '1',
-          {fields:['first_name','second_name']});
+          {fields: ['first_name', 'second_name']});
       });
 
       it('should filter by fields on multiple ids', function() {
         expectedSql = 'SELECT `first_name`, `second_name` ' +
           'FROM `test` WHERE `id` IN (1, 2, 3)';
-        storage.load(callback, 'test', [1,2,3],
-          {fields:['first_name','second_name']});
+        storage.load(callback, 'test', [1, 2, 3],
+          {fields: ['first_name', 'second_name']});
 
         expectedSql = 'SELECT `first_name`, `second_name` ' +
           'FROM `test` WHERE `id` IN (\'1\', \'2\', \'3\')';
-        storage.load(callback, 'test', ['1','2','3'],
-          {fields:['first_name','second_name']});
+        storage.load(callback, 'test', ['1', '2', '3'],
+          {fields: ['first_name', 'second_name']});
       });
 
       it('should filter by limit on single id ', function() {
         expectedSql = 'SELECT * FROM `test` WHERE `id` = 1 LIMIT 1';
-        storage.load(callback, 'test', 1, {limit:1});
+        storage.load(callback, 'test', 1, {limit: 1});
 
         expectedSql = 'SELECT * FROM `test` WHERE `id` = \'1\' LIMIT 1';
-        storage.load(callback, 'test', '1', {limit:1});
+        storage.load(callback, 'test', '1', {limit: 1});
       });
 
       it('should filter by limit on multiple ids', function() {
         expectedSql = 'SELECT * FROM `test` WHERE `id` IN (1, 2, 3) LIMIT 1';
-        storage.load(callback, 'test', [1,2,3], {limit:1});
+        storage.load(callback, 'test', [1, 2, 3], {limit: 1});
 
         expectedSql = 'SELECT * FROM `test` WHERE `id` ' +
           'IN (\'1\', \'2\', \'3\') LIMIT 1';
-        storage.load(callback, 'test', ['1','2','3'], {limit:1});
+        storage.load(callback, 'test', ['1', '2', '3'], {limit: 1});
       });
 
       it('should filter by offset on single id', function() {
         expectedSql = 'SELECT * FROM `test` WHERE `id` = 1 ' +
           'LIMIT 18446744073709551610 OFFSET 4';
-        storage.load(callback, 'test', 1, {offset:4});
+        storage.load(callback, 'test', 1, {offset: 4});
 
         expectedSql = 'SELECT * FROM `test` WHERE `id` = \'1\' ' +
           'LIMIT 18446744073709551610 OFFSET 4';
-        storage.load(callback, 'test', '1', {offset:4});
+        storage.load(callback, 'test', '1', {offset: 4});
       });
 
       it('should filter by offset on multiple ids', function() {
         expectedSql = 'SELECT * FROM `test` WHERE `id` IN (1, 2, 3) ' +
           'LIMIT 18446744073709551610 OFFSET 4';
-        storage.load(callback, 'test', [1,2,3], {offset:4});
+        storage.load(callback, 'test', [1, 2, 3], {offset: 4});
 
         expectedSql = 'SELECT * FROM `test` WHERE `id` ' +
           'IN (\'1\', \'2\', \'3\') LIMIT 18446744073709551610 OFFSET 4';
-        storage.load(callback, 'test', ['1','2','3'], {offset:4});
+        storage.load(callback, 'test', ['1', '2', '3'], {offset: 4});
       });
 
       it('should filter by offset, limit and fields on single id',
@@ -543,12 +539,12 @@ describe('Unit - MySql storage', function() {
         expectedSql = 'SELECT `first_name`, `second_name` FROM `test` ' +
           'WHERE `id` = 1 LIMIT 2 OFFSET 4';
         storage.load(callback, 'test', 1,
-          {offset: 4, limit: 2, fields:['first_name','second_name']});
+          {offset: 4, limit: 2, fields: ['first_name', 'second_name']});
 
         expectedSql = 'SELECT `first_name`, `second_name` FROM `test` ' +
           'WHERE `id` = \'1\' LIMIT 2 OFFSET 4';
         storage.load(callback, 'test', '1',
-          {offset: 4, limit: 2, fields:['first_name','second_name']});
+          {offset: 4, limit: 2, fields: ['first_name', 'second_name']});
       });
 
       it('should filter by offset, limit and fields on multiple ids',
@@ -556,15 +552,15 @@ describe('Unit - MySql storage', function() {
 
         expectedSql = 'SELECT `first_name`, `second_name` FROM `test` ' +
           'WHERE `id` IN (1, 2, 3) LIMIT 2 OFFSET 4';
-        storage.load(callback, 'test', [1,2,3],
-          {offset: 4, limit: 2, fields:['first_name','second_name']});
+        storage.load(callback, 'test', [1, 2, 3],
+          {offset: 4, limit: 2, fields: ['first_name', 'second_name']});
 
         expectedSql = 'SELECT `first_name`, `second_name` FROM `test` ' +
           'WHERE `id` IN (\'1\', \'2\', \'3\') LIMIT 2 OFFSET 4';
-        storage.load(callback, 'test', ['1','2','3'],
-          {offset: 4, limit: 2, fields:['first_name','second_name']});
+        storage.load(callback, 'test', ['1', '2', '3'],
+          {offset: 4, limit: 2, fields: ['first_name', 'second_name']});
       });
     });
   });
 
-})
+});

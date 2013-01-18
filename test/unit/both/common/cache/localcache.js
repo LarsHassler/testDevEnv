@@ -1,12 +1,9 @@
 /**
- * @fileoverview
+ * @fileoverview test for the localstorage cache class.
  */
 
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {
-}
+if (typeof module !== 'undefined' && module.exports)
+  require('nclosure');
 
 goog.require('goog.object');
 goog.require('goog.testing.asserts');
@@ -15,20 +12,22 @@ goog.require('remobid.common.storage.LocalStorage');
 goog.require('remobid.test.mock.browser.LocalStorage');
 goog.require('remobid.test.mock.Utilities');
 
-describe('Localstorage Cache - UNIT', function () {
+describe('Localstorage Cache - UNIT', function() {
   var LC,
       version = 'v1',
       url = 'users';
 
-  beforeEach(function(done){
+  beforeEach(function(done) {
     LC = new remobid.common.cache.LocalCache(version, url);
-    if(!LC.isAvailable() && (typeof module !== 'undefined' && module.exports)) {
-      LC.storage_ = /** @type {Storage} */ remobid.test.mock.browser.LocalStorage.getInstance();
+    if (!LC.isAvailable() &&
+        (typeof module !== 'undefined' && module.exports)) {
+      LC.storage_ = /** @type {Storage} */
+        remobid.test.mock.browser.LocalStorage.getInstance();
     }
     remobid.test.mock.Utilities.clearStack(done);
   });
 
-  afterEach(function(){
+  afterEach(function() {
     if (LC.isAvailable())
       LC.storage_.clear();
   });
@@ -403,7 +402,7 @@ describe('Localstorage Cache - UNIT', function () {
             done();
           });
         }, 'akey', 12);
-      }, 'key','test');
+      }, 'key', 'test');
     });
 
     it('should remove expired values if Limit reached', function(done) {
@@ -419,7 +418,7 @@ describe('Localstorage Cache - UNIT', function () {
           err);
         // one time stub to throw an QuotaExceededError Exception
         LC.storage_.setItem = function() {
-          if(!errorThrown) {
+          if (!errorThrown) {
             errorThrown = true;
             throw new Error({ name: 'QuotaExceededError'});
           }

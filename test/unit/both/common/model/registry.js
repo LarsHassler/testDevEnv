@@ -1,19 +1,15 @@
 /**
- * @fileoverview
+ * @fileoverview test for the global model registry.
  */
 
-/** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {
-}
+if (typeof module !== 'undefined' && module.exports)
+  require('nclosure');
 
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.model.Registry');
 goog.require('remobid.test.mock.Utilities');
 
-describe('UNIT - Model Registry ', function () {
+describe('UNIT - Model Registry ', function() {
   var registry;
 
   beforeEach(function(done) {
@@ -21,7 +17,7 @@ describe('UNIT - Model Registry ', function () {
     remobid.test.mock.Utilities.clearStack(done);
   });
 
-  afterEach(function(){
+  afterEach(function() {
     registry.dispose();
   });
 
@@ -74,7 +70,7 @@ describe('UNIT - Model Registry ', function () {
     );
   });
 
-  it('should return instances of registered classes', function(done){
+  it('should return instances of registered classes', function(done) {
 
     var modelConstructor = function() {};
     modelConstructor.getResourceById = function(id) {
@@ -83,7 +79,7 @@ describe('UNIT - Model Registry ', function () {
         id
       );
       done();
-    }
+    };
     registry.registerModel('users', modelConstructor);
     registry.getResourceById('users', 'asdjnfnsgh');
   });

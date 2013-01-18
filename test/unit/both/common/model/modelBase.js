@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview the tests for a basic model.
  */
 
 /** @preserveTry */
@@ -29,14 +29,14 @@ describe('UNIT - ModelBase', function() {
     }
   });
 
-  beforeEach(function(done){
+  beforeEach(function(done) {
     Model = new remobid.common.model.ModelBase();
     Model.setAutoStore(false);
     remobid.test.mock.Utilities.clearStack(done);
   });
 
   afterEach(function() {
-    if(!Model.isDisposed())
+    if (!Model.isDisposed())
       Model.dispose(true);
     goog.events.removeAll();
   });
@@ -189,7 +189,7 @@ describe('UNIT - ModelBase', function() {
         setterHelperCount = 0;
       var setter = function() {
         setterCallCount++;
-        if(--mappingsToDo <= 0)
+        if (--mappingsToDo <= 0)
           finalCheck();
       };
       var setterHelper = function(param) {
@@ -200,7 +200,7 @@ describe('UNIT - ModelBase', function() {
         setterHelperCount++;
         return param;
       };
-      var finalCheck = function(){
+      var finalCheck = function() {
         assertEquals('setter should be called 2 times',
           2,
           setterCallCount
@@ -247,7 +247,7 @@ describe('UNIT - ModelBase', function() {
       assertArrayEquals('wrong attributes tracked',
         goog.object.getValues(Model.mappings_),
         Model.trackedAttributes_
-      )
+      );
     });
   });
 
@@ -301,7 +301,7 @@ describe('UNIT - ModelBase', function() {
 
 
     });
-    
+
     it('should only dispatch only one LOCALLY_CHANGED Event if to setters ' +
         'are called within the delay', function(done) {
       var dispatchCounter = 0;
@@ -406,7 +406,7 @@ describe('UNIT - ModelBase', function() {
         goog.bind(Model.store, Model)
       );
     });
-    
+
   });
 
 });

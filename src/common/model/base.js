@@ -1,5 +1,5 @@
 /**
- * @fileoverview a base class for all data model or list model classes
+ * @fileoverview a base class for all data model or list model classes.
  */
 
 
@@ -8,6 +8,11 @@ goog.provide('remobid.common.model.base.EventType');
 
 goog.require('goog.events.EventTarget');
 
+/**
+ * A base class for all data model or list model classes.
+ * @extends {goog.events.EventTarget}
+ * @constructor
+ */
 remobid.common.model.Base = function() {
 
   /**

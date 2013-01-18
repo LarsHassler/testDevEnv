@@ -2,26 +2,24 @@
  * @fileoverview tests for the rest storage.
  */
 
-/** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {
-}
+if (typeof module !== 'undefined' && module.exports)
+  require('nclosure');
 
 goog.require('goog.testing.asserts');
 goog.require('goog.testing.net.XhrIoPool');
 goog.require('remobid.common.storage.Rest');
 goog.require('remobid.test.mock.Utilities');
 
-describe('Unit - Rest storage', function () {
+describe('Unit - Rest storage', function() {
   var Rest,
       version = 'v1',
       url = 'users',
       baseUrl;
 
   beforeEach(function(done) {
-    baseUrl = remobid.common.net.RestManager.defaultBase_ = 'https://api.remobid.com';
+    baseUrl =
+      remobid.common.net.RestManager.defaultBase_ =
+        'https://api.remobid.com';
     Rest = new remobid.common.storage.Rest(version, url);
     Rest.restManager_.xhrPool_ = new goog.testing.net.XhrIoPool();
     remobid.test.mock.Utilities.clearStack(done);
@@ -135,7 +133,7 @@ describe('Unit - Rest storage', function () {
     it('should store a single id', function() {
       var callback = function() {};
       var xhr = Rest.restManager_.xhrPool_.getXhr();
-      Rest.store(callback, 2, {"key": "data"});
+      Rest.store(callback, 2, {'key': 'data'});
       assertEquals('wrong uri constructed',
         baseUrl + '/v1/users/2',
         xhr.getLastUri()
@@ -153,7 +151,7 @@ describe('Unit - Rest storage', function () {
     it('should store with no id', function() {
       var callback = function() {};
       var xhr = Rest.restManager_.xhrPool_.getXhr();
-      Rest.store(callback, null, {"key": "data"});
+      Rest.store(callback, null, {'key': 'data'});
       assertEquals('wrong uri constructed',
         baseUrl + '/v1/users',
         xhr.getLastUri()
@@ -171,7 +169,7 @@ describe('Unit - Rest storage', function () {
     it('should store multiple ids', function() {
       var callback = function() {};
       var xhr = Rest.restManager_.xhrPool_.getXhr();
-      Rest.store(callback, [1,2], {"key": "data"});
+      Rest.store(callback, [1, 2], {'key': 'data'});
       assertEquals('wrong uri constructed',
         baseUrl + '/v1/users/1,2',
         xhr.getLastUri()
@@ -191,7 +189,7 @@ describe('Unit - Rest storage', function () {
       it('should handle fields option', function() {
         var callback = function() {};
         var xhr = Rest.restManager_.xhrPool_.getXhr();
-        Rest.load(callback, null, {fields : ['lastName', 'age']});
+        Rest.load(callback, null, {fields: ['lastName', 'age']});
         assertEquals('wrong uri constructed',
           baseUrl + '/v1/users?fields=lastName,age',
           xhr.getLastUri()
@@ -201,13 +199,13 @@ describe('Unit - Rest storage', function () {
       it('should handle offset and limit', function() {
         var callback = function() {};
         var xhr = Rest.restManager_.xhrPool_.getXhr();
-        Rest.load(callback, null, {offset : 25});
+        Rest.load(callback, null, {offset: 25});
         assertEquals('wrong uri constructed',
           baseUrl + '/v1/users?offset=25',
           xhr.getLastUri()
         );
         xhr.abort();
-        Rest.load(callback, null, {offset : 25, limit: 50});
+        Rest.load(callback, null, {offset: 25, limit: 50});
         assertEquals('wrong uri constructed',
           baseUrl + '/v1/users?offset=25&limit=50',
           xhr.getLastUri()
@@ -224,7 +222,7 @@ describe('Unit - Rest storage', function () {
         'there is a network connection', function() {
       var netStatus = true;
       Rest.restManager_ = {
-        isAvailable : function() {
+        isAvailable: function() {
           return netStatus;
         }
       };

@@ -2,12 +2,8 @@
  * @fileoverview Tests for the MySql wrapper.
  */
 
-/** @preserveTry */
-try {
-  if (require)
-    require('nclosure');
-} catch (e) {
-}
+if (typeof module !== 'undefined' && module.exports)
+  require('nclosure');
 
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.net.MySqlConnection');
