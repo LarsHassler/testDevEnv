@@ -41,14 +41,28 @@ var getSourceFiles = function(dir, done) {
 
 
 (function(){
-  TestRunner.addTypes('unit');
+  TestRunner.addTypes('unit/both');
+  TestRunner.addTypes('unit/node');
+  var dirsToAdd = 2;
 
-  getSourceFiles('test/unit', function(err, files){
-    for(var i = 0, len = files.length; i < len; i++)
-      TestRunner.addFiles(files[i].substr(10));
+  var startRunning = function() {
     TestRunner.run(function() {
       console.log('finished');
     });
+  };
+
+  getSourceFiles('test/unit/both', function(err, files){
+    for(var i = 0, len = files.length; i < len; i++)
+      TestRunner.addFiles(files[i].substr(15));
+    if(!--dirsToAdd)
+      startRunning();
+  });
+
+  getSourceFiles('test/unit/node', function(err, files){
+    for(var i = 0, len = files.length; i < len; i++)
+      TestRunner.addFiles(files[i].substr(15));
+    if(!--dirsToAdd)
+      startRunning();
   });
 
 })();

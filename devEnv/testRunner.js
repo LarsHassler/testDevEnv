@@ -61,7 +61,7 @@ remobid.devEnv.TestRunner.prototype.addFiles = function(var_args) {
 remobid.devEnv.TestRunner.prototype.addTypes = function(var_args) {
   for (var i = 0, len = arguments.length; i < len; i++) {
     var type = arguments[i];
-    if(goog.array.contains(['unit','integration','browser'], type))
+    if(goog.array.contains(['unit/both','unit/node','unit/browser'], type))
       goog.array.insert(this.testTypes_, type);
     else
       throw new Error('unknown test type');

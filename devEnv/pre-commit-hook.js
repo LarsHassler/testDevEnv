@@ -80,7 +80,8 @@ function getChangedFiles() {
             if(data[1].substr(-13) == '_interface.js' || data[1].substr(-8) == '_enum.js')
               onlyLintFiles.push(data[1]);
             else if(data[1].substr(-3) === '.js')
-              if (data[1].substr(0, 5) === 'test/unit')
+              if (data[1].substr(0, 15) === 'test/unit/both' ||
+                data[1].substr(0, 15) === 'test/unit/node')
                 testFiles.push(data[1]);
               else if (data[1].substr(0, 4) === 'src/')
                 sourceFiles.push(data[1]);
@@ -140,7 +141,8 @@ function gjslint(srcFiles, testFiles, additionalFiles) {
  */
 function runUnitTests(files) {
   var TestRunner = new testRunner.testRunner();
-  TestRunner.addTypes('unit');
+  TestRunner.addTypes('unit/both');
+  TestRunner.addTypes('unit/node');
   goog.array.forEach(files, function(file) {
     TestRunner.addFiles(file.substr(4));
   });
