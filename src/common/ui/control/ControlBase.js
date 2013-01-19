@@ -3,6 +3,8 @@
  */
 
 goog.provide('remobid.common.ui.control.ControlBase');
+goog.provide('remobid.common.ui.control.controlBase.Mapping');
+goog.provide('remobid.common.ui.control.controlBase.Mappings');
 
 goog.require('goog.dom');
 goog.require('goog.dom.dataset');
@@ -32,6 +34,7 @@ remobid.common.ui.control.ControlBase = function(model, opt_renderer,
     opt_domHelper);
 
   /**
+   * holds the data model for this control.
    * @type {remobid.common.model.ModelBase}
    * @private
    */
@@ -40,118 +43,40 @@ remobid.common.ui.control.ControlBase = function(model, opt_renderer,
   /**
    * a reference to the attribute mappings of this control type. Must be
    * extended by all subclasses
-   * @type {Object.<remobid.common.model.ModelBase.Mapping>}
+   * @type {Object.<remobid.common.ui.control.controlBase.Mapping>}
    * @private
    */
-  this.mappings_ = remobid.common.ui.control.ControlBase.mappings;
+  this.mappings_ = remobid.common.ui.control.controlBase.Mappings;
 
   /**
    * holds all options for a
-   * @type {?Object.<string, Object>}
+   * @type {?Object.<string, Array>}
    * @private
    */
   this.bindOptions_;
-
-  /**
-   * holds an array of all nodes that have bindings for easier access
-   * @type {?Array.<Node>}
-   * @private
-   */
-  this.bindNodes_;
 };
 goog.inherits(remobid.common.ui.control.ControlBase,
   goog.ui.Control);
 
 /** @override */
 remobid.common.ui.control.ControlBase.prototype.disposeInternal = function() {
-
+  this.model_.dispose();
+  this.mappings_ = null;
+  this.bindOptions_ = null;
+  goog.base(this, 'disposeInternal');
 };
 
 /**
  * @override
  */
-remobid.common.ui.control.ControlBase.prototype.enterDocument = function(
-    element) {
-  goog.base(this, 'enterDocument', element);
-
-  this.initBinding(element);
-};
-
-/**
- * get all node from the element of the control where the binding data attr is
- * set an creates all necessary binding.
- */
-remobid.common.ui.control.ControlBase.prototype.initBinding = function() {
-  var dom = this.getDomHelper();
+remobid.common.ui.control.ControlBase.prototype.createDom = function() {
+  goog.base(this, 'createDom');
 
   if (!this.bindOptions_) {
-    this.bindOptions_ = this.getRenderer().parseBinding();
-  }
-
-  var nodes2bind = goog.dom.findNodes(this.getElement(), function(node) {
-    return node.nodeType != goog.dom.NodeType.TEXT &&
-      goog.dom.dataset.has(node, 'rbBind');
-  });
-
-  goog.array.forEach(nodes2bind, this.bindNode_, this);
-};
-
-/**
- * parses the
- * @private
- */
-remobid.common.ui.control.ControlBase.prototype.parseBindOptions_ = function() {
-
-};
-
-/**
- * creates the binding for a given node
- * @param {!Node} node the node to bind to.
- * @private
- */
-remobid.common.ui.control.ControlBase.prototype.bindNode_ = function(node) {
-  var attributes, mapping, bindSet, bindGet, options, bindOptions;
-
-
-  attributes = goog.dom.dataset.getAll(node);
-
-  mapping = goog.object.findValue(this.mappings_, function(mapping) {
-    return mapping.name === attributes['rbBind'];
-  });
-
-  if (!mapping) {
-    throw Error(
-      remobid.common.ui.control.ControlBase.ErrorType.UNKNOWN_MAPPING
+    this.bindOptions_ = this.getRenderer().parseBinding(
+      this.getElement(),
+      this.mappings_
     );
-  }
-
-  bindSet = goog.object.containsKey(attributes, 'rbBindSet');
-  bindGet = goog.object.containsKey(attributes, 'rbBindGet');
-
-  // bind model updates to html updates
-  if (bindSet) {
-    options = attributes['rbBindGet'].split(',');
-    bindOptions = {
-
-    };
-  }
-
-  if (bindGet) {
-  }
-
-  if (bindSet || bindGet) {
-    this.getHandler()
-      .listen(
-        this.getModel(),
-        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
-        goog.bind(
-          this.getBindFunction(attributes['rbBindType']),
-          this,
-          node,
-          mapping,
-          goog.object.containsKey(attributes, 'rbBindHelper')
-        )
-      );
   }
 };
 
@@ -174,58 +99,16 @@ remobid.common.ui.control.ControlBase.prototype.getModelData = function() {
 };
 
 /**
- * creates the approriate function for a bind type.
- * @param {string} type the type to bind.
- * @return {function(!Node,
- *  remobid.common.ui.control.ControlBase.Mapping, boolean=)} the function that
- *     handles the binding.
- */
-remobid.common.ui.control.ControlBase.prototype.getBindFunction = function(
-    type) {
-  var returnFunction;
-
-  switch (type) {
-
-    case 'innerHTML':
-      returnFunction = function(node, mapping, useHelper) {
-        var value = mapping.getter.apply(this.getModel());
-        if (useHelper && goog.isDef(mapping.getterHelper)) {
-          value = mapping.getterHelper(value);
-        }
-        node.innerHTML = value;
-      };
-      break;
-    default:
-      returnFunction = function(node, mapping, useHelper) {
-        var value = mapping.getter.apply(this.getModel());
-        if (useHelper && goog.isDef(mapping.getterHelper)) {
-          value = mapping.getterHelper(value);
-        }
-        goog.dom.setTextContent(node, value);
-      };
-      break;
-  }
-
-  return returnFunction;
-};
-
-
-/**
  * @typedef {{name: string, getter: Function, setter: Function,
  *   getterHelper, setterHelper}}
  */
-remobid.common.ui.control.ControlBase.Mapping;
-
-/** @enum {string} */
-remobid.common.ui.control.ControlBase.ErrorType = {
-  UNKNOWN_MAPPING: 'trying to bind an unknown key'
-};
+remobid.common.ui.control.controlBase.Mapping;
 
 /**
  * holds all attribute mappings for this resource type.
- * @type {Object.<remobid.common.ui.control.ControlBase.Mapping>}
+ * @type {Object.<remobid.common.ui.control.controlBase.Mapping>}
  */
-remobid.common.ui.control.ControlBase.mappings = {
+remobid.common.ui.control.controlBase.Mappings = {
   ID: {
     name: 'id',
     getter: remobid.common.model.ModelBase.prototype.getIdentifier,

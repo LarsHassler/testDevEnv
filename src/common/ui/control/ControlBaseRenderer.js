@@ -3,10 +3,12 @@
  */
 
 goog.provide('remobid.common.ui.control.ControlBaseRenderer');
-goog.provide('remobid.common.ui.control.controlBaseRenderer');
+goog.provide('remobid.common.ui.control.controlBaseRenderer.ErrorType');
+goog.provide('remobid.common.ui.control.controlBaseRenderer.bindMethods');
 
 goog.require('goog.soy');
 goog.require('goog.ui.ControlRenderer');
+goog.require('remobid.common.ui.control.controlBase.Mapping');
 goog.require('remobid.templates.test');
 
 
@@ -27,6 +29,16 @@ remobid.common.ui.control.ControlBaseRenderer = function() {
 goog.inherits(remobid.common.ui.control.ControlBaseRenderer,
   goog.ui.ControlRenderer);
 goog.addSingletonGetter(remobid.common.ui.control.ControlBaseRenderer);
+
+/**
+ * overrides the template of this renderer.
+ * @param {function} template
+ *    the new template.
+ */
+remobid.common.ui.control.ControlBaseRenderer.prototype.setTemplate = function(
+    template) {
+  this.template_ = template;
+};
 
 /**
  * @param {remobid.common.ui.control.ControlBase} control the control to render.
@@ -50,7 +62,7 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.createDom = function(
  * parses the template and set the bindOptions to the given Control. Need to be
  * called just one time.
  * @param {Node} element the element of a control.
- * @param {Object.<remobid.common.ui.control.ControlBase.Mapping>} mappings the
+ * @param {Object.<remobid.common.ui.control.controlBase.Mapping>} mappings the
  *    attribute mappings of a control.
  * @return {Object.<string, Array>} the bindings found in the html code.
  */

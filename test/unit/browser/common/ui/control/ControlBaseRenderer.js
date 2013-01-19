@@ -7,14 +7,14 @@ if (typeof module !== 'undefined' && module.exports)
 
 goog.require('goog.dom');
 goog.require('goog.dom.dataset');
-goog.require('goog.testing.PropertyReplacer');
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.ui.control.ControlBase');
+goog.require('remobid.common.ui.control.controlBase.Mappings');
 goog.require('remobid.common.ui.control.ControlBaseRenderer');
 goog.require('remobid.test.mock.Utilities');
 
 describe('UNIT - ControlBaseRenderer - ', function() {
-  var renderer, control, model, sandBox, testTemplate, replacer;
+  var renderer, control, model, sandBox, testTemplate;
 
   testTemplate = function(opt_data, opt_ignored) {
     return '<div><span data-rb-bind-get="href,html,1,0|id,text,1,0">' +
@@ -27,8 +27,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
 
   beforeEach(function(done) {
     renderer = remobid.common.ui.control.ControlBaseRenderer.getInstance();
-    replacer = new goog.testing.PropertyReplacer();
-    replacer.set(renderer, 'template_', testTemplate);
+    renderer.setTemplate(testTemplate);
     model = new remobid.common.model.ModelBase('aada');
     model.setAutoStore(false);
     control = new remobid.common.ui.control.ControlBase(model);
@@ -39,7 +38,6 @@ describe('UNIT - ControlBaseRenderer - ', function() {
     // let the GC remove the instance of the Renderer since it is not longer
     // needed but saved in the global scope
     remobid.common.ui.control.ControlBaseRenderer.instance_ = null;
-    replacer.reset();
   });
 
 
@@ -125,7 +123,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
 
       // check mapping
       assertObjectEquals('wrong mappings bound',
-        remobid.common.ui.control.ControlBase.mappings.HREF,
+        remobid.common.ui.control.controlBase.Mappings.HREF,
         bindingOptions['href'][0].mappings
       );
       // check method
