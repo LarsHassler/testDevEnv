@@ -73,10 +73,16 @@ describe('UNIT - Lot Model -', function() {
   describe('static registry - ', function() {
 
     beforeEach(function() {
+      goog.object.forEach(remobid.lots.model.Lot.instances_, function(lot) {
+        lot.dispose();
+      });
       remobid.lots.model.Lot.instances_ = {};
     });
 
     afterEach(function() {
+      goog.object.forEach(remobid.lots.model.Lot.instances_, function(lot) {
+        lot.dispose();
+      });
       remobid.lots.model.Lot.instances_ = {};
     });
 
@@ -112,6 +118,14 @@ describe('UNIT - Lot Model -', function() {
       );
       assertFalse('instance still referenced',
         goog.object.containsKey(remobid.lots.model.Lot.instances_, 2)
+      );
+    });
+
+    it('should be registered with the global registry', function() {
+      var registry = remobid.common.model.Registry.getInstance();
+      assertEquals('not registered',
+        remobid.lots.model.Lot,
+        registry.getConstructorById('lot')
       );
     });
 
