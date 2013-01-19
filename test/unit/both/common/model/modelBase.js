@@ -15,6 +15,7 @@ goog.require('goog.events');
 goog.require('goog.testing.asserts');
 goog.require('goog.testing.MockClock');
 goog.require('remobid.common.model.ModelBase');
+goog.require('remobid.common.model.modelBase.Event');
 goog.require('remobid.common.model.modelBase.EventType');
 goog.require('remobid.common.storage.StorageBase');
 goog.require('remobid.test.mock.Utilities');
@@ -271,7 +272,10 @@ describe('UNIT - ModelBase', function() {
       goog.events.listen(
         Model,
         remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
-        function() {
+        function(event) {
+          assertTrue('event should be of type modelBase.Event',
+            event instanceof remobid.common.model.modelBase.Event
+          );
           dispatchCounter++;
         }
       );
@@ -302,7 +306,7 @@ describe('UNIT - ModelBase', function() {
 
     });
 
-    it('should only dispatch only one LOCALLY_CHANGED Event if to setters ' +
+    it('should only dispatch only one LOCALLY_CHANGED Event if two setters ' +
         'are called within the delay', function(done) {
       var dispatchCounter = 0;
 
@@ -364,7 +368,6 @@ describe('UNIT - ModelBase', function() {
       mockClock.tick(Model.changedEventDelay_ * 2);
       done();
     });
-
 
   });
 

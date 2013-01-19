@@ -4,10 +4,12 @@
 
 goog.provide('remobid.common.model.ModelBase');
 goog.provide('remobid.common.model.modelBase.ErrorType');
+goog.provide('remobid.common.model.modelBase.Event');
 goog.provide('remobid.common.model.modelBase.EventType');
 goog.provide('remobid.common.model.modelBase.Mapping');
 
 goog.require('goog.Timer');
+goog.require('goog.events.Event');
 goog.require('remobid.common.model.Base');
 goog.require('remobid.common.model.Registry');
 
@@ -351,14 +353,23 @@ remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
 
   this.changedEventTimerId_ = goog.Timer.callOnce(
     goog.bind(
-      this.dispatchEvent,
-      this,
-      remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+      this.dispatchChangeEvent_,
+      this
     ),
     this.changedEventDelay_
   );
 };
 
+/**
+ * dispatches the {@code LOCALLY_CHANGED} Event.
+ * @private
+ */
+remobid.common.model.ModelBase.prototype.dispatchChangeEvent_ = function() {
+  var event = new remobid.common.model.modelBase.Event(
+    remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+  );
+  this.dispatchEvent(event);
+};
 
 /* ####### static ####### */
 
@@ -416,3 +427,18 @@ remobid.common.model.modelBase.ErrorType = {
   // will be thrown whenever
   NO_STORAGE_ENGINE: 'no storage engine'
 };
+
+/**
+ * A event class for the change_locally event.
+ * @param {string} type
+ *    the event type.
+ * @extends {goog.events.Event}
+ * @constructor
+ */
+remobid.common.model.modelBase.Event = function(type) {
+  goog.base(this, type);
+
+};
+goog.inherits(remobid.common.model.modelBase.Event,
+  goog.events.Event);
+

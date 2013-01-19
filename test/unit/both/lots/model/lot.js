@@ -70,4 +70,50 @@ describe('UNIT - Lot Model -', function() {
 
   });
 
+  describe('static registry - ', function() {
+
+    beforeEach(function() {
+      remobid.lots.model.Lot.instances_ = {};
+    });
+
+    afterEach(function() {
+      remobid.lots.model.Lot.instances_ = {};
+    });
+
+    it('should return already registered items', function() {
+      remobid.lots.model.Lot.instances_[1] = Lot;
+      var returnedLot = remobid.lots.model.Lot.getResourceById(1);
+      assertEquals('wrong instance returned',
+        Lot,
+        returnedLot
+      );
+    });
+
+    it('should return a new instance if model ' +
+        'was not requested early', function() {
+      remobid.lots.model.Lot.instances_[1] = Lot;
+      var returnedLot = remobid.lots.model.Lot.getResourceById(2);
+      assertEquals('new instances reference was not saved',
+        2,
+        goog.object.getCount(remobid.lots.model.Lot.instances_)
+      );
+      assertEquals('wrong instance returned',
+        2,
+        returnedLot.getIdentifier()
+      );
+    });
+
+    it('should remove the reference if model is disposed', function() {
+      remobid.lots.model.Lot.instances_[1] = Lot;
+      var returnedLot = remobid.lots.model.Lot.getResourceById(2);
+      returnedLot.dispose();
+      assertTrue('lot not fully disposed',
+        returnedLot.isDisposed()
+      );
+      assertFalse('instance still referenced',
+        goog.object.containsKey(remobid.lots.model.Lot.instances_, 2)
+      );
+    });
+
+  });
 });

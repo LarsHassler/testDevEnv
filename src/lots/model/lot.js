@@ -5,7 +5,7 @@
 goog.provide('remobid.lots.model.Lot');
 
 goog.require('remobid.common.model.ModelBase');
-
+goog.require('remobid.common.model.Registry');
 /**
  *
  * @param {string} id
@@ -74,6 +74,43 @@ remobid.lots.model.Lot.prototype.setLotNo = function(lotNo) {
 };
 
 
+/** static **/
+
+/**
+ * holds all created instances of the lot class
+ * @type {object.<remobid.lots.model.Lot>}
+ * @private
+ */
+remobid.lots.model.Lot.instances_ = {};
+
+/**
+ * manages all created instances of the lot class.
+ * @param {string} id
+ *    the id of the lot.
+ * @return {remobid.lots.model.Lot}
+ *    the instance for the given id.
+ */
+remobid.lots.model.Lot.getResourceById = function(id) {
+  var lot;
+
+  if (goog.object.containsKey(remobid.lots.model.Lot.instances_, id)) {
+    lot = remobid.lots.model.Lot.instances_[id];
+  }
+  else {
+    lot = new remobid.lots.model.Lot(id);
+    goog.events.listenOnce(
+      lot,
+      remobid.common.model.base.EventType.DELETED,
+      function(event) {
+        var lot = event.currentTarget;
+        delete remobid.lots.model.Lot.instances_[lot.getIdentifier()];
+      }
+    );
+    remobid.lots.model.Lot.instances_[id] = lot;
+  }
+  return lot;
+};
+
 /**
  * holds all attribute mappings for this resource type.
  * @type {Object.<remobid.common.model.modelBase.Mapping>}
@@ -85,3 +122,11 @@ remobid.lots.model.Lot.attributeMappings = {
     setter: remobid.common.model.ModelBase.prototype.setLotNo
   }
 };
+
+/** register Model **/
+(function() {
+  remobid.common.model.Registry.getInstance().registerModel(
+    'lot',
+    remobid.lots.model.Lot
+  );
+})();
