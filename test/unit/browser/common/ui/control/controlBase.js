@@ -21,6 +21,8 @@ describe('UNIT - ControlBase -', function() {
   afterEach(function() {
     if(!control.isDisposed())
       control.dispose();
+    if(!model.isDisposed())
+      model.dispose();
   });
   
   describe('dispose', function() {
@@ -47,7 +49,40 @@ describe('UNIT - ControlBase -', function() {
       );
     });
 
-    
   });
 
+  describe('model - ', function() {
+
+    it('should increase the reference counter within ' +
+        'the constructor', function() {
+      var model2 = new remobid.common.model.ModelBase(2);
+      var counter = model2.referenceCounter_;
+      var control2 = new remobid.common.ui.control.ControlBase(model2);
+      assertEquals('reference counter was not increased',
+        counter + 1,
+        model2.referenceCounter_
+      );
+    });
+
+    it('should increase the reference counter on set', function() {
+      var model2 = new remobid.common.model.ModelBase(2);
+      var counter = model2.referenceCounter_;
+      control.setModel(model2);
+      assertEquals('reference counter was not increased',
+        counter + 1,
+        model2.referenceCounter_
+      );
+    });
+
+    it('should decrease the reference counter on the old model', function() {
+      var counter = model.referenceCounter_;
+      var model2 = new remobid.common.model.ModelBase(2);
+      control.setModel(model2);
+      assertEquals('reference counter was not increased',
+        counter - 1,
+        model.referenceCounter_
+      );
+    });
+
+  });
 });

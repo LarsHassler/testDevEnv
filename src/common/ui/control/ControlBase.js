@@ -35,10 +35,13 @@ remobid.common.ui.control.ControlBase = function(model, opt_renderer,
 
   /**
    * holds the data model for this control.
-   * @type {remobid.common.model.ModelBase}
+   * @type {?remobid.common.model.ModelBase}
    * @private
    */
-  this.model_ = model;
+  this.model_;
+
+  // call setModel so the control takes affect of the new model
+  this.setModel(model);
 
   /**
    * a reference to the attribute mappings of this control type. Must be
@@ -64,6 +67,19 @@ remobid.common.ui.control.ControlBase.prototype.disposeInternal = function() {
   this.mappings_ = null;
   this.bindOptions_ = null;
   goog.base(this, 'disposeInternal');
+};
+
+/**
+ *
+ * @param {remobid.common.model.ModelBase} model
+ *    the new model for this control.
+ */
+remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
+  var oldModel = this.getModel();
+  if (oldModel)
+    oldModel.dispose();
+  model.increaseReferenceCounter();
+  goog.base(this, 'setModel', model);
 };
 
 /**
