@@ -62,9 +62,15 @@ describe('UNIT - ControlBase -', function() {
         counter + 1,
         model2.referenceCounter_
       );
+      assertEquals('model was not saved within control',
+        model2,
+        control2.getModel()
+      );
+      control2.dispose();
+      model2.dispose();
     });
 
-    it('should increase the reference counter on set', function() {
+    it('should increase the reference counter', function() {
       var model2 = new remobid.common.model.ModelBase(2);
       var counter = model2.referenceCounter_;
       control.setModel(model2);
@@ -78,9 +84,62 @@ describe('UNIT - ControlBase -', function() {
       var counter = model.referenceCounter_;
       var model2 = new remobid.common.model.ModelBase(2);
       control.setModel(model2);
-      assertEquals('reference counter was not increased',
+      assertEquals('reference counter was not decreased',
         counter - 1,
         model.referenceCounter_
+      );
+    });
+
+    it('should listen to LOCALLY_CHANGED and CHANGED events', function() {
+      var model2 = new remobid.common.model.ModelBase(2);
+      model2.setAutoStore(false);
+      var controlCount = control.getHandler().getListenerCount();
+      var eventHandlerCount = 0;
+      control.handleChangedEvent_ = function() {
+        eventHandlerCount++;
+      };
+      control.setModel(model2);
+      assertEquals('listeners not set on Handler of the control',
+        controlCount + 2,
+        control.getHandler().getListenerCount()
+      );
+      model2.dispatchEvent(remobid.common.model.modelBase.EventType.CHANGED);
+      assertEquals('callback for CHANGED event not called',
+        1,
+        eventHandlerCount
+      );
+      model2.dispatchEvent(
+        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+      );
+      assertEquals('callback for LOCALLY_CHANGED event not called',
+        2,
+        eventHandlerCount
+      );
+    });
+
+    it('should remove listeners to LOCALLY_CHANGED and ' +
+        'CHANGED events of the old model', function() {
+      model.setAutoStore(false);
+      var model2 = new remobid.common.model.ModelBase(2);
+      model2.setAutoStore(false);
+      var eventHandlerCount = 0;
+      control.handleChangedEvent_ = function() {
+        eventHandlerCount++;
+      };
+      control.setModel(model2);
+      control.setModel(model);
+      model2.dispatchEvent(remobid.common.model.modelBase.EventType.CHANGED);
+      assertEquals('callback for CHANGED event has been called',
+        0,
+        eventHandlerCount
+      );
+      model2.dispatchEvent(
+        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+      );
+      assertEquals('callback for LOCALLY_CHANGED ' +
+          'event has been called',
+        0,
+        eventHandlerCount
       );
     });
 

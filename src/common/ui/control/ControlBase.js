@@ -70,16 +70,53 @@ remobid.common.ui.control.ControlBase.prototype.disposeInternal = function() {
 };
 
 /**
- *
+ * Set the new model and also disposes of the old model and increases the
+ * reference counter of the new model.
+ * It also (un)listen to the model locally_changed event.
  * @param {remobid.common.model.ModelBase} model
  *    the new model for this control.
  */
 remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
   var oldModel = this.getModel();
-  if (oldModel)
+  if (oldModel) {
+    this.getHandler()
+      .unlisten(
+      oldModel,
+      [
+        remobid.common.model.modelBase.EventType.CHANGED,
+        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+      ],
+      this.handleChangedEvent_,
+      false,
+      this
+    );
     oldModel.dispose();
+  }
+
   model.increaseReferenceCounter();
+  this.getHandler()
+    .listen(
+      model,
+      [
+        remobid.common.model.modelBase.EventType.CHANGED,
+        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+      ],
+      this.handleChangedEvent_,
+      false,
+      this
+    );
   goog.base(this, 'setModel', model);
+};
+
+/**
+ * handles a CHANGED or LOCALLY_CHANGED event from the model.
+ * @param {remobid.common.model.modelBase.Event} event
+ *    the event fired by the model.
+ * @private
+ */
+remobid.common.ui.control.ControlBase.prototype.handleChangedEvent_ = function(
+  event) {
+
 };
 
 /**
