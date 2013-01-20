@@ -83,6 +83,13 @@ remobid.common.model.ModelBase = function(id) {
   this.supressChangeTracking_ = false;
 
   /**
+   * flag for the model if updates from a external source are applied.
+   * @type {boolean}
+   * @private
+   */
+  this.runningExternalUpdates_ = false;
+
+  /**
    * holds all attributes which have been changed since the last time this
    * resource was stored
    * @type {Array.<remobid.common.model.ModelBase.Mapping>}
@@ -143,7 +150,7 @@ remobid.common.model.ModelBase.prototype.disposeInternal = function() {
 };
 
 /**
- * @param {goog.event.Event} event the {@code LOCALLY_CHANGED} Event.
+ * @param {goog.event.Event} event the {@code CHANGED} Event.
  */
 remobid.common.model.ModelBase.prototype.handleAutoStore = function(event) {
   this.store();
@@ -170,7 +177,7 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
   if (this.autoStoreEnabled_) {
     key = goog.events.listen(
       this,
-      remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+      remobid.common.model.modelBase.EventType.CHANGED,
       this.handleAutoStore,
       false,
       this
@@ -179,7 +186,7 @@ remobid.common.model.ModelBase.prototype.setAutoStore = function(enabled) {
   } else {
     var eventListener = goog.events.getListener(
       this,
-      remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+      remobid.common.model.modelBase.EventType.CHANGED,
       this.handleAutoStore,
       false,
       this
@@ -205,7 +212,7 @@ remobid.common.model.ModelBase.prototype.isAutoStoreEnabled = function() {
 };
 
 /**
- * @param {boolean} supressed whenever the model does fire a LOCALLY_CHANGED
+ * @param {boolean} supressed whenever the model does fire a CHANGED
  * Event.
  */
 remobid.common.model.ModelBase.prototype.setSupressChangeEvent = function(
@@ -214,7 +221,7 @@ remobid.common.model.ModelBase.prototype.setSupressChangeEvent = function(
 };
 
 /**
- * @return {boolean} whenever the model does fire a LOCALLY_CHANGED Event.
+ * @return {boolean} whenever the model does fire a CHANGED Event.
  */
 remobid.common.model.ModelBase.prototype.isSupressChangeEvent = function() {
   return this.supressChangeEvent_;
@@ -246,6 +253,12 @@ remobid.common.model.ModelBase.prototype.handleChangedAttribute = function(
   attributeMapping) {
   if (!this.supressChangeTracking_)
     this.unsavedAttributes_.push(attributeMapping);
+  this.changedAttributes_.push(
+    {
+      external: this.runningExternalUpdates_,
+      attribute: attributeMapping
+    }
+  );
   if (!this.supressChangeEvent_)
     this.prepareChangeEvent();
 };
@@ -312,16 +325,9 @@ remobid.common.model.ModelBase.prototype.getCache = function() {
  */
 remobid.common.model.ModelBase.prototype.updateFromExternal = function(
   data) {
-  var listenerKey = goog.events.listenOnce(this,
-    remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
-    goog.bind(
-      this.dispatchEvent,
-      this,
-      remobid.common.model.modelBase.EventType.CHANGED
-    )
-  );
+  this.runningExternalUpdates_ = true;
   this.updateDataViaMappings(data);
-  this.listenerKeys_.push(listenerKey);
+  this.runningExternalUpdates_ = false;
 };
 
 /**
@@ -354,7 +360,7 @@ remobid.common.model.ModelBase.prototype.updateDataViaMappings = function(
 };
 
 /**
- * sets the timer for the {@code LOCALLY_CHANGED} Event.
+ * sets the timer for the {@code CHANGED} Event.
  */
 remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
   if (this.supressChangeEvent_)
@@ -372,14 +378,16 @@ remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
 };
 
 /**
- * dispatches the {@code LOCALLY_CHANGED} Event.
+ * dispatches the {@code CHANGED} Event.
  * @private
  */
 remobid.common.model.ModelBase.prototype.dispatchChangeEvent_ = function() {
   var event = new remobid.common.model.modelBase.Event(
-    remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+    remobid.common.model.modelBase.EventType.CHANGED,
+    this.changedAttributes_
   );
   this.dispatchEvent(event);
+  this.changedAttributes_ = [];
 };
 
 /* ####### static ####### */
@@ -417,10 +425,8 @@ remobid.common.model.modelBase.Mapping;
 
 /** @enum {string} */
 remobid.common.model.modelBase.EventType = {
-  // if the model was changed due to new data from the server
+  // if the model was changed
   CHANGED: 'changed',
-  // if the model was changed due to action within the view
-  LOCALLY_CHANGED: 'local_changed',
   // if the data was stored successfully on the server
   STORED: 'stored',
   // if the data couldn't be transmitted onto the server, but was queued locally
@@ -443,12 +449,16 @@ remobid.common.model.modelBase.ErrorType = {
  * A event class for the change_locally event.
  * @param {string} type
  *    the event type.
+ * @param {Array.<Object>} changedAttributes
+ *    a list with all changed attributes since the last event was fired for a
+ *    particular model.
  * @extends {goog.events.Event}
  * @constructor
  */
-remobid.common.model.modelBase.Event = function(type) {
+remobid.common.model.modelBase.Event = function(type, changedAttributes) {
   goog.base(this, type);
 
+  this.attributes = changedAttributes;
 };
 goog.inherits(remobid.common.model.modelBase.Event,
   goog.events.Event);

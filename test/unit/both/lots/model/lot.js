@@ -54,7 +54,7 @@ describe('UNIT - Lot Model -', function() {
       Lot.setAutoStore(false);
       goog.events.listen(
         Lot,
-        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+        remobid.common.model.modelBase.EventType.CHANGED,
         function() {
           dispatchCounter++;
         }

@@ -83,8 +83,7 @@ remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
       .unlisten(
       oldModel,
       [
-        remobid.common.model.modelBase.EventType.CHANGED,
-        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+        remobid.common.model.modelBase.EventType.CHANGED
       ],
       this.handleChangedEvent_,
       false,
@@ -98,8 +97,7 @@ remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
     .listen(
       model,
       [
-        remobid.common.model.modelBase.EventType.CHANGED,
-        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+        remobid.common.model.modelBase.EventType.CHANGED
       ],
       this.handleChangedEvent_,
       false,
@@ -109,7 +107,7 @@ remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
 };
 
 /**
- * handles a CHANGED or LOCALLY_CHANGED event from the model.
+ * handles a CHANGED event from the model.
  * @param {remobid.common.model.modelBase.Event} event
  *    the event fired by the model.
  * @private

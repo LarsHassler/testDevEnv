@@ -94,6 +94,7 @@ describe('UNIT - ModelBase', function() {
       );
     });
 
+
     it('should unlisten from all events', function() {
       var length = Model.listenerKeys_.length;
       Model.setAutoStore(true);
@@ -242,7 +243,7 @@ describe('UNIT - ModelBase', function() {
       });
     });
 
-    it('should track the changed variables as unsaved', function() {
+    it('should track the changed variables as unsaved and changed', function() {
       Model.updateDataViaMappings({
         'id': 123,
         'href': 'www.test.de',
@@ -251,6 +252,19 @@ describe('UNIT - ModelBase', function() {
       assertArrayEquals('wrong attributes tracked as unsaved',
         goog.object.getValues(Model.mappings_),
         Model.unsavedAttributes_
+      );
+      assertArrayEquals('wrong attributes tracked as changed',
+        [
+          {
+            external: false,
+            attribute: Model.mappings_.ID
+          },
+          {
+            external: false,
+            attribute: Model.mappings_.HREF
+          }
+        ],
+        Model.changedAttributes_
       );
     });
   });
@@ -268,16 +282,21 @@ describe('UNIT - ModelBase', function() {
       Model.dispose();
     });
 
-    it('should dispatch the LOCALLY_CHANGED ' +
+    it('should dispatch the CHANGED ' +
         'Event with the set delay', function() {
       var dispatchCounter = 0;
 
       goog.events.listen(
         Model,
-        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+        remobid.common.model.modelBase.EventType.CHANGED,
         function(event) {
           assertTrue('event should be of type modelBase.Event',
             event instanceof remobid.common.model.modelBase.Event
+          );
+          assertArrayEquals('event should have a reference to the changed ' +
+              'Attributes',
+            [{external: false, attribute: Model.mappings_.ID}],
+            event.attributes
           );
           dispatchCounter++;
         }
@@ -305,11 +324,13 @@ describe('UNIT - ModelBase', function() {
         1,
         dispatchCounter
       );
-
-
+      assertArrayEquals('changedAttributes tracking not reseted',
+        [],
+        Model.changedAttributes_
+      );
     });
 
-    it('should only dispatch only one LOCALLY_CHANGED Event if two setters ' +
+    it('should only dispatch only one CHANGED Event if two setters ' +
         'are called within the delay', function(done) {
       var dispatchCounter = 0;
 
@@ -317,7 +338,7 @@ describe('UNIT - ModelBase', function() {
       Model2.setAutoStore(false);
       goog.events.listen(
         Model2,
-        remobid.common.model.modelBase.EventType.LOCALLY_CHANGED,
+        remobid.common.model.modelBase.EventType.CHANGED,
         function() {
           dispatchCounter++;
         }
@@ -344,14 +365,25 @@ describe('UNIT - ModelBase', function() {
       done();
     });
 
-    it('should dispatch a CHANGED Event if the data is set via' +
+    it('should dispatch a CHANGED Event if the data is set via ' +
         'the updateFromExternal function', function(done) {
       var dispatchCounter = 1;
       var prevTimerCount = mockClock.getTimeoutsMade();
       goog.events.listen(
         Model,
         remobid.common.model.modelBase.EventType.CHANGED,
-        function() {
+        function(event) {
+          assertTrue('event should be of type modelBase.Event',
+            event instanceof remobid.common.model.modelBase.Event
+          );
+          assertArrayEquals('event should have a reference to the changed ' +
+            'Attributes',
+            [
+              {external: true, attribute: Model.mappings_.ID},
+              {external: false, attribute: Model.mappings_.HREF}
+            ],
+            event.attributes
+          );
           dispatchCounter--;
           assertEquals('event fired multiple times',
             0,
@@ -362,7 +394,6 @@ describe('UNIT - ModelBase', function() {
       Model.updateFromExternal({
         'id': 123
       });
-      mockClock.tick(Model.changedEventDelay_);
       Model.setRestUrl('www.test.de');
       assertEquals('there should be to 2 timer set',
         prevTimerCount + 2,
@@ -376,7 +407,7 @@ describe('UNIT - ModelBase', function() {
 
   describe('Storage - ', function() {
 
-    it('autoStore should listen for LOCALLY_CHANGED', function() {
+    it('autoStore should listen for CHANGED', function() {
       var Model2 = new remobid.common.model.ModelBase();
       assertTrue('autoStore should be enabled from the start',
         Model2.isAutoStoreEnabled()
@@ -384,7 +415,7 @@ describe('UNIT - ModelBase', function() {
       assertTrue('no listeners set',
         goog.events.hasListener(
           Model2,
-          remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+          remobid.common.model.modelBase.EventType.CHANGED
         )
       );
       Model2.setAutoStore(false);
@@ -394,7 +425,7 @@ describe('UNIT - ModelBase', function() {
       assertFalse('there should be no listeners set',
         goog.events.hasListener(
           Model2,
-          remobid.common.model.modelBase.EventType.LOCALLY_CHANGED
+          remobid.common.model.modelBase.EventType.CHANGED
         )
       );
     });
