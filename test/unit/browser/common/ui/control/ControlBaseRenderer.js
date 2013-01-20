@@ -23,6 +23,10 @@ describe('UNIT - ControlBaseRenderer - ', function() {
 
   before(function() {
     sandBox = goog.dom.getElement('sandBox');
+    if (typeof module !== 'undefined' && module.exports) {
+      goog.Timer.defaultTimerObject = goog.global;
+      mockClock = new goog.testing.MockClock(true);
+    }
   });
 
   beforeEach(function(done) {
@@ -39,7 +43,6 @@ describe('UNIT - ControlBaseRenderer - ', function() {
     // needed but saved in the global scope
     remobid.common.ui.control.ControlBaseRenderer.instance_ = null;
   });
-
 
   describe('binding - ', function() {
 
@@ -72,7 +75,6 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         exception.message
       );
     });
-
 
     it('should not accept unknown methods', function() {
       var element, exception;
@@ -190,6 +192,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         element.children[0].innerHTML
       );
 
+      bindingOptions['href'][0].mappings.getterHelper = null;
     });
 
     it('should not call helper function if flag not set', function() {
@@ -215,6 +218,19 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         element.children[0].innerHTML
       );
 
+      bindingOptions['href'][0].mappings.getterHelper = null;
+    });
+
+    it('should handle model changed #integration', function() {
+      control.createDom();
+      model.setAutoStore(false);
+      model.setRestUrl('https://api.remobid/v1/testUrl');
+
+      mockClock.tick(model.changedEventDelay_);
+      assertEquals('dom was not updated',
+        'https://api.remobid/v1/testUrl',
+        goog.dom.getTextContent(control.getElement().children[0])
+      );
     });
 
   });

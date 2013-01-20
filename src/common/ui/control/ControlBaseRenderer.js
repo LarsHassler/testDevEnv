@@ -169,12 +169,11 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.handleChangeEvent =
 
   goog.array.forEach(bindOptions, function(options) {
     var value = options.mappings.getter.call(control.getModel());
-    if (options.useHelper && goog.isDef(options.mappings.getterHelper)) {
+    if (options.useHelper && goog.isFunction(options.mappings.getterHelper)) {
       value = options.mappings.getterHelper(value);
     }
     options.method(value, options.element, options.control);
   });
-
 
 };
 //

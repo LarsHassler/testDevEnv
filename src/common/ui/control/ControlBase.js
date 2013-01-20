@@ -82,9 +82,7 @@ remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
     this.getHandler()
       .unlisten(
       oldModel,
-      [
-        remobid.common.model.modelBase.EventType.CHANGED
-      ],
+      remobid.common.model.modelBase.EventType.CHANGED,
       this.handleChangedEvent_,
       false,
       this
@@ -96,9 +94,7 @@ remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
   this.getHandler()
     .listen(
       model,
-      [
-        remobid.common.model.modelBase.EventType.CHANGED
-      ],
+      remobid.common.model.modelBase.EventType.CHANGED,
       this.handleChangedEvent_,
       false,
       this
@@ -114,7 +110,20 @@ remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
  */
 remobid.common.ui.control.ControlBase.prototype.handleChangedEvent_ = function(
   event) {
+  // we have not created the dom, therefore the data was not parse into the
+  // template and the changes will be picked up on createDom, so we can't do
+  // anything here
+  if (!this.getElement())
+    return;
 
+  goog.array.forEach(event.attributes, function(changedAttr) {
+    this.getRenderer().handleChangeEvent(
+      changedAttr.attribute.name,
+      changedAttr.external,
+      this.bindOptions_,
+      this
+    );
+  }, this);
 };
 
 /**
