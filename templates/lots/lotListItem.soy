@@ -1,0 +1,47 @@
+{namespace remobid.templates.lots.lotListItem}
+
+/**
+ * @param modelData the data of the model of this control.
+ */
+{template .js}
+  <div class="{css rb-lot}">
+    <div class="{css rb-lot-pic}"></div>
+    <div class="{css rb-lot-lotno}"
+        data-rb-bind-get="lotNo,text">
+      {$modelData['lotNo']}
+    </div>
+    <div class="{css rb-lot-prices}">
+      <div class="{css rb-lot-start}"></div>
+      <div class="{css rb-lot-bid}"></div>
+    </div>
+    <div>
+  </div>
+{/template}
+
+
+
+/**
+template binding syntax
+
+Getter
+------
+e.g. :
+data-rb-bind-get="href,html,1,0|id,tglClass:rb-mark,0,1"
+
+seperat arguments with , and use | as a seperator for multiple getter
+
+[name of the model attribute]
+[type which defines the update function (html | text | tglClass:* | chAttr:* | control)]
+opt [flog: use the helper function (1:true | 0:false) default: (0)]
+opt [flag: externally changed -> mark parent (1) or it self (0) default: (0)]
+opt [class name which is used to indicate external changes defaults to {controlBase}-extUpdate]
+
+Setter
+------
+
+seperat arguments with ,
+
+data-rb-bind-set="href"
+[name of the model attribute]
+opt [class name which is used to indicate external changes defaults to {controlBase}-extUpdate]
+*/

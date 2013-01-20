@@ -44,14 +44,15 @@ remobid.lots.model.Lot = function(id) {
    */
   this.sort_ = 0;
 
-  if(!goog.isDefAndNotNull(remobid.lots.model.Lot.mappings)) {
-    remobid.lots.model.Lot.mappings = goog.object.extend(
+  if (!goog.isDefAndNotNull(remobid.lots.model.Lot.mappings)) {
+    goog.object.extend(
       this.mappings_,
       remobid.lots.model.Lot.attributeMappings
     );
+    remobid.lots.model.Lot.mappings = this.mappings_;
   }
-
-  this.mappings_ = remobid.lots.model.Lot.mappings;
+  else
+    this.mappings_ = remobid.lots.model.Lot.mappings;
 
 };
 goog.inherits(remobid.lots.model.Lot,
