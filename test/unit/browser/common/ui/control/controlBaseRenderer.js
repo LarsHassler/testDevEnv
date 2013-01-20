@@ -35,6 +35,8 @@ describe('UNIT - ControlBaseRenderer - ', function() {
     model = new remobid.common.model.ModelBase('aada');
     model.setAutoStore(false);
     control = new remobid.common.ui.control.ControlBase(model);
+    // used to test the helper functions.
+    control.mappings_['href'] = {};
     remobid.test.mock.Utilities.clearStack(done);
   });
 
@@ -50,7 +52,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       var element, binding;
       element = renderer.createDom(control);
       binding = assertNotThrows('valid bindings not accept',
-        goog.bind(renderer.parseBinding, renderer, element, control.mappings_)
+        goog.bind(renderer.parseBinding, renderer, element, model.mappings_)
       );
 
       var expectedBindingAttributes = ['href', 'id'];
@@ -66,7 +68,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       element = renderer.createDom(control);
       goog.dom.dataset.set(element, 'rbBindGet', 'unknown,html,1,0');
       exception = assertThrows('unknown attribute accepted',
-        goog.bind(renderer.parseBinding, renderer, element, control.mappings_)
+        goog.bind(renderer.parseBinding, renderer, element, model.mappings_)
       );
 
       var errorType = remobid.common.ui.control.controlBaseRenderer.ErrorType;
@@ -85,7 +87,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         'href,lalaFunction,1,0'
       );
       exception = assertThrows('unknown method accepted',
-        goog.bind(renderer.parseBinding, renderer, element, control.mappings_)
+        goog.bind(renderer.parseBinding, renderer, element, model.mappings_)
       );
 
       var errorType = remobid.common.ui.control.controlBaseRenderer.ErrorType;
@@ -104,7 +106,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
           'href,control,1,0';
       goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
       var bindingOptions = assertNotThrows('known method not accepted',
-        goog.bind(renderer.parseBinding, renderer, element, control.mappings_)
+        goog.bind(renderer.parseBinding, renderer, element, model.mappings_)
       );
       assertEquals('wrong binding count for HREF',
         5,
@@ -116,7 +118,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       var element = renderer.createDom(control);
       var binding = 'href,html,1,0';
       goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
-      var bindingOptions = renderer.parseBinding(element, control.mappings_);
+      var bindingOptions = renderer.parseBinding(element, model.mappings_);
 
       assertEquals('there should be 1 bindings for HREF',
         1,
@@ -125,7 +127,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
 
       // check mapping
       assertObjectEquals('wrong mappings bound',
-        remobid.common.ui.control.controlBase.Mappings.HREF,
+        remobid.common.model.ModelBase.attributeMappings.HREF,
         bindingOptions['href'][0].mappings
       );
       // check method
@@ -160,7 +162,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       var element = renderer.createDom(control);
       var binding = 'href,text,0,0';
       goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
-      var bindingOptions = renderer.parseBinding(element, control.mappings_);
+      var bindingOptions = renderer.parseBinding(element, model.mappings_);
       model.restUrl_ = 'https://www.testtest.co.uk';
       renderer.handleChangeEvent('href', false, bindingOptions, control);
       assertEquals('wrong updates applied',
@@ -169,14 +171,14 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       );
     });
 
-    it('should update without a helper function', function() {
+    it('should update with a helper function', function() {
       var helperCalled = false;
       var element = renderer.createDom(control);
       var binding = 'href,html,1,0';
       goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
-      var bindingOptions = renderer.parseBinding(element, control.mappings_);
+      var bindingOptions = renderer.parseBinding(element, model.mappings_);
       model.restUrl_ = 'https://www.testtest.co.uk';
-      bindingOptions['href'][0].mappings.getterHelper = function(value) {
+      control.mappings_['href'].getter = function(value) {
         helperCalled = true;
         return '#' + value + '!';
       };
@@ -192,7 +194,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         element.children[0].innerHTML
       );
 
-      bindingOptions['href'][0].mappings.getterHelper = null;
+      control.mappings_['href'].getter = null;
     });
 
     it('should not call helper function if flag not set', function() {
@@ -200,9 +202,9 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       var element = renderer.createDom(control);
       var binding = 'href,html,0,0';
       goog.dom.dataset.set(element.children[0], 'rbBindGet', binding);
-      var bindingOptions = renderer.parseBinding(element, control.mappings_);
+      var bindingOptions = renderer.parseBinding(element, model.mappings_);
       model.restUrl_ = 'https://www.testtest.co.uk';
-      bindingOptions['href'][0].mappings.getterHelper = function(value) {
+      control.mappings_['href'].getter = function(value) {
         helperCalled = true;
         return '#' + value + '!';
       };
@@ -218,7 +220,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
         element.children[0].innerHTML
       );
 
-      bindingOptions['href'][0].mappings.getterHelper = null;
+      control.mappings_['href'].getter = null;
     });
 
     it('should handle model changed #integration', function() {

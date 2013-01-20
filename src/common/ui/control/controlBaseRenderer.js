@@ -62,8 +62,8 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.createDom = function(
  * parses the template and set the bindOptions to the given Control. Need to be
  * called just one time.
  * @param {Node} element the element of a control.
- * @param {Object.<remobid.common.ui.control.controlBase.Mapping>} mappings the
- *    attribute mappings of a control.
+ * @param {Object.<remobid.common.model.modelBase.Mapping>} mappings the
+ *    attribute mappings of the used model for this control.
  * @return {Object.<string, Array>} the bindings found in the html code.
  */
 remobid.common.ui.control.ControlBaseRenderer.prototype.parseBinding = function(
@@ -94,10 +94,12 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseBinding = function(
 /**
  * parses one given dom node for all binding attributes. Also checks against
  * the given mappings if the binding contains invalid data.
- * @param {Object} mappings the mappings to check against for invalid data.
- * @param {Object} bindings the final bindings object to put all new found
- *    bindings into.
- * @param {Node} node the node to check.
+ * @param {Object.<remobid.common.model.modelBase.Mapping>} mappings
+ *    the mappings to check against for invalid data.
+ * @param {Object} bindings
+ *    the final bindings object to put all new found bindings into.
+ * @param {Node} node
+ *    the node to check.
  * @private
  */
 remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
@@ -169,8 +171,10 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.handleChangeEvent =
 
   goog.array.forEach(bindOptions, function(options) {
     var value = options.mappings.getter.call(control.getModel());
-    if (options.useHelper && goog.isFunction(options.mappings.getterHelper)) {
-      value = options.mappings.getterHelper(value);
+    if (options.useHelper &&
+        goog.object.containsKey(control.getMappings(), attribute) &&
+        goog.isFunction(control.getMappings()[attribute].getter)) {
+      value = control.getMappings()[attribute].getter(value);
     }
     options.method(value, options.element, options.control);
   });

@@ -44,8 +44,8 @@ remobid.common.ui.control.ControlBase = function(model, opt_renderer,
   this.setModel(model);
 
   /**
-   * a reference to the attribute mappings of this control type. Must be
-   * extended by all subclasses
+   * the mappings for the helper/format functions of this control. Must be
+   * extended by all subclasses.
    * @type {Object.<remobid.common.ui.control.controlBase.Mapping>}
    * @private
    */
@@ -135,22 +135,31 @@ remobid.common.ui.control.ControlBase.prototype.createDom = function() {
   if (!this.bindOptions_) {
     this.bindOptions_ = this.getRenderer().parseBinding(
       this.getElement(),
-      this.mappings_
+      this.getModel().mappings_
     );
   }
 };
 
+/**
+ * @return {Object.<remobid.common.ui.control.controlBase.Mapping>}
+ *    the mappings for the helper/format functions of this control.
+ */
+remobid.common.ui.control.ControlBase.prototype.getMappings = function() {
+  return this.mappings_
+};
 /**
  * generates a JSON Object with all necessary data for the templates.
  * @return {Object} the json object.
  */
 remobid.common.ui.control.ControlBase.prototype.getModelData = function() {
   var returnData = {};
+  var modelMappings = this.getModel().getMappings();
 
-  goog.object.forEach(this.mappings_, function(mapping) {
+  goog.object.forEach(modelMappings, function(mapping, key) {
     var value = mapping.getter.apply(this.getModel());
-    if (goog.isFunction(mapping.getterHelper)) {
-      value = mapping.getterHelper(value);
+    if (goog.object.containsKey(this.mappings_, key) &&
+        goog.isFunction(this.mappings_[key].getter)) {
+      value = this.mappings_[key].getter(value);
     }
     returnData[mapping.name] = value;
   }, this);
@@ -159,24 +168,12 @@ remobid.common.ui.control.ControlBase.prototype.getModelData = function() {
 };
 
 /**
- * @typedef {{name: string, getter: Function, setter: Function,
- *   getterHelper, setterHelper}}
+ * @typedef {{getter: Function, setter: Function}}
  */
 remobid.common.ui.control.controlBase.Mapping;
 
 /**
- * holds all attribute mappings for this resource type.
+ * holds all attribute helper/format functions for this resource type.
  * @type {Object.<remobid.common.ui.control.controlBase.Mapping>}
  */
-remobid.common.ui.control.controlBase.Mappings = {
-  ID: {
-    name: 'id',
-    getter: remobid.common.model.ModelBase.prototype.getIdentifier,
-    setter: remobid.common.model.ModelBase.prototype.setIdentifier
-  },
-  HREF: {
-    name: 'href',
-    getter: remobid.common.model.ModelBase.prototype.getRestUrl,
-    setter: remobid.common.model.ModelBase.prototype.setRestUrl
-  }
-};
+remobid.common.ui.control.controlBase.Mappings = {};

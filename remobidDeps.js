@@ -20,7 +20,9 @@ goog.addDependency('../../../../src/common/storage/storage_interface.js', ['remo
 goog.addDependency('../../../../src/common/ui/control/controlBase.js', ['remobid.common.ui.control.ControlBase', 'remobid.common.ui.control.controlBase.Mapping', 'remobid.common.ui.control.controlBase.Mappings'], ['goog.dom', 'goog.dom.dataset', 'goog.ui.Control', 'remobid.common.model.modelBase.EventType', 'remobid.common.ui.control.ControlBaseRenderer']);
 goog.addDependency('../../../../src/common/ui/control/controlBaseRenderer.js', ['remobid.common.ui.control.ControlBaseRenderer', 'remobid.common.ui.control.controlBaseRenderer.ErrorType', 'remobid.common.ui.control.controlBaseRenderer.bindMethods'], ['goog.soy', 'goog.ui.ControlRenderer', 'remobid.common.ui.control.controlBase.Mapping', 'remobid.templates.test']);
 goog.addDependency('../../../../src/lots/model/lot.js', ['remobid.lots.model.Lot'], ['remobid.common.model.ModelBase', 'remobid.common.model.Registry']);
-goog.addDependency('../../../../src/lots/ui/lotlistitem.js', ['remobid.lots.ui.LotListItem'], ['remobid.common.ui.control.ControlBase']);
+goog.addDependency('../../../../src/lots/ui/lotListItemRenderer.js', ['remobid.lots.ui.LotListItemRenderer'], ['remobid.common.ui.control.ControlBaseRenderer']);
+goog.addDependency('../../../../src/lots/ui/lotlistitem.js', ['remobid.lots.ui.LotListItem'], ['remobid.common.ui.control.ControlBase', 'remobid.lots.ui.LotListItemRenderer']);
+goog.addDependency('../../../../templates/_compiled/lotListItem.soy.js', ['remobid.templates.lots.lotListItem'], ['soy', 'soydata']);
 goog.addDependency('../../../../templates/_compiled/testTemplate.soy.js', ['remobid.templates.test'], ['soy', 'soydata']);
 goog.addDependency('../../../../test/mock/Utilities.js', ['remobid.test.mock.Utilities'], []);
 goog.addDependency('../../../../test/mock/browser/localstorage.js', ['remobid.test.mock.browser.LocalStorage'], ['goog.object']);

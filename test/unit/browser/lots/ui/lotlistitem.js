@@ -20,12 +20,4 @@ describe('UNIT - LotListItem -', function() {
     remobid.test.mock.Utilities.clearStack(done);
   });
   
-  describe('dispose', function() {
-    
-    it('should remove all references', function() {
-      
-    });
-    
-  });
-  
 });

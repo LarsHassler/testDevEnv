@@ -245,6 +245,14 @@ remobid.common.model.ModelBase.prototype.isSupressChangeTracking = function() {
 };
 
 /**
+ * @return {Array.<remobid.common.model.ModelBase.Mapping>}
+ *    the mappings for this class.
+ */
+remobid.common.model.ModelBase.prototype.getMappings = function() {
+  return this.mappings_;
+};
+
+/**
  *
  * @param {remobid.common.model.ModelBase.Mapping} attributeMapping the mappings
  *    for the attribute to change.

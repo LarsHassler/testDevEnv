@@ -44,8 +44,15 @@ remobid.lots.model.Lot = function(id) {
    */
   this.sort_ = 0;
 
-  goog.object.extend(this.mappings_,
-    remobid.lots.model.Lot.attributeMappings);
+  if(!goog.isDefAndNotNull(remobid.lots.model.Lot.mappings)) {
+    remobid.lots.model.Lot.mappings = goog.object.extend(
+      this.mappings_,
+      remobid.lots.model.Lot.attributeMappings
+    );
+  }
+
+  this.mappings_ = remobid.lots.model.Lot.mappings;
+
 };
 goog.inherits(remobid.lots.model.Lot,
   remobid.common.model.ModelBase);
@@ -112,14 +119,22 @@ remobid.lots.model.Lot.getResourceById = function(id) {
 };
 
 /**
+ * holds all attribute mappings for this resource type including the mappings
+ * of the parent. This object should be lazy created on the first constructor
+ * call for thsi resource type.
+ * @type {Object.<remobid.common.model.modelBase.Mapping>}
+ */
+remobid.lots.model.Lot.mappings;
+
+/**
  * holds all attribute mappings for this resource type.
  * @type {Object.<remobid.common.model.modelBase.Mapping>}
  */
 remobid.lots.model.Lot.attributeMappings = {
   LOTNO: {
     name: 'lotNo',
-    getter: remobid.common.model.ModelBase.prototype.getLotNo,
-    setter: remobid.common.model.ModelBase.prototype.setLotNo
+    getter: remobid.lots.model.Lot.prototype.getLotNo,
+    setter: remobid.lots.model.Lot.prototype.setLotNo
   }
 };
 
