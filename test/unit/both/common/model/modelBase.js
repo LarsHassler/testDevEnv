@@ -71,8 +71,8 @@ describe('UNIT - ModelBase', function() {
 
     it('should free all internal references', function() {
       Model.dispose();
-      assertNull('trackedAttributes not cleared',
-        Model.trackedAttributes_
+      assertNull('unsavedAttributes not cleared',
+        Model.unsavedAttributes_
       );
       assertNull('mappings not cleared',
         Model.mappings_
@@ -88,6 +88,9 @@ describe('UNIT - ModelBase', function() {
       );
       assertNull('storage reference not cleared',
         Model.storage_
+      );
+      assertNull('changedAttributes not cleared',
+        Model.changedAttributes_
       );
     });
 
@@ -138,12 +141,12 @@ describe('UNIT - ModelBase', function() {
 
   describe('supressed - ', function() {
 
-    it('should not track changes', function() {
+    it('should not track unsaved changes', function() {
       Model.setSupressChangeTracking(true);
       Model.setIdentifier(123);
       assertEquals('there should be no attribute tracked',
         0,
-        Model.trackedAttributes_.length
+        Model.unsavedAttributes_.length
       );
     });
 
@@ -239,15 +242,15 @@ describe('UNIT - ModelBase', function() {
       });
     });
 
-    it('should track the changed variables', function() {
+    it('should track the changed variables as unsaved', function() {
       Model.updateDataViaMappings({
         'id': 123,
         'href': 'www.test.de',
         'unknown': 'b'
       });
-      assertArrayEquals('wrong attributes tracked',
+      assertArrayEquals('wrong attributes tracked as unsaved',
         goog.object.getValues(Model.mappings_),
-        Model.trackedAttributes_
+        Model.unsavedAttributes_
       );
     });
   });
@@ -373,7 +376,7 @@ describe('UNIT - ModelBase', function() {
 
   describe('Storage - ', function() {
 
-    it('should automaticly store the model', function() {
+    it('autoStore should listen for LOCALLY_CHANGED', function() {
       var Model2 = new remobid.common.model.ModelBase();
       assertTrue('autoStore should be enabled from the start',
         Model2.isAutoStoreEnabled()

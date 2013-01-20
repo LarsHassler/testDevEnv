@@ -76,7 +76,7 @@ remobid.common.model.ModelBase = function(id) {
 
   /**
    * whenever this instance should not track which variables are changed but not
-   * stored yet {@code trackedAttributes_}.
+   * stored yet {@code unsavedAttributes_}.
    * @type {boolean}
    * @private
    */
@@ -88,7 +88,17 @@ remobid.common.model.ModelBase = function(id) {
    * @type {Array.<remobid.common.model.ModelBase.Mapping>}
    * @private
    */
-  this.trackedAttributes_ = [];
+  this.unsavedAttributes_ = [];
+
+  /**
+   * holds all attributes which are changed since the last change Event was
+   * fired.
+   * Each object hold a flag if the changed were applied externally and
+   * a reference to the {@see remobid.common.model.ModelBase.Mapping}.
+   * @type {Array.<Object>}
+   * @private
+   */
+  this.changedAttributes_ = [];
 
   /**
    * the id of the timeout for the changed Delay
@@ -112,7 +122,7 @@ goog.inherits(remobid.common.model.ModelBase,
  * @override
  */
 remobid.common.model.ModelBase.prototype.dispose = function(forced) {
-  if (!forced && this.trackedAttributes_.length)
+  if (!forced && this.unsavedAttributes_.length)
     throw new Error(remobid.common.model.modelBase.ErrorType.UNSAVED);
   goog.base(this, 'dispose');
 };
@@ -123,7 +133,8 @@ remobid.common.model.ModelBase.prototype.dispose = function(forced) {
 remobid.common.model.ModelBase.prototype.disposeInternal = function() {
   goog.base(this, 'disposeInternal');
   this.mappings_ = null;
-  this.trackedAttributes_ = null;
+  this.unsavedAttributes_ = null;
+  this.changedAttributes_ = null;
   goog.array.forEach(this.listenerKeys_, function(key) {
     goog.events.unlistenByKey(key);
   });
@@ -211,7 +222,7 @@ remobid.common.model.ModelBase.prototype.isSupressChangeEvent = function() {
 
 /**
  * @param {boolean} supressed whenever the model does not track which attributes
- * are changed.
+ * are changed but not saved.
  */
 remobid.common.model.ModelBase.prototype.setSupressChangeTracking = function(
   supressed) {
@@ -220,7 +231,7 @@ remobid.common.model.ModelBase.prototype.setSupressChangeTracking = function(
 
 /**
  * @return {boolean} whenever the model does not track which attributes are
- * changed.
+ * changed but not saved.
  */
 remobid.common.model.ModelBase.prototype.isSupressChangeTracking = function() {
   return this.supressChangeTracking_;
@@ -234,7 +245,7 @@ remobid.common.model.ModelBase.prototype.isSupressChangeTracking = function() {
 remobid.common.model.ModelBase.prototype.handleChangedAttribute = function(
   attributeMapping) {
   if (!this.supressChangeTracking_)
-    this.trackedAttributes_.push(attributeMapping);
+    this.unsavedAttributes_.push(attributeMapping);
   if (!this.supressChangeEvent_)
     this.prepareChangeEvent();
 };
