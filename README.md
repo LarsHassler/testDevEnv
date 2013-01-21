@@ -30,7 +30,8 @@ Git Settings
         co = checkout
         ci = commit
         br = branch
-        nbr = checkout -b
+        nbr = !sh -c 'git co master && git checkout -b "$0" && git push -u origin "$0"'
+        rbr = !sh -c 'git co master && git br -d "$0" && git push origin :"$0"'
         l = log --oneline --decorate --graph
         timeline = log --graph --branches --pretty=oneline --decorate
         mods = ls-files -m
