@@ -88,7 +88,7 @@ describe('UNIT - lot item Renderer -', function() {
       var element = control.getElement();
       var foundElements = goog.dom.getElementsByClass('rb-lot-lotno', element);
       model.setLotNo('99B');
-      mockClock.tick(model.changedEventDelay_ * 2);
+      mockClock.tick(model.changedEventDelay_);
       assertEquals('template not updated',
         '99B',
         goog.dom.getTextContent(foundElements[0])
@@ -100,7 +100,7 @@ describe('UNIT - lot item Renderer -', function() {
       var element = control.getElement();
       var foundElements = goog.dom.getElementsByClass('rb-lot-pic', element);
       model.setPicture('http://testur.de/pic2.jpg');
-      mockClock.tick(model.changedEventDelay_ * 2);
+      mockClock.tick(model.changedEventDelay_);
       assertEquals('template not updated',
         'http://testur.de/pic2.jpg',
         foundElements[0].children[0].src
