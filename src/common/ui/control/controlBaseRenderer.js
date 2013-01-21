@@ -141,7 +141,9 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
     }
     bindings[name].push({
       mappings: mapping,
-      method: remobid.common.ui.control.controlBaseRenderer.bindMethods[method],
+      method:
+        remobid.common.ui.control.controlBaseRenderer.bindMethods[method[0]],
+      methodOptions: method[1] || null,
       element: node,
       control: method === 'control' ? true : null,
       useHelper: bindOptions[2] === '1',
@@ -176,7 +178,12 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.handleChangeEvent =
         goog.isFunction(control.getMappings()[attribute].getter)) {
       value = control.getMappings()[attribute].getter(value);
     }
-    options.method(value, options.element, options.control);
+    options.method(
+      value,
+      options.element,
+      options.control,
+      options.methodOptions
+    );
   });
 
 };
@@ -194,7 +201,9 @@ remobid.common.ui.control.controlBaseRenderer.bindMethods = {
     goog.dom.setTextContent(element, value);
   },
   'tglClass': goog.nullFunction,
-  'chAttr': goog.nullFunction,
+  'chAttr': function(value, element, control, options) {
+    element[options] = value;
+  },
   'control': goog.nullFunction
 };
 
