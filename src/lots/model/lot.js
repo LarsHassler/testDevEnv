@@ -35,14 +35,14 @@ remobid.lots.model.Lot = function(id) {
    * @type {number}
    * @private
    */
-  this.ausruf_ = 0;
+  this.startingPrice_ = 0;
 
   /**
    * the final bid amount at which the lot got awarded
    * @type {number}
    * @private
    */
-  this.zuschlag_ = 0;
+  this.soldPrice_ = 0;
 
   /**
    * the sorting value
@@ -106,6 +106,24 @@ remobid.lots.model.Lot.prototype.setPicture = function(url) {
     remobid.common.model.ModelBase.attributeMappings.PICTURE);
 };
 
+/**
+ * @return {number}
+ *    the starting price for this lot.
+ */
+remobid.lots.model.Lot.prototype.getStartingPrice = function() {
+  return this.startingPrice_;
+};
+
+/**
+ * @param {number} amount
+ *    the starting price for this lot.
+ */
+remobid.lots.model.Lot.prototype.setStartingPrice = function(amount) {
+  this.startingPrice_ = amount;
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.STARTING_PRICE);
+};
+
 /** static **/
 
 /**
@@ -133,14 +151,21 @@ remobid.lots.model.Lot.getResourceById = function(id) {
     goog.events.listenOnce(
       lot,
       remobid.common.model.base.EventType.DELETED,
-      function(event) {
-        var lot = event.currentTarget;
-        delete remobid.lots.model.Lot.instances_[lot.getIdentifier()];
-      }
+      remobid.lots.model.Lot.removeResource
     );
     remobid.lots.model.Lot.instances_[id] = lot;
   }
   return lot;
+};
+
+/**
+ * removes a instance from the instances list.
+ * @param {goog.events.Event} event
+ *    the DELETED Event send by the model.
+ */
+remobid.lots.model.Lot.removeResource = function(event) {
+  var lot = event.currentTarget;
+  delete remobid.lots.model.Lot.instances_[lot.getIdentifier()];
 };
 
 /**
@@ -165,6 +190,11 @@ remobid.lots.model.Lot.attributeMappings = {
     name: 'picture',
     getter: remobid.lots.model.Lot.prototype.getPicture,
     setter: remobid.lots.model.Lot.prototype.setPicture
+  },
+  STARTING_PRICE: {
+    name: 'startingPrice',
+    getter: remobid.lots.model.Lot.prototype.getStartingPrice,
+    setter: remobid.lots.model.Lot.prototype.setStartingPrice
   }
 };
 

@@ -13,7 +13,9 @@
       {$modelData['lotNo']}
     </div>
     <div class="{css rb-lot-prices}">
-      <div class="{css rb-lot-start}"></div>
+      <div class="{css rb-lot-start}" data-rb-bind-get="startingPrice,text,1">
+        {$modelData['startingPrice']}
+      </div>
       <div class="{css rb-lot-bid}"></div>
     </div>
     <div>
