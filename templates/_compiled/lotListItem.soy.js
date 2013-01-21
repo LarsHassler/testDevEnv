@@ -14,5 +14,5 @@ goog.require('soydata');
  * @notypecheck
  */
 remobid.templates.lots.lotListItem.js = function(opt_data, opt_ignored) {
-  return '<div class="rb-lot"><div class="rb-lot-pic"></div><div class="rb-lot-lotno" data-rb-bind-get="lotNo,text">' + soy.$$escapeHtml(opt_data.modelData['lotNo']) + '</div><div class="rb-lot-prices"><div class="rb-lot-start"></div><div class="rb-lot-bid"></div></div><div></div>';
+  return '<div class="rb-lot"><div class="rb-lot-pic"><img src="' + soy.$$escapeHtml(opt_data.modelData['picture']) + '" data-rb-bind-get="picture,chAttr:src"></div><div class="rb-lot-lotno" data-rb-bind-get="lotNo,text">' + soy.$$escapeHtml(opt_data.modelData['lotNo']) + '</div><div class="rb-lot-prices"><div class="rb-lot-start"></div><div class="rb-lot-bid"></div></div><div></div>';
 };

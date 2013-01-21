@@ -18,7 +18,8 @@ describe('UNIT - lot item Renderer -', function() {
     model = new remobid.lots.model.Lot('123');
     model.setAutoStore(false);
     model.updateDataViaMappings({
-      lotNo: '100A'
+      lotNo: '100A',
+      picture: 'http://img.remobid.com/1.jpg'
     });
     control = new remobid.lots.ui.LotListItem(model);
     renderer = remobid.lots.ui.LotListItemRenderer.getInstance();
@@ -38,7 +39,6 @@ describe('UNIT - lot item Renderer -', function() {
         '100A',
         goog.dom.getTextContent(foundElements[0])
       );
-
     });
 
     it('should have exactly one element for the picture', function() {
@@ -47,6 +47,14 @@ describe('UNIT - lot item Renderer -', function() {
       assertEquals('element not found or multiple elements found',
         1,
         foundElements.length
+      );
+      assertEquals('there should be a img tag within the picture element',
+        'IMG',
+        foundElements[0].children[0].tagName.toUpperCase()
+      );
+      assertEquals('src of the img is wrong',
+        'http://img.remobid.com/1.jpg',
+        foundElements[0].children[0].src
       );
     });
 
@@ -71,6 +79,34 @@ describe('UNIT - lot item Renderer -', function() {
             foundElements.length
           );
     });
+  });
+
+  describe('template binding - #integration ', function() {
+
+    it('should update the element of the lotno', function() {
+      control.createDom();
+      var element = control.getElement();
+      var foundElements = goog.dom.getElementsByClass('rb-lot-lotno', element);
+      model.setLotNo('99B');
+      mockClock.tick(model.changedEventDelay_ * 2);
+      assertEquals('template not updated',
+        '99B',
+        goog.dom.getTextContent(foundElements[0])
+      );
+    });
+
+    it('should update the src of the picture', function() {
+      control.createDom();
+      var element = control.getElement();
+      var foundElements = goog.dom.getElementsByClass('rb-lot-pic', element);
+      model.setPicture('http://testur.de/pic2.jpg');
+      mockClock.tick(model.changedEventDelay_ * 2);
+      assertEquals('template not updated',
+        'http://testur.de/pic2.jpg',
+        foundElements[0].children[0].src
+      );
+    });
+
   });
   
 });

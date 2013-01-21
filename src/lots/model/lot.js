@@ -24,6 +24,13 @@ remobid.lots.model.Lot = function(id) {
   this.lotNo_ = '';
 
   /**
+   * the url of the preview picture
+   * @type {string}
+   * @private
+   */
+  this.picture_ = '';
+
+  /**
    * the starting price of this lot
    * @type {number}
    * @private
@@ -81,6 +88,23 @@ remobid.lots.model.Lot.prototype.setLotNo = function(lotNo) {
     remobid.common.model.ModelBase.attributeMappings.LOTNO);
 };
 
+/**
+ * @return {string}
+ *    the full url to the image.
+ */
+remobid.lots.model.Lot.prototype.getPicture = function() {
+  return this.picture_;
+};
+
+/**
+ * @param {string} url
+ *    the full url to the image.
+ */
+remobid.lots.model.Lot.prototype.setPicture = function(url) {
+  this.picture_ = url;
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.PICTURE);
+};
 
 /** static **/
 
@@ -136,6 +160,11 @@ remobid.lots.model.Lot.attributeMappings = {
     name: 'lotNo',
     getter: remobid.lots.model.Lot.prototype.getLotNo,
     setter: remobid.lots.model.Lot.prototype.setLotNo
+  },
+  PICTURE: {
+    name: 'picture',
+    getter: remobid.lots.model.Lot.prototype.getPicture,
+    setter: remobid.lots.model.Lot.prototype.setPicture
   }
 };
 

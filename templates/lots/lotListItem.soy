@@ -5,7 +5,9 @@
  */
 {template .js}
   <div class="{css rb-lot}">
-    <div class="{css rb-lot-pic}"></div>
+    <div class="{css rb-lot-pic}">
+      <img src="{$modelData['picture']}" data-rb-bind-get="picture,chAttr:src">
+    </div>
     <div class="{css rb-lot-lotno}"
         data-rb-bind-get="lotNo,text">
       {$modelData['lotNo']}
