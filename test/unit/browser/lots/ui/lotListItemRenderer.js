@@ -20,7 +20,8 @@ describe('UNIT - lot item Renderer -', function() {
     model.updateDataViaMappings({
       lotNo: '100A',
       picture: 'http://img.remobid.com/1.jpg',
-      startingPrice: 1000
+      startingPrice: 1000,
+      soldPrice: 1000000
     });
     control = new remobid.lots.ui.LotListItem(model);
     renderer = remobid.lots.ui.LotListItemRenderer.getInstance();
@@ -83,6 +84,10 @@ describe('UNIT - lot item Renderer -', function() {
             1,
             foundElements.length
           );
+          assertEquals('template not updated',
+            '€1,000,000.00',
+            goog.dom.getTextContent(foundElements[0])
+          );
     });
   });
 
@@ -120,6 +125,18 @@ describe('UNIT - lot item Renderer -', function() {
       mockClock.tick(model.changedEventDelay_);
       assertEquals('template not updated',
         '€20,000.00',
+        goog.dom.getTextContent(foundElements[0])
+      );
+    });
+
+    it('should update the sold price', function() {
+      control.createDom();
+      var element = control.getElement();
+      var foundElements = goog.dom.getElementsByClass('rb-lot-bid', element);
+      model.setSoldPrice(299000);
+      mockClock.tick(model.changedEventDelay_);
+      assertEquals('template not updated',
+        '€299,000.00',
         goog.dom.getTextContent(foundElements[0])
       );
     });

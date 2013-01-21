@@ -124,6 +124,25 @@ remobid.lots.model.Lot.prototype.setStartingPrice = function(amount) {
     remobid.common.model.ModelBase.attributeMappings.STARTING_PRICE);
 };
 
+
+/**
+ * @return {number}
+ *    the sold price for this lot.
+ */
+remobid.lots.model.Lot.prototype.getSoldPrice = function() {
+  return this.soldPrice_;
+};
+
+/**
+ * @param {number} amount
+ *    the starting price for this lot.
+ */
+remobid.lots.model.Lot.prototype.setSoldPrice = function(amount) {
+  this.soldPrice_ = amount;
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.SOLD_PRICE);
+};
+
 /** static **/
 
 /**
@@ -195,6 +214,11 @@ remobid.lots.model.Lot.attributeMappings = {
     name: 'startingPrice',
     getter: remobid.lots.model.Lot.prototype.getStartingPrice,
     setter: remobid.lots.model.Lot.prototype.setStartingPrice
+  },
+  SOLD_PRICE: {
+    name: 'soldPrice',
+    getter: remobid.lots.model.Lot.prototype.getSoldPrice,
+    setter: remobid.lots.model.Lot.prototype.setSoldPrice
   }
 };
 

@@ -55,6 +55,9 @@ remobid.lots.ui.LotListItem.currencyFormatter = new goog.i18n.NumberFormat(
 remobid.lots.ui.LotListItem.helperMappings = {
   'startingPrice' : {
     getter: remobid.lots.ui.LotListItem.formatCurreny
+  },
+  'soldPrice' : {
+    getter: remobid.lots.ui.LotListItem.formatCurreny
   }
 };
 
