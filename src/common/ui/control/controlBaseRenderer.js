@@ -3,10 +3,12 @@
  */
 
 goog.provide('remobid.common.ui.control.ControlBaseRenderer');
-goog.provide('remobid.common.ui.control.controlBaseRenderer');
+goog.provide('remobid.common.ui.control.controlBaseRenderer.ErrorType');
+goog.provide('remobid.common.ui.control.controlBaseRenderer.bindMethods');
 
 goog.require('goog.soy');
 goog.require('goog.ui.ControlRenderer');
+goog.require('remobid.common.ui.control.controlBase.Mapping');
 goog.require('remobid.templates.test');
 
 
@@ -27,6 +29,16 @@ remobid.common.ui.control.ControlBaseRenderer = function() {
 goog.inherits(remobid.common.ui.control.ControlBaseRenderer,
   goog.ui.ControlRenderer);
 goog.addSingletonGetter(remobid.common.ui.control.ControlBaseRenderer);
+
+/**
+ * overrides the template of this renderer.
+ * @param {function} template
+ *    the new template.
+ */
+remobid.common.ui.control.ControlBaseRenderer.prototype.setTemplate = function(
+    template) {
+  this.template_ = template;
+};
 
 /**
  * @param {remobid.common.ui.control.ControlBase} control the control to render.
@@ -50,8 +62,8 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.createDom = function(
  * parses the template and set the bindOptions to the given Control. Need to be
  * called just one time.
  * @param {Node} element the element of a control.
- * @param {Object.<remobid.common.ui.control.ControlBase.Mapping>} mappings the
- *    attribute mappings of a control.
+ * @param {Object.<remobid.common.model.modelBase.Mapping>} mappings the
+ *    attribute mappings of the used model for this control.
  * @return {Object.<string, Array>} the bindings found in the html code.
  */
 remobid.common.ui.control.ControlBaseRenderer.prototype.parseBinding = function(
@@ -82,10 +94,12 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseBinding = function(
 /**
  * parses one given dom node for all binding attributes. Also checks against
  * the given mappings if the binding contains invalid data.
- * @param {Object} mappings the mappings to check against for invalid data.
- * @param {Object} bindings the final bindings object to put all new found
- *    bindings into.
- * @param {Node} node the node to check.
+ * @param {Object.<remobid.common.model.modelBase.Mapping>} mappings
+ *    the mappings to check against for invalid data.
+ * @param {Object} bindings
+ *    the final bindings object to put all new found bindings into.
+ * @param {Node} node
+ *    the node to check.
  * @private
  */
 remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
@@ -127,7 +141,9 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
     }
     bindings[name].push({
       mappings: mapping,
-      method: remobid.common.ui.control.controlBaseRenderer.bindMethods[method],
+      method:
+        remobid.common.ui.control.controlBaseRenderer.bindMethods[method[0]],
+      methodOptions: method[1] || null,
       element: node,
       control: method === 'control' ? true : null,
       useHelper: bindOptions[2] === '1',
@@ -157,12 +173,18 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.handleChangeEvent =
 
   goog.array.forEach(bindOptions, function(options) {
     var value = options.mappings.getter.call(control.getModel());
-    if (options.useHelper && goog.isDef(options.mappings.getterHelper)) {
-      value = options.mappings.getterHelper(value);
+    if (options.useHelper &&
+        goog.object.containsKey(control.getMappings(), attribute) &&
+        goog.isFunction(control.getMappings()[attribute].getter)) {
+      value = control.getMappings()[attribute].getter(value);
     }
-    options.method(value, options.element, options.control);
+    options.method(
+      value,
+      options.element,
+      options.control,
+      options.methodOptions
+    );
   });
-
 
 };
 //
@@ -179,7 +201,9 @@ remobid.common.ui.control.controlBaseRenderer.bindMethods = {
     goog.dom.setTextContent(element, value);
   },
   'tglClass': goog.nullFunction,
-  'chAttr': goog.nullFunction,
+  'chAttr': function(value, element, control, options) {
+    element[options] = value;
+  },
   'control': goog.nullFunction
 };
 
