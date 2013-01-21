@@ -157,9 +157,9 @@ remobid.common.ui.control.ControlBase.prototype.getModelData = function() {
 
   goog.object.forEach(modelMappings, function(mapping, key) {
     var value = mapping.getter.apply(this.getModel());
-    if (goog.object.containsKey(this.mappings_, key) &&
-        goog.isFunction(this.mappings_[key].getter)) {
-      value = this.mappings_[key].getter(value);
+    if (goog.object.containsKey(this.mappings_, mapping.name) &&
+        goog.isFunction(this.mappings_[mapping.name].getter)) {
+      value = this.mappings_[mapping.name].getter(value);
     }
     returnData[mapping.name] = value;
   }, this);
