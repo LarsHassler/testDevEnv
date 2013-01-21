@@ -10,7 +10,8 @@ basePath = '../';
     MOCHA_ADAPTER,
     'test/unit/both/**/*.js',
     'test/unit/browser/**/*.js',
-    {pattern: 'src/**/*.js', included: false, served: false}
+    {pattern: 'src/**/*.js', included: false, served: false},
+    {pattern: 'templates/_compiled/**/*.js', included: false, served: false}
   ];
 
   // use dots reporter, as travis terminal does not support escaping sequences
