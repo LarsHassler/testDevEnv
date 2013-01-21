@@ -377,11 +377,9 @@ remobid.common.model.ModelBase.prototype.prepareChangeEvent = function() {
   goog.Timer.clear(this.changedEventTimerId_);
 
   this.changedEventTimerId_ = goog.Timer.callOnce(
-    goog.bind(
-      this.dispatchChangeEvent_,
-      this
-    ),
-    this.changedEventDelay_
+    this.dispatchChangeEvent_,
+    this.changedEventDelay_,
+    this
   );
 };
 
