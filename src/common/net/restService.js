@@ -19,8 +19,8 @@ remobid.common.net.RestService = function() {
 
   this.server_ = restify.createServer();
   this.server_.use(restify.queryParser());
-  this.server_.get('/lots/:input', this.respond);
-  this.server_.head('/lots/:input', this.respond);
+  this.server_.get('/lots/', this.respond);
+  this.server_.head('/lots/', this.respond);
 
   this.server_.listen(9000, goog.bind(function() {
     //console.log('%s listening at %s', this.server_.name, this.server_.url);
@@ -35,14 +35,14 @@ goog.inherits(remobid.common.net.RestService,
  * @param {Object} req
  *    The request.
  * @param {Object} res
- *    The resource.
+ *    The response.
  * @param {Object} next
  *    Next.
  */
 remobid.common.net.RestService.prototype.respond = function(req, res, next) {
   testOutput = {'firstName': 'Peter', 'secondName': 'Pan'};
   console.log(req.query);
-  res.send('input: ' + req.params.input);
+  res.send('some response');
 };
 
 var x = new remobid.common.net.RestService();

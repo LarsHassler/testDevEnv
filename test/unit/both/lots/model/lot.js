@@ -47,21 +47,105 @@ describe('UNIT - Lot Model -', function() {
   });
 
   describe('setter Events - ', function() {
+    var dispatchCounter, lKey;
 
-    it('should fire an CHANGE Event on setLotNo', function() {
-      var dispatchCounter = 0;
-
+    beforeEach(function() {
+      dispatchCounter = 0;
       Lot.setAutoStore(false);
-      goog.events.listen(
+      lKey = goog.events.listen(
         Lot,
         remobid.common.model.modelBase.EventType.CHANGED,
         function() {
           dispatchCounter++;
         }
       );
+    });
 
+    afterEach(function() {
+      goog.events.unlistenByKey(lKey);
+    });
+
+    it('should fire a CHANGE Event on setAuction', function() {
+      Lot.setAuction({});
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire an CHANGE Event on setLotNo', function() {
       Lot.setLotNo('1004A');
-      mockClock.tick(Lot.changedEventDelay_ * 2);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire an CHANGE Event on setPicture', function() {
+      Lot.setPicture('2.jpg');
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire an CHANGE Event on setStartingPrice', function() {
+      Lot.setStartingPrice(99);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire an CHANGE Event on setSoldPrice', function() {
+      Lot.setSoldPrice(99);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire an CHANGE Event on setFinished', function() {
+      Lot.setFinished(true);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+      Lot.setFinished(true);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched even if the value not changed',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire an CHANGE Event on setCurrentBid', function() {
+      Lot.setCurrentBid(109);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire a CHANGE Event on setSession', function() {
+      Lot.setSession({});
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire a CHANGE Event on setSort', function() {
+      Lot.setSort(101);
+      mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
         1,
         dispatchCounter
@@ -96,7 +180,7 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should return a new instance if model ' +
-        'was not requested early', function() {
+      'was not requested early', function() {
       remobid.lots.model.Lot.instances_[1] = Lot;
       var returnedLot = remobid.lots.model.Lot.getResourceById(2);
       assertEquals('new instances reference was not saved',
