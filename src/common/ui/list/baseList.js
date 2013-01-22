@@ -32,8 +32,61 @@ goog.inherits(remobid.common.ui.list.BaseList,
  *    the collection model for this list view.
  */
 remobid.common.ui.list.BaseList.prototype.setModel = function(model) {
-  if (this.getModel() !== model) {
-    this.removeChildren(true);
+  if (this.getModel() === model)
+    return;
+
+  this.removeChildren(true);
+  if (this.getModel()) {
+    goog.events.unlisten(
+      this.getModel(),
+      remobid.common.model.collection.EventType.ADDED,
+      this.handleModelItemAdded_,
+      false,
+      this
+    );
+    goog.events.unlisten(
+      this.getModel(),
+      remobid.common.model.collection.EventType.REMOVED,
+      this.handleModelItemRemoved_,
+      false,
+      this
+    );
   }
   goog.base(this, 'setModel', model);
+  goog.events.listen(
+    model,
+    remobid.common.model.collection.EventType.ADDED,
+    this.handleModelItemAdded_,
+    false,
+    this
+  );
+  goog.events.listen(
+    model,
+    remobid.common.model.collection.EventType.REMOVED,
+    this.handleModelItemRemoved_,
+    false,
+    this
+  );
+};
+
+/**
+ * callback to handle the event if a item was added to the model list.
+ * @param {remobid.common.model.collection.Event} event
+ *    the event from the list model.
+ * @private
+ */
+remobid.common.ui.list.BaseList.prototype.handleModelItemRemoved_ = function(
+    event) {
+
+};
+
+/**
+ * callback to handle the event if a item was removed to the model list.
+ * @param {remobid.common.model.collection.Event} event
+ *    the event from the list model.
+ * @private
+ */
+remobid.common.ui.list.BaseList.prototype.handleModelItemAdded_ = function(
+    event) {
+
 };

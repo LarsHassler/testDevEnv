@@ -40,6 +40,56 @@ describe('UNIT - BaseList - ', function() {
       );
     });
 
+    it('should listen for model event', function() {
+      var addedListener, removedListener;
+      addedListener = goog.events.getListener(
+        listModel,
+        remobid.common.model.collection.EventType.ADDED,
+        list.handleModelItemAdded_,
+        false,
+        list
+      );
+      removedListener = goog.events.getListener(
+        listModel,
+        remobid.common.model.collection.EventType.REMOVED,
+        list.handleModelItemRemoved_,
+        false,
+        list
+      );
+      assertNotNullNorUndefined('ADDED listener not set',
+        addedListener
+      );
+      assertNotNullNorUndefined('REMOVED listener not set',
+        removedListener
+      );
+    });
+
+    it('should remove listeners for old model', function() {
+      var addedListener, removedListener;
+      var listModel2 = new remobid.common.model.Collection();
+      list.setModel(listModel2);
+      addedListener = goog.events.getListener(
+        listModel,
+        remobid.common.model.collection.EventType.ADDED,
+        list.handleModelItemAdded_,
+        false,
+        list
+      );
+      removedListener = goog.events.getListener(
+        listModel,
+        remobid.common.model.collection.EventType.REMOVED,
+        list.handleModelItemRemoved_,
+        false,
+        list
+      );
+      assertNull('ADDED listener still active',
+        addedListener
+      );
+      assertNull('REMOVED listener still active',
+        removedListener
+      );
+    });
+
   });
 
 
