@@ -25,9 +25,33 @@ remobid.common.model.Collection = function() {
    * @private
    */
   this.items_ = {};
+
+  /**
+   * The type of the list objects.
+   * @type {String}
+   * @private
+   */
+  this.type_ = '';
 };
 goog.inherits(remobid.common.model.Collection,
   remobid.common.model.Base);
+
+/**
+ *
+ * @param {string} type
+ *    The type of the list objects.
+ */
+remobid.common.model.Collection.prototype.setType = function(type) {
+  this.type_ = type;
+};
+
+/**
+ *
+ * @return {string} The type of the list objects.
+ */
+remobid.common.model.Collection.prototype.getType = function() {
+  return this.type_;
+};
 
 /**
  * @override
