@@ -58,6 +58,9 @@ remobid.lots.ui.LotListItem.helperMappings = {
   },
   'soldPrice' : {
     getter: remobid.lots.ui.LotListItem.formatCurreny
+  },
+  'currentBid' : {
+    getter: remobid.lots.ui.LotListItem.formatCurreny
   }
 };
 

@@ -16,8 +16,13 @@
       <div class="{css rb-lot-start}" data-rb-bind-get="startingPrice,text,1">
         {$modelData['startingPrice']}
       </div>
-      <div class="{css rb-lot-bid}" data-rb-bind-get="soldPrice,text,1">
-        {$modelData['soldPrice']}
+      <div class="{css rb-lot-bid}"
+          data-rb-bind-get="soldPrice,text,1,1|currentBid,text,1,1">
+        {if $modelData['finished']}
+          {$modelData['soldPrice']}
+        {else}
+          {$modelData['currentBid']}
+        {/if}
       </div>
     </div>
     <div>

@@ -23,6 +23,8 @@ describe('UNIT - lot item Renderer -', function() {
       startingPrice: 1000,
       soldPrice: 1000000
     });
+    // make sure no event will be fired within the tests.
+    mockClock.tick(model.changedEventDelay_ * 2);
     control = new remobid.lots.ui.LotListItem(model);
     renderer = remobid.lots.ui.LotListItemRenderer.getInstance();
     remobid.test.mock.Utilities.clearStack(done);
@@ -85,9 +87,26 @@ describe('UNIT - lot item Renderer -', function() {
             foundElements.length
           );
           assertEquals('template not updated',
-            '€1,000,000.00',
+            '€0.00',
             goog.dom.getTextContent(foundElements[0])
           );
+    });
+
+    it('should have the sold price if finished', function() {
+      model.setFinished(true);
+      var element = renderer.createDom(control);
+      var foundElements = goog.dom.getElementsByClass(
+        'rb-lot-bid',
+        element
+      );
+      assertEquals('element not found or multiple elements found',
+        1,
+        foundElements.length
+      );
+      assertEquals('template not updated',
+        '€1,000,000.00',
+        goog.dom.getTextContent(foundElements[0])
+      );
     });
   });
 
@@ -137,6 +156,18 @@ describe('UNIT - lot item Renderer -', function() {
       mockClock.tick(model.changedEventDelay_);
       assertEquals('template not updated',
         '€299,000.00',
+        goog.dom.getTextContent(foundElements[0])
+      );
+    });
+
+    it('should update the bid', function() {
+      control.createDom();
+      var element = control.getElement();
+      var foundElements = goog.dom.getElementsByClass('rb-lot-bid', element);
+      model.setCurrentBid(99);
+      mockClock.tick(model.changedEventDelay_);
+      assertEquals('template not updated',
+        '€99.00',
         goog.dom.getTextContent(foundElements[0])
       );
     });

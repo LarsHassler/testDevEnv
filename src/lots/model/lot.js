@@ -38,6 +38,13 @@ remobid.lots.model.Lot = function(id) {
   this.startingPrice_ = 0;
 
   /**
+   * the amount of the current bid
+   * @type {number}
+   * @private
+   */
+  this.currentBid_ = 0;
+
+  /**
    * the final bid amount at which the lot got awarded
    * @type {number}
    * @private
@@ -45,11 +52,19 @@ remobid.lots.model.Lot = function(id) {
   this.soldPrice_ = 0;
 
   /**
+   * whenever the binding for this lot is finished.
+   * @type {boolean}
+   * @private
+   */
+  this.finished_ = false;
+
+  /**
    * the sorting value
    * @type {number}
    * @private
    */
   this.sort_ = 0;
+
 
   if (!goog.isDefAndNotNull(remobid.lots.model.Lot.mappings)) {
     goog.object.extend(
@@ -124,6 +139,23 @@ remobid.lots.model.Lot.prototype.setStartingPrice = function(amount) {
     remobid.common.model.ModelBase.attributeMappings.STARTING_PRICE);
 };
 
+/**
+ * @return {number}
+ *    the amount of the current bid.
+ */
+remobid.lots.model.Lot.prototype.getCurrentBid = function() {
+  return this.currentBid_;
+};
+
+/**
+ * @param {number} amount
+ *    the amount of the current bid.
+ */
+remobid.lots.model.Lot.prototype.setCurrentBid = function(amount) {
+  this.currentBid_ = amount;
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.CURRENT_BID);
+};
 
 /**
  * @return {number}
@@ -143,6 +175,27 @@ remobid.lots.model.Lot.prototype.setSoldPrice = function(amount) {
     remobid.common.model.ModelBase.attributeMappings.SOLD_PRICE);
 };
 
+/**
+ * @return {boolean}
+ *    whenever the binding for this lot is finished.
+ */
+remobid.lots.model.Lot.prototype.isFinished = function() {
+  return this.finished_;
+};
+
+/**
+ * @param {boolen} finished
+ *    whenever the binding for this lot is finished.
+ */
+remobid.lots.model.Lot.prototype.setFinished = function(finished) {
+  // status already saved so we can stop here
+  if (this.finished_ === finished)
+    return;
+
+  this.finished_ = finished;
+  this.handleChangedAttribute(
+    remobid.common.model.ModelBase.attributeMappings.FINISHED);
+};
 /** static **/
 
 /**
@@ -219,6 +272,16 @@ remobid.lots.model.Lot.attributeMappings = {
     name: 'soldPrice',
     getter: remobid.lots.model.Lot.prototype.getSoldPrice,
     setter: remobid.lots.model.Lot.prototype.setSoldPrice
+  },
+  FINISHED: {
+    name: 'finished',
+    getter: remobid.lots.model.Lot.prototype.isFinished,
+    setter: remobid.lots.model.Lot.prototype.setFinished
+  },
+  CURRENT_BID: {
+    name: 'currentBid',
+    getter: remobid.lots.model.Lot.prototype.getCurrentBid,
+    setter: remobid.lots.model.Lot.prototype.setCurrentBid
   }
 };
 

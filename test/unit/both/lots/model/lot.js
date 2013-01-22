@@ -101,6 +101,30 @@ describe('UNIT - Lot Model -', function() {
       );
     });
 
+    it('should fire an CHANGE Event on setFinished', function() {
+      Lot.setFinished(true);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+      Lot.setFinished(true);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched even if the value not changed',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire an CHANGE Event on setCurrentBid', function() {
+      Lot.setCurrentBid(109);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
   });
 
   describe('static registry - ', function() {
