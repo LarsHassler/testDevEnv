@@ -27,15 +27,16 @@ remobid.common.ui.list.BaseList = function(
 goog.inherits(remobid.common.ui.list.BaseList,
   goog.ui.Container);
 
-/**
- * @param {remobid.common.model.Collection} model
- *    the collection model for this list view.
- */
-remobid.common.ui.list.BaseList.prototype.setModel = function(model) {
-  if (this.getModel() === model)
-    return;
+/** @override */
+remobid.common.ui.list.BaseList.prototype.disposeInternal = function() {
+  this.removeModelListeners();
+  goog.base(this, 'disposeInternal');
+};
 
-  this.removeChildren(true);
+/**
+ * removes the listeners for ADDED and REMOVED of the list model.
+ */
+remobid.common.ui.list.BaseList.prototype.removeModelListeners = function() {
   if (this.getModel()) {
     goog.events.unlisten(
       this.getModel(),
@@ -52,6 +53,18 @@ remobid.common.ui.list.BaseList.prototype.setModel = function(model) {
       this
     );
   }
+};
+
+/**
+ * @param {remobid.common.model.Collection} model
+ *    the collection model for this list view.
+ */
+remobid.common.ui.list.BaseList.prototype.setModel = function(model) {
+  if (this.getModel() === model)
+    return;
+
+  this.removeChildren(true);
+  this.removeModelListeners();
   goog.base(this, 'setModel', model);
   goog.events.listen(
     model,

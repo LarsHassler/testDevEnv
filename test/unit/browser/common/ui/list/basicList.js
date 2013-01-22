@@ -20,6 +20,39 @@ describe('UNIT - BaseList - ', function() {
     remobid.test.mock.Utilities.clearStack(done);
   });
 
+  describe('dispose - ', function() {
+
+    it('should fully dispose', function() {
+      list.dispose();
+      assertTrue('not fully disposed',
+        list.isDisposed())
+    });
+
+    it('should remove listeners for old model', function() {
+      list.dispose();
+      var addedListener = goog.events.getListener(
+        listModel,
+        remobid.common.model.collection.EventType.ADDED,
+        list.handleModelItemAdded_,
+        false,
+        list
+      );
+      var removedListener = goog.events.getListener(
+        listModel,
+        remobid.common.model.collection.EventType.REMOVED,
+        list.handleModelItemRemoved_,
+        false,
+        list
+      );
+      assertNull('ADDED listener still active',
+        addedListener
+      );
+      assertNull('REMOVED listener still active',
+        removedListener
+      );
+    });
+
+  });
 
   describe('set model - ', function() {
 
