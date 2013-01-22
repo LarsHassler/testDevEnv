@@ -77,7 +77,7 @@ remobid.common.ui.list.BaseList.prototype.setModel = function(model) {
  */
 remobid.common.ui.list.BaseList.prototype.handleModelItemRemoved_ = function(
     event) {
-
+  // TODO implement
 };
 
 /**
@@ -88,5 +88,5 @@ remobid.common.ui.list.BaseList.prototype.handleModelItemRemoved_ = function(
  */
 remobid.common.ui.list.BaseList.prototype.handleModelItemAdded_ = function(
     event) {
-
+  // TODO implement
 };

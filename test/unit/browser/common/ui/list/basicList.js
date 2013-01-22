@@ -23,6 +23,13 @@ describe('UNIT - BaseList - ', function() {
 
   describe('set model - ', function() {
 
+    it('should store the model', function() {
+      assertEquals('wrong model saved',
+        listModel,
+        list.getModel()
+      );
+    });
+
     it('should remove all children on model change', function() {
       var child = new goog.ui.Control('aa');
       list.addChild(child);
