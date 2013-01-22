@@ -74,7 +74,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       var errorType = remobid.common.ui.control.controlBaseRenderer.ErrorType;
       assertEquals('wrong exception thrown',
         errorType.UNKNOWN_BINDING_NAME,
-        exception.message
+        exception.errorType
       );
     });
 
@@ -93,7 +93,7 @@ describe('UNIT - ControlBaseRenderer - ', function() {
       var errorType = remobid.common.ui.control.controlBaseRenderer.ErrorType;
       assertEquals('wrong exception thrown',
         errorType.UNKNOWN_BINDING_METHOD,
-        exception.message
+        exception.errorType
       );
     });
 

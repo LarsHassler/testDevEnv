@@ -8,6 +8,7 @@ goog.provide('remobid.common.ui.control.controlBaseRenderer.bindMethods');
 
 goog.require('goog.soy');
 goog.require('goog.ui.ControlRenderer');
+goog.require('remobid.common.error.BaseError');
 goog.require('remobid.common.ui.control.controlBase.Mapping');
 goog.require('remobid.templates.test');
 
@@ -119,10 +120,11 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
 
     // an unknown mapping name was found
     if (!mapping) {
-      // todo change to remobid error instance
       errorTypes = remobid.common.ui.control.controlBaseRenderer.ErrorType;
-      throw new Error(errorTypes.UNKNOWN_BINDING_NAME);
-      return;
+      throw new remobid.common.error.BaseError(
+        errorTypes.UNKNOWN_BINDING_NAME,
+        name + ' is no valid binding variable'
+      );
     }
 
     var method = bindOptions[1].split(':');
@@ -130,10 +132,11 @@ remobid.common.ui.control.ControlBaseRenderer.prototype.parseNode_ =
     if (!goog.object.containsKey(
           remobid.common.ui.control.controlBaseRenderer.bindMethods,
           method[0])) {
-      // todo change to remobid error instance
       var errorTypes = remobid.common.ui.control.controlBaseRenderer.ErrorType;
-      throw new Error(errorTypes.UNKNOWN_BINDING_METHOD);
-      return;
+      throw new remobid.common.error.BaseError(
+        errorTypes.UNKNOWN_BINDING_METHOD,
+        method[0] + ' is no valid binding method'
+      );
     }
 
     if (!goog.object.containsKey(bindings, name)) {
