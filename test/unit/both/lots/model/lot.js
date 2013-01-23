@@ -65,6 +65,15 @@ describe('UNIT - Lot Model -', function() {
       goog.events.unlistenByKey(lKey);
     });
 
+    it('should fire a CHANGE Event on setAuction', function() {
+      Lot.setAuction({});
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
     it('should fire an CHANGE Event on setLotNo', function() {
       Lot.setLotNo('1004A');
       mockClock.tick(Lot.changedEventDelay_);
@@ -125,6 +134,24 @@ describe('UNIT - Lot Model -', function() {
       );
     });
 
+    it('should fire a CHANGE Event on setSession', function() {
+      Lot.setSession({});
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
+    it('should fire a CHANGE Event on setSort', function() {
+      Lot.setSort(101);
+      mockClock.tick(Lot.changedEventDelay_);
+      assertEquals('event dispatched more then once or not at all',
+        1,
+        dispatchCounter
+      );
+    });
+
   });
 
   describe('static registry - ', function() {
@@ -153,7 +180,7 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should return a new instance if model ' +
-        'was not requested early', function() {
+      'was not requested early', function() {
       remobid.lots.model.Lot.instances_[1] = Lot;
       var returnedLot = remobid.lots.model.Lot.getResourceById(2);
       assertEquals('new instances reference was not saved',

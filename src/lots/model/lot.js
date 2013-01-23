@@ -17,6 +17,13 @@ remobid.lots.model.Lot = function(id) {
   goog.base(this, id);
 
   /**
+   * The auction that the lot belongs to.
+   * @type {String}
+   * @private
+   */
+  this.auction_ = '';
+
+  /**
    * the lot number of this lot
    * @type {string}
    * @private
@@ -59,12 +66,19 @@ remobid.lots.model.Lot = function(id) {
   this.finished_ = false;
 
   /**
+   * The session that the lot belongs to.
+   * @type {Object}
+   * @private
+   */
+  this.session_ = {};
+
+
+  /**
    * the sorting value
    * @type {number}
    * @private
    */
   this.sort_ = 0;
-
 
   if (!goog.isDefAndNotNull(remobid.lots.model.Lot.mappings)) {
     goog.object.extend(
@@ -86,6 +100,26 @@ remobid.lots.model.Lot.prototype.disposeInternal = function() {
 };
 
 /**
+ *
+ * @return {Object}
+ *    The auction, that the lot belongs to.
+ */
+remobid.lots.model.Lot.prototype.getAuction = function() {
+  return this.auction_;
+};
+
+/**
+ *
+ * @param {Object} auction
+ *    The auction, that the lot belogns to.
+ */
+remobid.lots.model.Lot.prototype.setAuction = function(auction) {
+  this.auction_ = auction;
+  this.handleChangedAttribute(
+    remobid.lots.model.Lot.attributeMappings.AUCTION);
+};
+
+/**
  * @return {string}
  *    the lot number of this lot.
  */
@@ -100,7 +134,7 @@ remobid.lots.model.Lot.prototype.getLotNo = function() {
 remobid.lots.model.Lot.prototype.setLotNo = function(lotNo) {
   this.lotNo_ = lotNo;
   this.handleChangedAttribute(
-    remobid.common.model.ModelBase.attributeMappings.LOTNO);
+    remobid.lots.model.Lot.attributeMappings.LOTNO);
 };
 
 /**
@@ -118,11 +152,50 @@ remobid.lots.model.Lot.prototype.getPicture = function() {
 remobid.lots.model.Lot.prototype.setPicture = function(url) {
   this.picture_ = url;
   this.handleChangedAttribute(
-    remobid.common.model.ModelBase.attributeMappings.PICTURE);
+    remobid.lots.model.Lot.attributeMappings.PICTURE);
+};
+
+/**
+ *
+ * @return {Object}
+ *    The Session that the lot belongs to.
+ */
+remobid.lots.model.Lot.prototype.getSession = function() {
+  return this.session_;
+};
+
+/**
+ *
+ * @param {Object} session
+ *    The Session that the lot belogns to.
+ */
+remobid.lots.model.Lot.prototype.setSession = function(session) {
+  this.session_ = session;
+  this.handleChangedAttribute(
+    remobid.lots.model.Lot.attributeMappings.SESSION);
 };
 
 /**
  * @return {number}
+ *    the starting price for this lot.
+ */
+remobid.lots.model.Lot.prototype.getStartingPrice = function() {
+  return this.startingPrice_;
+};
+
+/**
+ * @param {number} amount
+ *    the starting price for this lot.
+ */
+remobid.lots.model.Lot.prototype.setStartingPrice = function(amount) {
+  this.startingPrice_ = amount;
+  this.handleChangedAttribute(
+    remobid.lots.model.Lot.attributeMappings.STARTING_PRICE);
+};
+
+/**
+ * @return {number}
+<<<<<<< HEAD
  *    the starting price for this lot.
  */
 remobid.lots.model.Lot.prototype.getStartingPrice = function() {
@@ -154,7 +227,7 @@ remobid.lots.model.Lot.prototype.getCurrentBid = function() {
 remobid.lots.model.Lot.prototype.setCurrentBid = function(amount) {
   this.currentBid_ = amount;
   this.handleChangedAttribute(
-    remobid.common.model.ModelBase.attributeMappings.CURRENT_BID);
+    remobid.lots.model.Lot.attributeMappings.CURRENT_BID);
 };
 
 /**
@@ -172,7 +245,27 @@ remobid.lots.model.Lot.prototype.getSoldPrice = function() {
 remobid.lots.model.Lot.prototype.setSoldPrice = function(amount) {
   this.soldPrice_ = amount;
   this.handleChangedAttribute(
-    remobid.common.model.ModelBase.attributeMappings.SOLD_PRICE);
+    remobid.lots.model.Lot.attributeMappings.SOLD_PRICE);
+};
+
+/**
+ *
+ * @return {number}
+ *    The position (sorting).
+ */
+remobid.lots.model.Lot.prototype.getSort = function() {
+  return this.sort_;
+};
+
+/**
+ *
+ * @param {number} sort
+ *    Used for sorting.
+ */
+remobid.lots.model.Lot.prototype.setSort = function(sort) {
+  this.sort_ = sort;
+  this.handleChangedAttribute(
+    remobid.lots.model.Lot.attributeMappings.SORT);
 };
 
 /**
@@ -194,7 +287,7 @@ remobid.lots.model.Lot.prototype.setFinished = function(finished) {
 
   this.finished_ = finished;
   this.handleChangedAttribute(
-    remobid.common.model.ModelBase.attributeMappings.FINISHED);
+    remobid.lots.model.Lot.attributeMappings.FINISHED);
 };
 /** static **/
 
@@ -253,15 +346,15 @@ remobid.lots.model.Lot.mappings;
  * @type {Object.<remobid.common.model.modelBase.Mapping>}
  */
 remobid.lots.model.Lot.attributeMappings = {
+  AUCTION: {
+    name: 'auction',
+    getter: remobid.lots.model.Lot.prototype.getAuction,
+    setter: remobid.lots.model.Lot.prototype.setAuction
+  },
   LOTNO: {
     name: 'lotNo',
     getter: remobid.lots.model.Lot.prototype.getLotNo,
     setter: remobid.lots.model.Lot.prototype.setLotNo
-  },
-  PICTURE: {
-    name: 'picture',
-    getter: remobid.lots.model.Lot.prototype.getPicture,
-    setter: remobid.lots.model.Lot.prototype.setPicture
   },
   STARTING_PRICE: {
     name: 'startingPrice',
@@ -273,15 +366,30 @@ remobid.lots.model.Lot.attributeMappings = {
     getter: remobid.lots.model.Lot.prototype.getSoldPrice,
     setter: remobid.lots.model.Lot.prototype.setSoldPrice
   },
-  FINISHED: {
-    name: 'finished',
-    getter: remobid.lots.model.Lot.prototype.isFinished,
-    setter: remobid.lots.model.Lot.prototype.setFinished
-  },
   CURRENT_BID: {
     name: 'currentBid',
     getter: remobid.lots.model.Lot.prototype.getCurrentBid,
     setter: remobid.lots.model.Lot.prototype.setCurrentBid
+  },
+  PICTURE: {
+    name: 'picture',
+    getter: remobid.lots.model.Lot.prototype.getPicture,
+    setter: remobid.lots.model.Lot.prototype.setPicture
+  },
+  SESSION: {
+    name: 'session',
+    getter: remobid.lots.model.Lot.prototype.getSession,
+    setter: remobid.lots.model.Lot.prototype.setSession
+  },
+  SORT: {
+    name: 'sort',
+    getter: remobid.lots.model.Lot.prototype.getSort,
+    setter: remobid.lots.model.Lot.prototype.setSort
+  },
+  FINISHED: {
+    name: 'finished',
+    getter: remobid.lots.model.Lot.prototype.isFinished,
+    setter: remobid.lots.model.Lot.prototype.setFinished
   }
 };
 
