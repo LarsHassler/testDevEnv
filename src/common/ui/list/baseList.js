@@ -30,6 +30,7 @@ goog.inherits(remobid.common.ui.list.BaseList,
 /** @override */
 remobid.common.ui.list.BaseList.prototype.disposeInternal = function() {
   this.removeModelListeners();
+  this.getModel().dispose();
   goog.base(this, 'disposeInternal');
 };
 

@@ -20,12 +20,23 @@ describe('UNIT - BaseList - ', function() {
     remobid.test.mock.Utilities.clearStack(done);
   });
 
+  afterEach(function() {
+    if (!list.isDisposed())
+      list.dispose();
+  });
+
   describe('dispose - ', function() {
 
     it('should fully dispose', function() {
       list.dispose();
       assertTrue('not fully disposed',
         list.isDisposed())
+    });
+
+    it('should dispose of the model', function() {
+      list.dispose();
+      assertTrue('model not disposed',
+        listModel.isDisposed())
     });
 
     it('should remove listeners for old model', function() {
