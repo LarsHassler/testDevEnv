@@ -23,6 +23,14 @@ remobid.common.ui.list.BaseList = function(
   goog.base(this, opt_orientation, opt_renderer, opt_domHelper);
 
   this.setModel(model);
+
+  /**
+   * a hash map from item identifier to the corresponding control for easier
+   * access
+   * @type {Object.<string, remobid.common.ui.control.ControlBase>}
+   * @private
+   */
+  this.item2Control_ = {};
 };
 goog.inherits(remobid.common.ui.list.BaseList,
   goog.ui.Container);
@@ -54,6 +62,14 @@ remobid.common.ui.list.BaseList.prototype.removeModelListeners = function() {
       this
     );
   }
+};
+
+/** @override */
+remobid.common.ui.list.BaseList.prototype.addChildAt = function(
+    child, index, opt_render) {
+  goog.base(this, 'addChildAt', child, index, opt_render);
+  this.item2Control_[child.getModel().getIdentifier()] =
+      child;
 };
 
 /**
@@ -91,7 +107,12 @@ remobid.common.ui.list.BaseList.prototype.setModel = function(model) {
  */
 remobid.common.ui.list.BaseList.prototype.handleModelItemRemoved_ = function(
     event) {
-  // TODO implement
+  var modelItem = event.getItem();
+  this.removeChild(
+    this.item2Control_[modelItem.getIdentifier()],
+    true
+  );
+  delete this.item2Control_[modelItem.getIdentifier()];
 };
 
 /**

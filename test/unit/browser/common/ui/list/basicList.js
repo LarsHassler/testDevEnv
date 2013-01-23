@@ -8,6 +8,7 @@ if (typeof module !== 'undefined' && module.exports)
 goog.require('goog.testing.asserts');
 goog.require('remobid.common.ui.list.BaseList');
 goog.require('remobid.common.model.Collection');
+goog.require('remobid.common.model.ModelBase');
 goog.require('remobid.test.mock.Utilities');
 
 describe('UNIT - BaseList - ', function() {
@@ -76,6 +77,8 @@ describe('UNIT - BaseList - ', function() {
 
     it('should remove all children on model change', function() {
       var child = new goog.ui.Control('aa');
+      var itemModel = new remobid.common.model.ModelBase('1');
+      child.setModel(itemModel);
       list.addChild(child);
       var listModel2 = new remobid.common.model.Collection();
       list.setModel(listModel);
@@ -143,6 +146,29 @@ describe('UNIT - BaseList - ', function() {
 
   });
 
+  describe('event model - ', function() {
 
-  
+    it('should remove the control if an item was' +
+        ' removed from the list model', function() {
+      var child = new goog.ui.Control('aa');
+      var itemModel = new remobid.common.model.ModelBase('1');
+      child.setModel(itemModel);
+      list.addChild(child);
+      listModel.dispatchEvent(new remobid.common.model.collection.Event(
+        remobid.common.model.collection.EventType.REMOVED,
+        itemModel
+       ));
+      assertArrayEquals('child not removed',
+        [],
+        list.children_
+      );
+      assertObjectEquals('child ref not removed',
+        {},
+        list.item2Control_
+      );
+    });
+
+  });
+
+
 });
