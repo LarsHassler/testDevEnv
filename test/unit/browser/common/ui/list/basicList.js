@@ -157,7 +157,7 @@ describe('UNIT - BaseList - ', function() {
       listModel.dispatchEvent(new remobid.common.model.collection.Event(
         remobid.common.model.collection.EventType.REMOVED,
         itemModel
-       ));
+      ));
       assertArrayEquals('child not removed',
         [],
         list.children_
@@ -165,6 +165,26 @@ describe('UNIT - BaseList - ', function() {
       assertObjectEquals('child ref not removed',
         {},
         list.item2Control_
+      );
+    });
+
+    it('should add a control if a new item was' +
+        ' added to the list model', function() {
+      var itemModel = new remobid.common.model.ModelBase('1');
+      listModel.dispatchEvent(new remobid.common.model.collection.Event(
+        remobid.common.model.collection.EventType.ADDED,
+        itemModel
+      ));
+      assertTrue('no control added',
+        goog.isArray(list.children_)
+      );
+      assertEquals('no control added',
+        1,
+        list.children_.length
+      );
+      assertEquals('control has wrong model',
+        itemModel,
+        list.children_[0].getModel()
       );
     });
 

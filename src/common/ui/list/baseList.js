@@ -123,5 +123,7 @@ remobid.common.ui.list.BaseList.prototype.handleModelItemRemoved_ = function(
  */
 remobid.common.ui.list.BaseList.prototype.handleModelItemAdded_ = function(
     event) {
-  // TODO implement
+  var modelItem = event.getItem();
+  var control = new remobid.common.ui.control.ControlBase(modelItem);
+  this.addChild(control);
 };
