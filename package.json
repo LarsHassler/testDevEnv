@@ -13,6 +13,7 @@
     "mysql": "2.0.x"
   },
   "devDependencies": {
-    "mocha": "1.7.x"
+    "mocha": "1.7.x",
+    "testacular": "0.5.x"
   }
 }
