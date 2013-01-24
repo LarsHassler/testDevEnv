@@ -45,7 +45,7 @@ goog.inherits(remobid.common.ui.list.BaseList,
 /** @override */
 remobid.common.ui.list.BaseList.prototype.disposeInternal = function() {
   this.removeModelListeners();
-  this.getModel().dispose();
+  this.getModel().dispose(true);
   goog.base(this, 'disposeInternal');
   this.item2Control_ = null;
 };
@@ -121,6 +121,34 @@ remobid.common.ui.list.BaseList.prototype.addChildAt = function(
   goog.base(this, 'addChildAt', control, index, opt_render);
   this.item2Control_[control.getModel().getIdentifier()] =
       control;
+  goog.events.listen(
+    control.getModel(),
+    remobid.common.model.modelBase.EventType.CHANGED,
+    this.repositionOnModelChange_,
+    false,
+    this
+  );
+};
+
+/**
+ * checks if a control has to be repositioned if the model of the control was
+ * changed.
+ * @param {remobid.common.model.modelBase.Event} event
+ *    the event fired by the model.
+ * @private
+ */
+remobid.common.ui.list.BaseList.prototype.repositionOnModelChange_ = function(
+    event) {
+  var model = event.currentTarget;
+  var control = this.item2Control_[model.getIdentifier()];
+  var currentPosition = this.indexOfChild(control);
+  var prevItem = this.getChildAt(currentPosition - 1);
+  var nextItem = this.getChildAt(currentPosition + 1);
+  if ((prevItem && this.sortFunction_(prevItem, control) !== -1) ||
+      (nextItem && this.sortFunction_(control, nextItem) !== -1)) {
+    this.removeChild(control, true);
+    this.addChild(control, true);
+  }
 };
 
 /**

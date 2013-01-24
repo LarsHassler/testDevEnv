@@ -9,6 +9,7 @@ goog.require('goog.testing.asserts');
 goog.require('remobid.common.ui.list.BaseList');
 goog.require('remobid.common.model.Collection');
 goog.require('remobid.common.model.ModelBase');
+goog.require('remobid.common.ui.control.ControlBase');
 goog.require('remobid.test.mock.Utilities');
 
 describe('UNIT - BaseList - ', function() {
@@ -235,6 +236,45 @@ describe('UNIT - BaseList - ', function() {
         [child1, child2, child3],
         list.children_
       );
+      model1.dispose(true);
+      model2.dispose(true);
+      model3.dispose(true);
+    });
+
+    it('should listen to CHANGED events of the control and' +
+        ' rearrange the sorting if needed', function() {
+      var sortFunction = function(item1, item2) {
+        if(item1.getModel().sort < item2.getModel().sort)
+          return -1;
+        if(item1.getModel().sort > item2.getModel().sort)
+          return 1;
+      };
+      list.setSortFunction(sortFunction);
+      var model1 = new remobid.common.model.ModelBase(1);
+      model1.sort = 1;
+      model1.setAutoStore(false);
+      var child1 = new remobid.common.ui.control.ControlBase(model1);
+      list.addChild(child1);
+      var model2 = new remobid.common.model.ModelBase(2);
+      model2.sort = 2;
+      var child2 = new remobid.common.ui.control.ControlBase(model2);
+      list.addChild(child2);
+      model1.sort = 3;
+      model1.dispatchChangeEvent_();
+      assertArrayEquals('model not resorted',
+        [child2, child1],
+        list.children_
+      );
+      model1.dispose(true);
+      model2.dispose(true);
+    });
+
+  });
+
+  describe('remove control - ', function() {
+
+    it('should unlisten to CHANGED event of the control', function() {
+
     });
 
   });
