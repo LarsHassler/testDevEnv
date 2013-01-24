@@ -63,7 +63,7 @@ goog.inherits(remobid.common.ui.control.ControlBase,
 
 /** @override */
 remobid.common.ui.control.ControlBase.prototype.disposeInternal = function() {
-  this.model_.dispose();
+  this.model_.dispose(true);
   this.mappings_ = null;
   this.bindOptions_ = null;
   goog.base(this, 'disposeInternal');
