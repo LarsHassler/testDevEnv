@@ -47,7 +47,7 @@ describe('UNIT - Lot Model -', function() {
   });
 
   describe('setter Events - ', function() {
-    var dispatchCounter, lKey;
+    var dispatchCounter, dispatchAttribute, lKey;
 
     beforeEach(function() {
       dispatchCounter = 0;
@@ -55,17 +55,23 @@ describe('UNIT - Lot Model -', function() {
       lKey = goog.events.listen(
         Lot,
         remobid.common.model.modelBase.EventType.CHANGED,
-        function() {
+        function(event) {
           dispatchCounter++;
+          assertEquals('wrong attribute dispatched',
+            dispatchAttribute,
+            event.attributes[0].attribute
+          );
         }
       );
     });
 
     afterEach(function() {
+      dispatchAttribute = null;
       goog.events.unlistenByKey(lKey);
     });
 
     it('should fire a CHANGE Event on setAuction', function() {
+      dispatchAttribute = remobid.lots.model.Lot.attributeMappings.AUCTION;
       Lot.setAuction({});
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -75,6 +81,7 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire an CHANGE Event on setLotNo', function() {
+      dispatchAttribute = remobid.lots.model.Lot.attributeMappings.LOTNO;
       Lot.setLotNo('1004A');
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -84,6 +91,7 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire an CHANGE Event on setPicture', function() {
+      dispatchAttribute = remobid.lots.model.Lot.attributeMappings.PICTURE;
       Lot.setPicture('2.jpg');
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -93,6 +101,8 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire an CHANGE Event on setStartingPrice', function() {
+      dispatchAttribute =
+          remobid.lots.model.Lot.attributeMappings.STARTING_PRICE;
       Lot.setStartingPrice(99);
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -102,6 +112,8 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire an CHANGE Event on setSoldPrice', function() {
+      dispatchAttribute =
+        remobid.lots.model.Lot.attributeMappings.SOLD_PRICE;
       Lot.setSoldPrice(99);
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -111,6 +123,8 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire an CHANGE Event on setFinished', function() {
+      dispatchAttribute =
+        remobid.lots.model.Lot.attributeMappings.FINISHED;
       Lot.setFinished(true);
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -126,6 +140,8 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire an CHANGE Event on setCurrentBid', function() {
+      dispatchAttribute =
+        remobid.lots.model.Lot.attributeMappings.CURRENT_BID;
       Lot.setCurrentBid(109);
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -135,6 +151,8 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire a CHANGE Event on setSession', function() {
+      dispatchAttribute =
+        remobid.lots.model.Lot.attributeMappings.SESSION;
       Lot.setSession({});
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
@@ -144,6 +162,8 @@ describe('UNIT - Lot Model -', function() {
     });
 
     it('should fire a CHANGE Event on setSort', function() {
+      dispatchAttribute =
+        remobid.lots.model.Lot.attributeMappings.SORT;
       Lot.setSort(101);
       mockClock.tick(Lot.changedEventDelay_);
       assertEquals('event dispatched more then once or not at all',
