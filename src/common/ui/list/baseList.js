@@ -31,6 +31,13 @@ remobid.common.ui.list.BaseList = function(
    * @private
    */
   this.item2Control_ = {};
+
+  /**
+   * @type {function(remobid.common.ui.control.ControlBase,
+   *  remobid.common.ui.control.ControlBase):number}
+   * @private
+   */
+  this.sortFunction_ = remobid.common.ui.list.BaseList.defaultSortFunction;
 };
 goog.inherits(remobid.common.ui.list.BaseList,
   goog.ui.Container);
@@ -40,6 +47,19 @@ remobid.common.ui.list.BaseList.prototype.disposeInternal = function() {
   this.removeModelListeners();
   this.getModel().dispose();
   goog.base(this, 'disposeInternal');
+  this.item2Control_ = null;
+};
+
+/**
+ * @param {function(remobid.common.ui.control.ControlBase,
+ *  remobid.common.ui.control.ControlBase):number} func
+ *    Compares two given controls and returns their relative position.
+ *    -1 if item2 should be after item1
+ *     0 if both are equal
+ *     1 if item1 should be after item2.
+ */
+remobid.common.ui.list.BaseList.prototype.setSortFunction = function(func) {
+  this.sortFunction_ = func;
 };
 
 /**
@@ -65,11 +85,42 @@ remobid.common.ui.list.BaseList.prototype.removeModelListeners = function() {
 };
 
 /** @override */
+remobid.common.ui.list.BaseList.prototype.addChild = function(
+    control, opt_render) {
+  var position = this.getPosition_(control);
+  this.addChildAt(control, position, opt_render);
+};
+
+/**
+ * Gets the position for a new control within the list.
+ * @param {remobid.common.ui.control.ControlBase} control
+ *    the control to get the position for.
+ * @return {Number}
+ *    0-index position within this list.
+ * @private
+ */
+remobid.common.ui.list.BaseList.prototype.getPosition_ = function(control) {
+  var right = this.getChildCount();
+  if (right === 0 ||
+      this.sortFunction_(control, this.getChildAt(0)) === -1)
+    return 0;
+  if (this.sortFunction_(control, this.getChildAt(right - 1)) === 1)
+    return right;
+
+  var pos = goog.array.binarySearch(
+    this.children_,
+    control,
+    this.sortFunction_
+  );
+  return pos >= 0 ? pos : ~pos;
+};
+
+/** @override */
 remobid.common.ui.list.BaseList.prototype.addChildAt = function(
-    child, index, opt_render) {
-  goog.base(this, 'addChildAt', child, index, opt_render);
-  this.item2Control_[child.getModel().getIdentifier()] =
-      child;
+    control, index, opt_render) {
+  goog.base(this, 'addChildAt', control, index, opt_render);
+  this.item2Control_[control.getModel().getIdentifier()] =
+      control;
 };
 
 /**
@@ -126,4 +177,20 @@ remobid.common.ui.list.BaseList.prototype.handleModelItemAdded_ = function(
   var modelItem = event.getItem();
   var control = new remobid.common.ui.control.ControlBase(modelItem);
   this.addChild(control);
+};
+
+/**
+ * Compares two given controls and returns their relative position.
+ * The default sorting function, will put item2 after item1.
+ * @param {remobid.common.ui.control.ControlBase} item1
+ *    the first item.
+ * @param {remobid.common.ui.control.ControlBase} item2
+ *    the second item.
+ * @return {Number}
+ *   -1 if item2 should be after item1
+ *    0 if both are equal
+ *    1 if item1 should be after item2.
+ */
+remobid.common.ui.list.BaseList.defaultSortFunction = function(item1, item2) {
+  return -1;
 };

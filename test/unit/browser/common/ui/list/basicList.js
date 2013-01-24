@@ -64,6 +64,13 @@ describe('UNIT - BaseList - ', function() {
       );
     });
 
+    it('should remove all references', function() {
+      list.dispose();
+      assertNull('item2control hash map not freed',
+        list.item2Control_
+      );
+    });
+
   });
 
   describe('set model - ', function() {
@@ -190,5 +197,46 @@ describe('UNIT - BaseList - ', function() {
 
   });
 
+  describe('add control - ', function() {
+
+    it('should add them according to the sortFunction', function() {
+      var sortFunction = function(item1, item2) {
+        if(item1.getModel().getIdentifier() < item2.getModel().getIdentifier())
+          return 1;
+        if(item1.getModel().getIdentifier() > item2.getModel().getIdentifier())
+          return -1;
+      };
+      list.setSortFunction(sortFunction);
+      var model1 = new remobid.common.model.ModelBase(1);
+      var child1 = new remobid.common.ui.control.ControlBase(model1);
+      var model2 = new remobid.common.model.ModelBase(2);
+      var child2 = new remobid.common.ui.control.ControlBase(model2);
+      var model3 = new remobid.common.model.ModelBase(3);
+      var child3 = new remobid.common.ui.control.ControlBase(model3);
+      list.addChild(child2);
+      list.addChild(child3);
+      list.addChild(child1);
+      assertArrayEquals('model added in wrong order',
+        [child3, child2, child1],
+        list.children_
+      );
+      list.removeChildren(true);
+      var sortFunction = function(item1, item2) {
+        if(item1.getModel().getIdentifier() < item2.getModel().getIdentifier())
+          return -1;
+        if(item1.getModel().getIdentifier() > item2.getModel().getIdentifier())
+          return 1;
+      };
+      list.setSortFunction(sortFunction);
+      list.addChild(child2);
+      list.addChild(child3);
+      list.addChild(child1);
+      assertArrayEquals('no change with different sortFunction',
+        [child1, child2, child3],
+        list.children_
+      );
+    });
+
+  });
 
 });
