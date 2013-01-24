@@ -116,7 +116,7 @@ remobid.lots.model.Lot.prototype.getAuction = function() {
 remobid.lots.model.Lot.prototype.setAuction = function(auction) {
   this.auction_ = auction;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.AUCTION);
+    remobid.lots.model.Lot.attributeMappings.auction);
 };
 
 /**
@@ -134,7 +134,7 @@ remobid.lots.model.Lot.prototype.getLotNo = function() {
 remobid.lots.model.Lot.prototype.setLotNo = function(lotNo) {
   this.lotNo_ = lotNo;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.LOTNO);
+    remobid.lots.model.Lot.attributeMappings.lotNumber);
 };
 
 /**
@@ -152,7 +152,7 @@ remobid.lots.model.Lot.prototype.getPicture = function() {
 remobid.lots.model.Lot.prototype.setPicture = function(url) {
   this.picture_ = url;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.PICTURE);
+    remobid.lots.model.Lot.attributeMappings.picture);
 };
 
 /**
@@ -172,7 +172,7 @@ remobid.lots.model.Lot.prototype.getSession = function() {
 remobid.lots.model.Lot.prototype.setSession = function(session) {
   this.session_ = session;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.SESSION);
+    remobid.lots.model.Lot.attributeMappings.session);
 };
 
 /**
@@ -190,7 +190,7 @@ remobid.lots.model.Lot.prototype.getStartingPrice = function() {
 remobid.lots.model.Lot.prototype.setStartingPrice = function(amount) {
   this.startingPrice_ = amount;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.STARTING_PRICE);
+    remobid.lots.model.Lot.attributeMappings.startingPrice);
 };
 
 /**
@@ -208,7 +208,7 @@ remobid.lots.model.Lot.prototype.getCurrentBid = function() {
 remobid.lots.model.Lot.prototype.setCurrentBid = function(amount) {
   this.currentBid_ = amount;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.CURRENT_BID);
+    remobid.lots.model.Lot.attributeMappings.currentBid);
 };
 
 /**
@@ -226,7 +226,7 @@ remobid.lots.model.Lot.prototype.getSoldPrice = function() {
 remobid.lots.model.Lot.prototype.setSoldPrice = function(amount) {
   this.soldPrice_ = amount;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.SOLD_PRICE);
+    remobid.lots.model.Lot.attributeMappings.soldPrice);
 };
 
 /**
@@ -246,7 +246,7 @@ remobid.lots.model.Lot.prototype.getSort = function() {
 remobid.lots.model.Lot.prototype.setSort = function(sort) {
   this.sort_ = sort;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.SORT);
+    remobid.lots.model.Lot.attributeMappings.sort);
 };
 
 /**
@@ -268,7 +268,7 @@ remobid.lots.model.Lot.prototype.setFinished = function(finished) {
 
   this.finished_ = finished;
   this.handleChangedAttribute(
-    remobid.lots.model.Lot.attributeMappings.FINISHED);
+    remobid.lots.model.Lot.attributeMappings.finished);
 };
 /** static **/
 
@@ -327,47 +327,47 @@ remobid.lots.model.Lot.mappings;
  * @type {Object.<remobid.common.model.modelBase.Mapping>}
  */
 remobid.lots.model.Lot.attributeMappings = {
-  AUCTION: {
+  'auction': {
     name: 'auction',
     getter: remobid.lots.model.Lot.prototype.getAuction,
     setter: remobid.lots.model.Lot.prototype.setAuction
   },
-  LOTNO: {
-    name: 'lotNo',
+  'lotNumber': {
+    name: 'lotNumber',
     getter: remobid.lots.model.Lot.prototype.getLotNo,
     setter: remobid.lots.model.Lot.prototype.setLotNo
   },
-  STARTING_PRICE: {
+  'startingPrice': {
     name: 'startingPrice',
     getter: remobid.lots.model.Lot.prototype.getStartingPrice,
     setter: remobid.lots.model.Lot.prototype.setStartingPrice
   },
-  SOLD_PRICE: {
+  'soldPrice': {
     name: 'soldPrice',
     getter: remobid.lots.model.Lot.prototype.getSoldPrice,
     setter: remobid.lots.model.Lot.prototype.setSoldPrice
   },
-  CURRENT_BID: {
+  'currentBid': {
     name: 'currentBid',
     getter: remobid.lots.model.Lot.prototype.getCurrentBid,
     setter: remobid.lots.model.Lot.prototype.setCurrentBid
   },
-  PICTURE: {
+  'picture': {
     name: 'picture',
     getter: remobid.lots.model.Lot.prototype.getPicture,
     setter: remobid.lots.model.Lot.prototype.setPicture
   },
-  SESSION: {
+  'session': {
     name: 'session',
     getter: remobid.lots.model.Lot.prototype.getSession,
     setter: remobid.lots.model.Lot.prototype.setSession
   },
-  SORT: {
+  'sort': {
     name: 'sort',
     getter: remobid.lots.model.Lot.prototype.getSort,
     setter: remobid.lots.model.Lot.prototype.setSort
   },
-  FINISHED: {
+  'finished': {
     name: 'finished',
     getter: remobid.lots.model.Lot.prototype.isFinished,
     setter: remobid.lots.model.Lot.prototype.setFinished
