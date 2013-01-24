@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "nclosure": "0.4.x",
-    "mysql": "2.0.x"
+    "mysql": "2.0.x",
+    "restify": "2.0.x"
   },
   "devDependencies": {
     "mocha": "1.7.x",
