@@ -218,10 +218,33 @@ remobid.common.ui.list.BaseList.prototype.removeChild = function(
 remobid.common.ui.list.BaseList.prototype.handleModelItemAdded_ = function(
     event) {
   var modelItem = event.getItem();
-  var control = new remobid.common.ui.control.ControlBase(modelItem);
-  this.addChild(control);
+  var control = this.getUiControl_(modelItem);
+  this.addChild(control, true);
 };
 
+/**
+ * overrides the {@code getUiControl_} function to enable different controls.
+ * @param {function(remobid.common.model.ModelBase):
+ *  remobid.common.ui.control.ControlBase} func
+ *    the new function.
+ */
+remobid.common.ui.list.BaseList.prototype.overrideControlFunction = function(
+    func) {
+  this.getUiControl_ = func;
+};
+
+/**
+ * returns the ui control to use for a given model.
+ * @param {remobid.common.model.ModelBase} model
+ *    the model to get the UI for.
+ * @return {remobid.common.ui.control.ControlBase}
+ *    the corresponding control to add into the list.
+ * @private
+ */
+remobid.common.ui.list.BaseList.prototype.getUiControl_ = function(
+  model) {
+  return new remobid.common.ui.control.ControlBase(model);
+};
 /**
  * Compares two given controls and returns their relative position.
  * The default sorting function, will put item2 after item1.
