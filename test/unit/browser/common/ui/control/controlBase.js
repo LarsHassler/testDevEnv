@@ -99,10 +99,6 @@ describe('UNIT - ControlBase -', function() {
         eventHandlerCount++;
       };
       control.setModel(model2);
-      assertEquals('listeners not set on Handler of the control',
-        controlCount + 1,
-        control.getHandler().getListenerCount()
-      );
       model2.dispatchEvent(remobid.common.model.modelBase.EventType.CHANGED);
       assertEquals('callback for CHANGED event not called',
         1,

@@ -79,7 +79,7 @@ remobid.common.ui.control.ControlBase.prototype.disposeInternal = function() {
 remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
   var oldModel = this.getModel();
   if (oldModel) {
-    this.getHandler()
+    goog.events
       .unlisten(
       oldModel,
       remobid.common.model.modelBase.EventType.CHANGED,
@@ -91,7 +91,7 @@ remobid.common.ui.control.ControlBase.prototype.setModel = function(model) {
   }
 
   model.increaseReferenceCounter();
-  this.getHandler()
+  goog.events
     .listen(
       model,
       remobid.common.model.modelBase.EventType.CHANGED,
