@@ -274,7 +274,23 @@ describe('UNIT - BaseList - ', function() {
   describe('remove control - ', function() {
 
     it('should unlisten to CHANGED event of the control', function() {
-
+      var model1 = new remobid.common.model.ModelBase(1);
+      var child1 = new remobid.common.ui.control.ControlBase(model1);
+      list.addChild(child1);
+      var listenerCounter = goog.events.getListeners(
+        model1,
+        remobid.common.model.modelBase.EventType.CHANGED,
+        false
+      ).length;
+      list.removeChild(child1);
+      assertEquals('listener not removed',
+        listenerCounter - 1,
+        goog.events.getListeners(
+          model1,
+          remobid.common.model.modelBase.EventType.CHANGED,
+          false
+        ).length
+      );
     });
 
   });

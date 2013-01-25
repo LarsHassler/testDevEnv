@@ -5,6 +5,8 @@
 goog.provide('remobid.common.ui.list.BaseList');
 
 goog.require('goog.ui.Container');
+goog.require('remobid.common.model.collection.EventType');
+goog.require('remobid.common.ui.control.ControlBase');
 
 /**
  * @param {remobid.common.model.Collection} model
@@ -45,7 +47,7 @@ goog.inherits(remobid.common.ui.list.BaseList,
 /** @override */
 remobid.common.ui.list.BaseList.prototype.disposeInternal = function() {
   this.removeModelListeners();
-  this.getModel().dispose(true);
+  this.getModel().dispose();
   goog.base(this, 'disposeInternal');
   this.item2Control_ = null;
 };
@@ -191,7 +193,20 @@ remobid.common.ui.list.BaseList.prototype.handleModelItemRemoved_ = function(
     this.item2Control_[modelItem.getIdentifier()],
     true
   );
-  delete this.item2Control_[modelItem.getIdentifier()];
+};
+
+/** @override */
+remobid.common.ui.list.BaseList.prototype.removeChild = function(
+    child, opt_unrender) {
+  delete this.item2Control_[child.getModel().getIdentifier()];
+  this.getHandler().unlisten(
+    child.getModel(),
+    remobid.common.model.modelBase.EventType.CHANGED,
+    this.repositionOnModelChange_,
+    false,
+    this
+  );
+  goog.base(this, 'removeChild', child, opt_unrender);
 };
 
 /**
