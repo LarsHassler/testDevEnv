@@ -242,9 +242,10 @@ remobid.common.ui.list.BaseList.prototype.overrideControlFunction = function(
  * @private
  */
 remobid.common.ui.list.BaseList.prototype.getUiControl_ = function(
-  model) {
+    model) {
   return new remobid.common.ui.control.ControlBase(model);
 };
+
 /**
  * Compares two given controls and returns their relative position.
  * The default sorting function, will put item2 after item1.
